@@ -2,9 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
-      "/posts/post-with-code/index.html",
-      "/posts/welcome/index.html",
-      "/posts/nb_blog/dt.html"
+      "/posts/2025-05-04-decision-trees-basics/1_basic_decision_tree_for_classification.html"
     ]
   }
 ]
