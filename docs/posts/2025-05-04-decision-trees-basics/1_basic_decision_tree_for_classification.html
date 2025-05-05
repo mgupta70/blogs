@@ -8,6 +8,7 @@
 
 <meta name="author" content="Mohit Gupta">
 <meta name="dcterms.date" content="2025-05-01">
+<meta name="description" content="Understanding and implementing core concepts related to decision trees.">
 
 <title>Decision Trees Made Easy – AI Blogs</title>
 <style>
@@ -164,7 +165,12 @@ gtag('config', 'G-YQ6KB81L7R', { 'anonymize_ip': true});
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <h1 class="title">Decision Trees Made Easy</h1>
-                                <div class="quarto-categories">
+                  <div>
+        <div class="description">
+          Understanding and implementing core concepts related to decision trees.
+        </div>
+      </div>
+                          <div class="quarto-categories">
                 <div class="quarto-category">machine learning</div>
               </div>
                   </div>
@@ -208,15 +214,16 @@ gtag('config', 'G-YQ6KB81L7R', { 'anonymize_ip': true});
 
 
 
-<div id="cell-1" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_iris</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pprint <span class="im">import</span> pprint</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>In this notebook, we will be building a basic decision tree to learn and familiarize ourselves with various governing foundational concepts about decision trees. For this, we will use a relatively simple dataframe containing purely numerical features for the task of <strong>classification</strong>. As our understanding about decision trees expands, we will extend the concepts learned here to handle complex and challenging dataframes (such as those with missing values, with categorical features, etc.)</p>
 <p>Let’s load the popular iris data. (We are using sklearn only and only to load a popular benchmark dataset. We will not use it to build decision trees. Instead, we will build our decision trees entirely from scratch in using numpy)</p>
+<p>In this notebook, we will be building a basic decision tree to learn and familiarize ourselves with various governing foundational concepts about decision trees. For this, we will use a relatively simple dataframe containing purely numerical features for the task of <strong>classification</strong>. As our understanding about decision trees expands, we will extend the concepts learned here to handle complex and challenging dataframes (such as those with missing values, with categorical features, etc.)</p>
+<div id="cell-3" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import necessary libraries</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_iris</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pprint <span class="im">import</span> pprint</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <div id="cell-4" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load the data</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>iris_data <span class="op">=</span> load_iris()</span>
