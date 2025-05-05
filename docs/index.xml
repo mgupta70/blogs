@@ -1,0 +1,1468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>AI Blogs</title>
+<link>https://mgupta70.github.io/</link>
+<atom:link href="https://mgupta70.github.io/index.xml" rel="self" type="application/rss+xml"/>
+<description>AI/ML blogs from Mohit, Ph.D. Computer Vision</description>
+<generator>quarto-1.8.1</generator>
+<lastBuildDate>Thu, 01 May 2025 07:00:00 GMT</lastBuildDate>
+<item>
+  <title>Decision Trees Made Easy</title>
+  <dc:creator>Mohit Gupta</dc:creator>
+  <link>https://mgupta70.github.io/posts/2025-05-04-decision-trees-basics/1_basic_decision_tree_for_classification.html</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<div id="cell-1" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> numpy <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> np</span>
+<span id="cb1-2"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pandas <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> pd</span>
+<span id="cb1-3"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> matplotlib.pyplot <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> plt</span>
+<span id="cb1-4"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> sklearn.datasets <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> load_iris</span>
+<span id="cb1-5"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> pprint <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pprint</span></code></pre></div>
+</div>
+<p>In this notebook, we will be building a basic decision tree to learn and familiarize ourselves with various governing foundational concepts about decision trees. For this, we will use a relatively simple dataframe containing purely numerical features for the task of <strong>classification</strong>. As our understanding about decision trees expands, we will extend the concepts learned here to handle complex and challenging dataframes (such as those with missing values, with categorical features, etc.)</p>
+<p>Let’s load the popular iris data. (We are using sklearn only and only to load a popular benchmark dataset. We will not use it to build decision trees. Instead, we will build our decision trees entirely from scratch in using numpy)</p>
+<div id="cell-4" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># load the data</span></span>
+<span id="cb2-2">iris_data <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> load_iris()</span>
+<span id="cb2-3">X <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> iris_data.data</span>
+<span id="cb2-4">y <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> iris_data.target</span>
+<span id="cb2-5"></span>
+<span id="cb2-6"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Here X and y are numpy arrays. We do a bit of processing to convert X and y into pandas dataframe for readability</span></span>
+<span id="cb2-7">feature_names <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> iris_data.feature_names</span>
+<span id="cb2-8">target_names <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> iris_data.target_names</span>
+<span id="cb2-9"></span>
+<span id="cb2-10">df <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.DataFrame(X, columns<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>feature_names) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># start df with features i.e. X</span></span>
+<span id="cb2-11">df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'target'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> y                            <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># add target column to df i.e. y</span></span>
+<span id="cb2-12"></span>
+<span id="cb2-13">df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'target'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'target'</span>].<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">apply</span>(<span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">lambda</span> x: target_names[x]) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Optional: convert integer labels to actual class names</span></span>
+<span id="cb2-14">df.head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">sepal length (cm)</th>
+<th data-quarto-table-cell-role="th">sepal width (cm)</th>
+<th data-quarto-table-cell-role="th">petal length (cm)</th>
+<th data-quarto-table-cell-role="th">petal width (cm)</th>
+<th data-quarto-table-cell-role="th">target</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>5.1</td>
+<td>3.5</td>
+<td>1.4</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>4.9</td>
+<td>3.0</td>
+<td>1.4</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>4.7</td>
+<td>3.2</td>
+<td>1.3</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>4.6</td>
+<td>3.1</td>
+<td>1.5</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5.0</td>
+<td>3.6</td>
+<td>1.4</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Now, we will build a decision tree which when given 4 numerical feature values will classify the plant species as one of <code>'setosa', 'versicolor', 'virginica'</code>.</p>
+<p>For this, we first need to split the data into train and val sets. Then we will use the train set to build the model and test it on the val set.</p>
+<div id="cell-6" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> train_test_split_df(df, test_size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.2</span>, random_state<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">42</span>):</span>
+<span id="cb3-2">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">""" splits the data into train and test sets"""</span></span>
+<span id="cb3-3"></span>
+<span id="cb3-4">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">isinstance</span>(test_size, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">float</span>) <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">and</span> test_size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>:</span>
+<span id="cb3-5">        test_size <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">int</span>(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(df)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>test_size)</span>
+<span id="cb3-6">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">elif</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">isinstance</span>(test_size, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">int</span>):</span>
+<span id="cb3-7">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">pass</span></span>
+<span id="cb3-8">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span>:</span>
+<span id="cb3-9">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">raise</span> <span class="pp" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">ValueError</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"test size must be a float/ int"</span>)</span>
+<span id="cb3-10">    </span>
+<span id="cb3-11">    shuffled_indices <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.permutation(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(df))</span>
+<span id="cb3-12">    test_indices <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> shuffled_indices[:test_size]</span>
+<span id="cb3-13">    test_df <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df.iloc[test_indices]</span>
+<span id="cb3-14">    train_df <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df.drop(test_indices)</span>
+<span id="cb3-15">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> train_df, test_df</span></code></pre></div>
+</div>
+<div id="cell-7" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1">train_df, test_df <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> train_test_split_df(df, test_size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">20</span>, random_state<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>)</span>
+<span id="cb4-2"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">f'Train size: </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(train_df)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">, Test size: </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(test_df)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span>)</span>
+<span id="cb4-3">train_df.head()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Train size: 130, Test size: 20</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">sepal length (cm)</th>
+<th data-quarto-table-cell-role="th">sepal width (cm)</th>
+<th data-quarto-table-cell-role="th">petal length (cm)</th>
+<th data-quarto-table-cell-role="th">petal width (cm)</th>
+<th data-quarto-table-cell-role="th">target</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>4.9</td>
+<td>3.0</td>
+<td>1.4</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2</td>
+<td>4.7</td>
+<td>3.2</td>
+<td>1.3</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3</td>
+<td>4.6</td>
+<td>3.1</td>
+<td>1.5</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5.0</td>
+<td>3.6</td>
+<td>1.4</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5</td>
+<td>5.4</td>
+<td>3.9</td>
+<td>1.7</td>
+<td>0.4</td>
+<td>setosa</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>To build a decision tree, the dataset is split into 2 subsets using a condition - where one subset satisfies the condition and another does not.</p>
+<p>The condition is nothing but thresholding of one the features. (For example, condition: <code>sepal lenghth &lt;= 4.4 cms</code> will split the dataset into 2 subsets - one where <code>sepal lenghth</code> is less than 4.4 cms and another where it is not)</p>
+<p><strong>The main question here is how we decide which feature to use and what threshold to pick?</strong></p>
+<p>Answer: Pick the feature which results in most <code>information gain</code>.</p>
+<p>Now to understand the above term <code>information gain</code>, we need to first familiarize ourselves with few more concepts.</p>
+<ol type="1">
+<li><p><code>Purity</code> - Measure of homogenity of a subset. For ex: if a data subset contains only red balls - it is pure. But if it contains even a single green ball - it is now impure. The extent of impurity is measured using <code>entropy</code>.</p></li>
+<li><p><code>Entropy</code> - calculated as:</p>
+<pre><code>  H(X) = — Σ (pi * log2 pi)</code></pre></li>
+</ol>
+<p>where; X = Total number of samples, and, pi is the probability of class i</p>
+<p><strong>Pure dataset:</strong> - One which contains elements belonging to single class. For e.g.: All red balls - For a pure dataset: entropy = 0</p>
+<p><strong>Most Impure dataset:</strong> - One which contains elements distributed equally among other classes. For e.g.: 10 blue balls and 10 red balls - For the most impure subset: entropy = 1</p>
+<ol start="3" type="1">
+<li><p><code>Information Gain</code> - If we split the dataset, then the entropy (i.e.&nbsp;degree of impurity) in the children subsets should ideally be lower. This reduction in entropy is the information gain.</p>
+<pre><code> Information Gain = entropy (parent) — [average entropy of ( children)]</code></pre></li>
+</ol>
+<p>Now, based on the above concepts, we will split the dataset, using the feature that results in highest information gain.</p>
+<p><strong>And how we do this?</strong></p>
+<p>Answer: Brute Force. Yes, Brute Force… We go through all the feature columns one at a time and for each feature column, we go through all of their possible values one at a time, splitting the data into 2 children nodes, calculating information gain, storing it and then pick one which gave us the highest information gain.</p>
+<p>We repeat this process, either a fixed number of times or until the entropy of children becomes zero (i.e.&nbsp;children subsets become pure) and then we stop.</p>
+<p>Let’s see this step by step…</p>
+<div id="cell-10" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># let's check the purity of our current data</span></span>
+<span id="cb8-2"></span>
+<span id="cb8-3"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> check_purity(df: pd.DataFrame) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-&gt;</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">bool</span>:</span>
+<span id="cb8-4">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">"""</span></span>
+<span id="cb8-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">    Check if data is pure.</span></span>
+<span id="cb8-6"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">    """</span></span>
+<span id="cb8-7">    y <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df.iloc[:, <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]</span>
+<span id="cb8-8">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(y.unique())<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span></span>
+<span id="cb8-9"></span>
+<span id="cb8-10"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Is the train data pure? -&gt;'</span>, check_purity(train_df))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Is the train data pure? -&gt; False</code></pre>
+</div>
+</div>
+<p>As it is not pure. Let’s see how much <em>impure</em> it is by calculating entropy.</p>
+<div id="cell-12" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> calculate_entropy(df: pd.DataFrame) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-&gt;</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">float</span>:</span>
+<span id="cb10-2">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">"""</span></span>
+<span id="cb10-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">    Calculates the entropy of the data. Entropy =  — Σ (pi * log2 pi)</span></span>
+<span id="cb10-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">    """</span></span>
+<span id="cb10-5">    y <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df.iloc[:, <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]</span>
+<span id="cb10-6">    values, counts <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.unique(y, return_counts<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>)</span>
+<span id="cb10-7">    probs <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> counts<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(y)</span>
+<span id="cb10-8">    entropy <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">sum</span>(probs<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>np.log2(probs))</span>
+<span id="cb10-9">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> entropy</span>
+<span id="cb10-10"></span>
+<span id="cb10-11">parent_entropy <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> calculate_entropy(train_df)</span>
+<span id="cb10-12"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">f"Entropy of parent node: </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>parent_entropy<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Entropy of parent node: 1.5848773505329046</code></pre>
+</div>
+</div>
+<p>Now, let’s see the details of how we will split the data. The code below should be very straightforward and intuitive to understand.</p>
+<p>As mentioned, now (1) we will go through all features and their all possible values to split the dataset and then (2)check the information gain. SO, let’s first create the function called <code>get_potential_splits</code> that does (1) for us and then we will implement <code>determine_best_split</code> that will do (2) for us.</p>
+<div id="cell-14" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Function (1)</span></span>
+<span id="cb12-2"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> get_potential_splits(df: pd.DataFrame) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-&gt;</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">dict</span>:</span>
+<span id="cb12-3">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">"""</span></span>
+<span id="cb12-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">    Get all the possible potential splits of the data.</span></span>
+<span id="cb12-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">    """</span></span>
+<span id="cb12-6">    potential_splits <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> {}</span>
+<span id="cb12-7">    _, n_columns <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df.shape</span>
+<span id="cb12-8">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> column_index <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(n_columns <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>): <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># -1 to skip the target column</span></span>
+<span id="cb12-9">        values <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df.iloc[:, column_index]</span>
+<span id="cb12-10">        unique_values <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.unique(values)</span>
+<span id="cb12-11">        potential_splits[column_index] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> [] <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># initialize a list for storing possible split values per column aka feature</span></span>
+<span id="cb12-12"></span>
+<span id="cb12-13">        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># using mid-points between 2 consecutive unique values to split the data</span></span>
+<span id="cb12-14">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(unique_values)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>):</span>
+<span id="cb12-15">            split_value <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> (unique_values[i]<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span>unique_values[i<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>])<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span></span>
+<span id="cb12-16">            potential_splits[column_index].append(split_value)</span>
+<span id="cb12-17">        </span>
+<span id="cb12-18">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> potential_splits</span>
+<span id="cb12-19"></span>
+<span id="cb12-20"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># let's see the potential splits for our data</span></span>
+<span id="cb12-21">potential_splits <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> get_potential_splits(train_df)</span>
+<span id="cb12-22"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Potential splits for each feature column:"</span>)</span>
+<span id="cb12-23"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(potential_splits)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Potential splits for each feature column:
+{0: [4.35, 4.45, 4.55, 4.65, 4.75, 4.85, 4.95, 5.05, 5.15, 5.25, 5.35, 5.45, 5.55, 5.65, 5.75, 5.85, 5.95, 6.05, 6.15, 6.25, 6.35, 6.45, 6.55, 6.65, 6.75, 6.85, 7.0, 7.15, 7.25, 7.35, 7.5, 7.65], 1: [2.1, 2.25, 2.3499999999999996, 2.45, 2.55, 2.6500000000000004, 2.75, 2.8499999999999996, 2.95, 3.05, 3.1500000000000004, 3.25, 3.3499999999999996, 3.45, 3.55, 3.6500000000000004, 3.75, 3.8499999999999996, 4.0, 4.15], 2: [1.05, 1.2000000000000002, 1.35, 1.45, 1.55, 1.65, 1.7999999999999998, 2.45, 3.15, 3.4, 3.55, 3.6500000000000004, 3.75, 3.8499999999999996, 3.95, 4.05, 4.15, 4.25, 4.35, 4.45, 4.55, 4.65, 4.75, 4.85, 4.95, 5.05, 5.15, 5.25, 5.35, 5.45, 5.55, 5.65, 5.75, 5.85, 5.95, 6.05, 6.199999999999999, 6.449999999999999, 6.65, 6.800000000000001], 3: [0.15000000000000002, 0.25, 0.35, 0.45, 0.55, 0.8, 1.05, 1.15, 1.25, 1.35, 1.45, 1.55, 1.65, 1.75, 1.85, 1.95, 2.05, 2.1500000000000004, 2.25, 2.3499999999999996, 2.45]}</code></pre>
+</div>
+</div>
+<p>0: above is first column i.e.&nbsp;<code>sepal length (cms)</code>, 1: is second column and so on.</p>
+<p>Now, we have find all the possible ways to split the data (mentioned as (1))</p>
+<p>Now, let’s see how to get the best split by developing <code>determine_best_split</code> (mentioned as (2)). For this, first create a function (2-1) that will split the data into 2 parts given a feature and its value. Then, we will use this function to split the data for all possible combinations, calculate information gain and pick the one that gives highest information gain (2-2).</p>
+<div id="cell-17" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Function (2-1)</span></span>
+<span id="cb14-2"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> split_data(df: pd.DataFrame, split_column: <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">int</span>, split_value: <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">float</span>) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-&gt;</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">tuple</span>[pd.DataFrame, pd.DataFrame]:</span>
+<span id="cb14-3">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">""" </span></span>
+<span id="cb14-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">    SPlit the data into 2 subsets based on split column and split value.</span></span>
+<span id="cb14-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">        split_column (int) : column index</span></span>
+<span id="cb14-6"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">    """</span></span>
+<span id="cb14-7">    split_column_values <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df.iloc[:, split_column]</span>
+<span id="cb14-8">    left_split <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df[split_column_values <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> split_value]</span>
+<span id="cb14-9">    right_split <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df[split_column_values <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> split_value]</span>
+<span id="cb14-10"></span>
+<span id="cb14-11">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> left_split, right_split</span>
+<span id="cb14-12"></span>
+<span id="cb14-13"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Functions (2-2)</span></span>
+<span id="cb14-14"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> determine_best_split(df: pd.DataFrame, potential_splits: <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">dict</span>) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-&gt;</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">tuple</span>[<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">int</span>, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">float</span>]:</span>
+<span id="cb14-15">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">"""</span></span>
+<span id="cb14-16"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">    Determine the best split column and its value.</span></span>
+<span id="cb14-17"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">    """</span></span>
+<span id="cb14-18">    best_split_column <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">None</span></span>
+<span id="cb14-19">    best_split_value <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">None</span></span>
+<span id="cb14-20">    best_info_gain <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span></span>
+<span id="cb14-21">    parent_entropy <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> calculate_entropy(df) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Parent Entropy</span></span>
+<span id="cb14-22">    </span>
+<span id="cb14-23">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># (Recursive)Iterate over all possible combinations of columns and their split values</span></span>
+<span id="cb14-24">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> column_index <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> potential_splits.keys():</span>
+<span id="cb14-25">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> split_value <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> potential_splits[column_index]:</span>
+<span id="cb14-26">            left_split, right_split <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> split_data(df, column_index, split_value)</span>
+<span id="cb14-27">            average_children_entropy <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> calculate_average_children_entropy(left_split, right_split)</span>
+<span id="cb14-28">            information_gain <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> parent_entropy <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> average_children_entropy</span>
+<span id="cb14-29">            <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># print("Column:", iris_data.feature_names[column_index], "Split value:", split_value, "Information gain:", information_gain)</span></span>
+<span id="cb14-30">            </span>
+<span id="cb14-31">            <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># pick the one with highest information gain</span></span>
+<span id="cb14-32">            <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> information_gain <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> best_info_gain:</span>
+<span id="cb14-33">                best_info_gain <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> information_gain</span>
+<span id="cb14-34">                best_split_column <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> column_index</span>
+<span id="cb14-35">                best_split_value <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> split_value</span>
+<span id="cb14-36">        </span>
+<span id="cb14-37">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#print("Best Information Gain:", best_info_gain)</span></span>
+<span id="cb14-38">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> best_split_column, best_split_value</span>
+<span id="cb14-39"></span>
+<span id="cb14-40"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> calculate_average_children_entropy(left_split: pd.DataFrame, right_split: pd.DataFrame) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-&gt;</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">float</span>:</span>
+<span id="cb14-41">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">"""</span></span>
+<span id="cb14-42"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">    Calculates the overall entropy of the data after splitting i.e. average entropy of the children nodes</span></span>
+<span id="cb14-43"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">    overall entropy = weighted average of children entropies = Σ (p_c * E(c))</span></span>
+<span id="cb14-44"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">    """</span></span>
+<span id="cb14-45">    n <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(left_split) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(right_split) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># total size of data</span></span>
+<span id="cb14-46">    w_left <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(left_split)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> n            <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># relative weight of left data</span></span>
+<span id="cb14-47">    w_right <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(right_split)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> n          <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># relative weight of right data</span></span>
+<span id="cb14-48">    overall_entropy <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> w_left <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> calculate_entropy(left_split) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> w_right <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> calculate_entropy(right_split)</span>
+<span id="cb14-49">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> overall_entropy</span></code></pre></div>
+</div>
+<p>Above 2 functions should be straightforward to understand. Only new concept is: to get entropy of data after split - we calculate it as average weighted entropy of children nodes.</p>
+<p>(uncomment the print the statement in <code>determine_best_split</code>, if interested to see information gain for all possible splits)</p>
+<div id="cell-20" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1">best_split_column, best_split_value <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> determine_best_split(train_df, potential_splits)</span>
+<span id="cb15-2"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Best split column:"</span>, iris_data.feature_names[best_split_column], <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"with value:"</span>, best_split_value)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Best split column: petal length (cm) with value: 2.45</code></pre>
+</div>
+</div>
+<p>Note: The result one gets could be different if the <code>seed</code>/ <code>random_state</code> in <code>train_val_split_df</code> is changed (because it will change the underlying training data i.e.&nbsp;<code>train_df</code>)</p>
+<p>The result I got: <code>Best split column: petal length (cm) with value: 2.45</code></p>
+<p>Now, let’s create the splits</p>
+<div id="cell-22" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1">left_branch <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> train_df[train_df.iloc[:, best_split_column] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> best_split_value] <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># branch that satisfies the condition: petal length (cm) &lt;= 2.45</span></span>
+<span id="cb17-2">right_branch <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> train_df[train_df.iloc[:, best_split_column] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> best_split_value]</span>
+<span id="cb17-3"></span>
+<span id="cb17-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># # or, we could also do</span></span>
+<span id="cb17-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># left_branch, right_branch = split_data(train_df, best_split_column, best_split_value)</span></span></code></pre></div>
+</div>
+<p>Let’s verify that after splitting the data has less impurity that is it has less entropy.</p>
+<p>(How do we do that? - By calculating weighted average entropy of children nodes)</p>
+<div id="cell-24" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">f"Before splitting,  Entropy: </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>parent_entropy<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span>
+<span id="cb18-2"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">f"After splitting,  Entropy: </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>calculate_average_children_entropy(left_branch, right_branch)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Before splitting,  Entropy: 1.5848773505329046
+After splitting,  Entropy: 0.6691669882046775</code></pre>
+</div>
+</div>
+<p>So, this verifies that our splitting was good.</p>
+<p>Let’s see if either of the child node (i.e.&nbsp;data split) is pure</p>
+<div id="cell-27" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1">check_purity(left_branch), check_purity(right_branch)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>(True, False)</code></pre>
+</div>
+</div>
+<p>Wow! our <code>left_branch</code> is pure i.e.&nbsp;it contains all the datapoints that has single class. Thus, it would not need any further splitting.</p>
+<p>Whereas <code>right_brach</code> is not pure i.e.&nbsp;it contains datapoints from multiple classes. Thus, it would need further splitting.</p>
+<div id="cell-29" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1">np.unique(left_branch.target) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># see classes in left_branch</span></span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>array(['setosa'], dtype=object)</code></pre>
+</div>
+</div>
+<div id="cell-30" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb24" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1">np.unique(right_branch.target, return_counts<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>)  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># see classes in right_branch</span></span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<pre><code>(array(['versicolor', 'virginica'], dtype=object),
+ array([43, 44], dtype=int64))</code></pre>
+</div>
+</div>
+<p>Based on just one condition, we can create a small subtree as follows:</p>
+<p><code>sub_tree = {"condition" : ["left_split_answer", "right_split_answer"]}</code></p>
+<p>If we suppose if this small sub-tree is our final decision tree which we want to use for testing. So, if we were to classify one <code>test_example</code> as input, we will check it’s petal length, see if it is less than &lt;= 2.45 cm, we will return <code>setosa</code> as the class, else, we will pick the class with higher relative probability in the <code>right_branch</code> as the predicted class.</p>
+<div id="cell-33" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># In plain english </span></span>
+<span id="cb26-2">sub_tree <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> { <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"petal length (cm) &lt;= 2.45"</span> : [<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"setosa"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"versicolor"</span>]} <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># right split is versicolor because it is dominant in right_branch</span></span></code></pre></div>
+</div>
+<p>Almost Never, we create decision tree with only a single condition i.e.&nbsp;2 child nodes. Usually a decision tree is composed of multiple sub-trees composing multiple conditons.</p>
+<p>Programatically speaking, we repeat the process of splitting for both the <code>left_branch</code> and <code>right_branch</code> until we reach the stopping condition:</p>
+<ol type="1">
+<li>child nodes become pure</li>
+<li>a fixed number of steps by setting hyperparameters like <code>max_depth</code>, <code>min_samples</code>, etc.</li>
+</ol>
+<p><strong>Note:</strong> There should not be any doubt/confusion when I say that the condition for splitting a <code>left_branch</code> and <code>right_branch</code> belonging to same parent node could be completely different (because it depends upon the data distribution within the child node).</p>
+<p>Let’s build a full-fledged decision tree programatically using concepts of dynamic programming.</p>
+<section id="decision-tree-code-for-case-1.-i.e-keep-splitting-until-child-nodes-become-puren" class="level3">
+<h3 class="anchored" data-anchor-id="decision-tree-code-for-case-1.-i.e-keep-splitting-until-child-nodes-become-puren">Decision Tree code (for case 1. i.e keep splitting until child nodes become pure)N</h3>
+<p>(<strong>Note:</strong> FYI: Case 2. i.e.&nbsp;splitting fo a fixed number of steps is also covered later in this notebook.)</p>
+<div id="cell-37" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb27" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> decision_tree_algorithm(df: pd.DataFrame) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-&gt;</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">dict</span>:</span>
+<span id="cb27-2">    data <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df</span>
+<span id="cb27-3"></span>
+<span id="cb27-4">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># base case: If data is pure-&gt; stop and return the class of the child node</span></span>
+<span id="cb27-5">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> check_purity(data):</span>
+<span id="cb27-6">        predicted_class <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.unique(data.iloc[:, <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>])[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>] <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># only 1 unique value</span></span>
+<span id="cb27-7">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> predicted_class</span>
+<span id="cb27-8">    </span>
+<span id="cb27-9">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># else: keep on splitting </span></span>
+<span id="cb27-10">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Recursive</span></span>
+<span id="cb27-11">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span>:</span>
+<span id="cb27-12">        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># for splitting: get_potential_splits -&gt; determine_best_split -&gt; split_data based on best_split_column and best_split_value</span></span>
+<span id="cb27-13">        potential_splits <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> get_potential_splits(data)</span>
+<span id="cb27-14">        best_split_column, best_split_value <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> determine_best_split(data, potential_splits)</span>
+<span id="cb27-15">        left_branch, right_branch <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> split_data(data, best_split_column, best_split_value)</span>
+<span id="cb27-16"></span>
+<span id="cb27-17">        </span>
+<span id="cb27-18">        condition <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{}</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;"> &lt;= </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{}</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">format</span>(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">list</span>(df.columns)[best_split_column], best_split_value)</span>
+<span id="cb27-19">        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># create the sub-tree as a dictionary storing the condition as key and a list as the value. This list for a </span></span>
+<span id="cb27-20">        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># condition has either the `predicted_class` if the child node is pure or another condition that will further split the </span></span>
+<span id="cb27-21">        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># impure child node.</span></span>
+<span id="cb27-22">        sub_tree <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> {condition: []}</span>
+<span id="cb27-23"></span>
+<span id="cb27-24">        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># get the answer for the 2 child nodes we just created (Step-1) and append them to the sub-tree</span></span>
+<span id="cb27-25">        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># (Step-1): get answers</span></span>
+<span id="cb27-26">        left_branch_answer <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> decision_tree_algorithm(left_branch)</span>
+<span id="cb27-27">        right_branch_answer <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> decision_tree_algorithm(right_branch)</span>
+<span id="cb27-28"></span>
+<span id="cb27-29">        sub_tree[condition].append(left_branch_answer)</span>
+<span id="cb27-30">        sub_tree[condition].append(right_branch_answer)</span>
+<span id="cb27-31"></span>
+<span id="cb27-32">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> sub_tree</span></code></pre></div>
+</div>
+<div id="cell-38" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb28" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1">my_tree <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> decision_tree_algorithm(train_df)</span>
+<span id="cb28-2">pprint(my_tree)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{'petal length (cm) &lt;= 2.45': ['setosa',
+                               {'petal width (cm) &lt;= 1.75': [{'petal length (cm) &lt;= 4.95': [{'petal width (cm) &lt;= 1.65': ['versicolor',
+                                                                                                                          'virginica']},
+                                                                                            {'petal width (cm) &lt;= 1.55': ['virginica',
+                                                                                                                          {'sepal length (cm) &lt;= 6.95': ['versicolor',
+                                                                                                                                                         'virginica']}]}]},
+                                                             {'petal length (cm) &lt;= 4.85': [{'sepal length (cm) &lt;= 5.95': ['versicolor',
+                                                                                                                           'virginica']},
+                                                                                            'virginica']}]}]}</code></pre>
+</div>
+</div>
+<p>Above is the decision tree which we created, which can be read as follows. (Do not pay attention to the code but to the print block)</p>
+<p><img src="https://mgupta70.github.io/posts/2025-05-04-decision-trees-basics/iris_dt_case1.png" width="550" height="400"></p>
+<p>Let’s writ some code to evaluate the decision tree we built.</p>
+<div id="cell-42" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb30" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> classify_example(example, tree):</span>
+<span id="cb30-2">    question <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">list</span>(tree.keys())[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>]</span>
+<span id="cb30-3">    feature_name, split_value <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> question.split(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">" &lt;= "</span>)</span>
+<span id="cb30-4">    </span>
+<span id="cb30-5"></span>
+<span id="cb30-6">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># ask question</span></span>
+<span id="cb30-7">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> example[feature_name] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">float</span>(split_value):</span>
+<span id="cb30-8">        answer <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> tree[question][<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>]</span>
+<span id="cb30-9">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span>:</span>
+<span id="cb30-10">        answer <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> tree[question][<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]</span>
+<span id="cb30-11"></span>
+<span id="cb30-12">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># base case</span></span>
+<span id="cb30-13">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">not</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">isinstance</span>(answer, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">dict</span>): <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># if the answer is not a dictionary, then it is a leaf node</span></span>
+<span id="cb30-14">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> answer</span>
+<span id="cb30-15"></span>
+<span id="cb30-16">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># recursive case</span></span>
+<span id="cb30-17">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span>:</span>
+<span id="cb30-18">        residual_tree <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> answer</span>
+<span id="cb30-19">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> classify_example(example, residual_tree)</span>
+<span id="cb30-20">    </span>
+<span id="cb30-21"></span>
+<span id="cb30-22"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> calculate_accuracy(df, tree):</span>
+<span id="cb30-23">    df  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df.copy()</span>
+<span id="cb30-24"></span>
+<span id="cb30-25">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># df["classification"] = df.apply(classify_example, axis=1, args=(tree,))</span></span>
+<span id="cb30-26">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># df["classification_correct"] = df["classification"] == df["target"]</span></span>
+<span id="cb30-27"></span>
+<span id="cb30-28">    df.loc[:, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"classification"</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">apply</span>(classify_example, axis<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, args<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(tree,))</span>
+<span id="cb30-29">    df.loc[:, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"classification_correct"</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"classification"</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"target"</span>]</span>
+<span id="cb30-30">    </span>
+<span id="cb30-31">    accuracy <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"classification_correct"</span>].mean()</span>
+<span id="cb30-32">    </span>
+<span id="cb30-33">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> accuracy</span></code></pre></div>
+</div>
+<p>Since, we created sub_trees in an uninhibited manner, it will result in perfect train accuracy.</p>
+<div id="cell-44" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb31" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1">calculate_accuracy(train_df, my_tree)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<pre><code>1.0</code></pre>
+</div>
+</div>
+<p>Let’s check the test accuracy</p>
+<div id="cell-46" class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb33" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1">calculate_accuracy(test_df, my_tree)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<pre><code>1.0</code></pre>
+</div>
+</div>
+<p>Surprisingly! It also resulted in the perfect test accuracy</p>
+<section id="control-the-depth-and-min_samples-in-a-decision-tree" class="level4">
+<h4 class="anchored" data-anchor-id="control-the-depth-and-min_samples-in-a-decision-tree">Control the depth and min_samples in a decision tree</h4>
+<p>In the above case, we got test accuracy of 100%. But usually this is not the case because datasets are more complex.</p>
+<p>If we allow the decision tree to grow unhibited manner then it overfits where it is possible that every leaf node would only have one data point. This is not a good decision tree because then prediction from such a tree becomes highly sensitive to small fluctuations in the data.</p>
+<p>Hence, now we modify our code to <em>pre-prune</em> the tree i.e.&nbsp;limit its growth using <code>max_depth</code> and <code>min_samples</code> as the hyperparamters</p>
+</section>
+</section>
+<section id="decision-tree-code-for-case-2.-i.e.-splitting-fo-a-fixed-number-of-steps" class="level3">
+<h3 class="anchored" data-anchor-id="decision-tree-code-for-case-2.-i.e.-splitting-fo-a-fixed-number-of-steps">Decision Tree code (for case 2. i.e.&nbsp;splitting fo a fixed number of steps)</h3>
+<p>Before we write the actual code, we need a function to get the majority class label of the set if the subset is not pure but further splitting is not possible because stopping condition is reached.</p>
+<div id="cell-52" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb35" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> get_majority_class(df: pd.DataFrame) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-&gt;</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">int</span>:</span>
+<span id="cb35-2">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">"""</span></span>
+<span id="cb35-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">    Classify the data.</span></span>
+<span id="cb35-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">    """</span></span>
+<span id="cb35-5">    y <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df.iloc[:, <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]</span>
+<span id="cb35-6">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> y.mode()[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>]</span></code></pre></div>
+</div>
+<div id="cell-53" class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb36" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> decision_tree_improved(df: pd.DataFrame, counter <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>,  min_samples<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, max_depth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-&gt;</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">dict</span>:</span>
+<span id="cb36-2"></span>
+<span id="cb36-3">    data <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df</span>
+<span id="cb36-4">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># base case: If data is pure or we hit max_depth or min_sample condition violates-&gt; stop and return the class of the child node</span></span>
+<span id="cb36-5">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> check_purity(data) <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">or</span> (<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(data) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;</span> min_samples) <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">or</span> (counter <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> max_depth):</span>
+<span id="cb36-6">        predicted_class <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> get_majority_class(data) </span>
+<span id="cb36-7">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> predicted_class</span>
+<span id="cb36-8">    </span>
+<span id="cb36-9">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># else: keep on splitting </span></span>
+<span id="cb36-10">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Recursive</span></span>
+<span id="cb36-11">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span>:</span>
+<span id="cb36-12">        counter<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span></span>
+<span id="cb36-13">        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># for splitting: get_potential_splits -&gt; determine_best_split -&gt; split_data based on best_split_column and best_split_value</span></span>
+<span id="cb36-14">        potential_splits <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> get_potential_splits(data)</span>
+<span id="cb36-15">        best_split_column, best_split_value <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> determine_best_split(data, potential_splits)</span>
+<span id="cb36-16">        left_branch, right_branch <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> split_data(data, best_split_column, best_split_value)</span>
+<span id="cb36-17"></span>
+<span id="cb36-18">        </span>
+<span id="cb36-19">        condition <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{}</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;"> &lt;= </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{}</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">format</span>(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">list</span>(data.columns)[best_split_column], best_split_value)</span>
+<span id="cb36-20">        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># create the sub-tree as a dictionary storing the condition as key and a list as the value. This list for a </span></span>
+<span id="cb36-21">        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># condition has either the `predicted_class` if the child node is pure or another condition that will further split the </span></span>
+<span id="cb36-22">        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># impure child node.</span></span>
+<span id="cb36-23">        sub_tree <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> {condition: []}</span>
+<span id="cb36-24"></span>
+<span id="cb36-25">        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># get the answer for the 2 child nodes we just created (Step-1) and append them to the sub-tree</span></span>
+<span id="cb36-26">        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># (Step-1): get answers</span></span>
+<span id="cb36-27">        left_branch_answer <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> decision_tree_improved(left_branch,  counter, min_samples, max_depth)</span>
+<span id="cb36-28">        right_branch_answer <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> decision_tree_improved(right_branch, counter, min_samples, max_depth)</span>
+<span id="cb36-29"></span>
+<span id="cb36-30">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> left_branch_answer <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> right_branch_answer: <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Example: Instead of {'petal length &lt;= 2.5': ['setosa', 'setosa']} just return 'setosa'</span></span>
+<span id="cb36-31">            sub_tree <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> left_branch_answer</span>
+<span id="cb36-32"></span>
+<span id="cb36-33">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span>:</span>
+<span id="cb36-34">            sub_tree[condition].append(left_branch_answer)</span>
+<span id="cb36-35">            sub_tree[condition].append(right_branch_answer)</span>
+<span id="cb36-36"></span>
+<span id="cb36-37">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> sub_tree</span></code></pre></div>
+</div>
+<div id="cell-54" class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb37" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1">my_tree <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> decision_tree_improved(train_df, max_depth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>)</span>
+<span id="cb37-2">pprint(my_tree)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{'petal length (cm) &lt;= 2.45': ['setosa',
+                               {'petal width (cm) &lt;= 1.75': [{'petal length (cm) &lt;= 4.95': ['versicolor',
+                                                                                            'virginica']},
+                                                             {'petal length (cm) &lt;= 4.85': ['versicolor',
+                                                                                            'virginica']}]}]}</code></pre>
+</div>
+</div>
+<p><img src="https://mgupta70.github.io/posts/2025-05-04-decision-trees-basics/iris_dt_case2.png" width="550" height="400"></p>
+<div id="cell-56" class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb39" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1">calculate_accuracy(test_df, my_tree) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># test accuracy with pruned tree</span></span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="26">
+<pre><code>0.95</code></pre>
+</div>
+</div>
+
+
+</section>
+
+ ]]></description>
+  <category>machine learning</category>
+  <guid>https://mgupta70.github.io/posts/2025-05-04-decision-trees-basics/1_basic_decision_tree_for_classification.html</guid>
+  <pubDate>Thu, 01 May 2025 07:00:00 GMT</pubDate>
+  <media:content url="https://mgupta70.github.io/posts/2025-05-04-decision-trees-basics/dt_thumbnail.png" medium="image" type="image/png" height="82" width="144"/>
+</item>
+</channel>
+</rss>
