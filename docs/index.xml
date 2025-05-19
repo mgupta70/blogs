@@ -10,7 +10,738 @@
 <atom:link href="https://mgupta70.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>AI/ML blogs from Mohit, Ph.D. Computer Vision</description>
 <generator>quarto-1.8.1</generator>
-<lastBuildDate>Thu, 01 May 2025 07:00:00 GMT</lastBuildDate>
+<lastBuildDate>Sun, 18 May 2025 07:00:00 GMT</lastBuildDate>
+<item>
+  <title>Linear Regression Made Easy</title>
+  <dc:creator>Mohit Gupta</dc:creator>
+  <link>https://mgupta70.github.io/posts/2025-05-018-linear-regression-basics/2_linear_regression.html</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>In this notebook, we will be building a Linear Regression model from scratch to learn and familiarize ourselves with various governing foundational concepts about it. For this, we will use a <code>sklearn.datasets.make_regression</code> function to create a simple synthetic dataset in one variable. We can extend the concepts learned here to build multi-variate linear regression models.</p>
+<div id="cell-2" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Import necessary libraries</span></span>
+<span id="cb1-2"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> numpy <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> np</span>
+<span id="cb1-3"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pandas <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> pd</span>
+<span id="cb1-4"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> matplotlib.pyplot <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> plt</span>
+<span id="cb1-5"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> sklearn.datasets <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> make_regression</span>
+<span id="cb1-6"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> pprint <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pprint</span></code></pre></div>
+</div>
+<div id="cell-3" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Generate the data</span></span>
+<span id="cb2-2">X,y <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> make_regression(n_samples<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, n_features<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, noise<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>, random_state<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">42</span>) </span>
+<span id="cb2-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Here, </span></span>
+<span id="cb2-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># X.shape: (n_samples, n_features) = (100, 1)</span></span>
+<span id="cb2-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># y.shape: (n_samples, ) = (100, )</span></span>
+<span id="cb2-6"></span>
+<span id="cb2-7">fig, ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.subplots(figsize <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>))</span>
+<span id="cb2-8">ax.scatter(X,y)</span>
+<span id="cb2-9">plt.show()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://mgupta70.github.io/posts/2025-05-018-linear-regression-basics/2_linear_regression_files/figure-html/cell-3-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We can see that X axis varies from -2 to 2. It implies that our feature space is already normalized.😄</p>
+<p>However, if we are dealing with multiple features, then it is common to have different features in different range. For ex. in a dataset of house price prediction, the house area can range from 100-5000 while number of bedrooms typically range from 1-5. To make the linear regression model to give equal importance to all the features, it is a good practise to bring all the features in same range. So, we normalize the features. There are multiple ways to normalize:</p>
+<ol type="1">
+<li>X/max: new feature range is 0 to 1</li>
+<li>X-mean/std: new feature range is -3 to 3 mostly (except outliers)</li>
+<li>(X-min)/(max-min): new feature range is 0 to 1</li>
+</ol>
+<p>In Machine Learning, whenever, we want to build any model, we usually split it into 2 sets - train and val. We build algo on train and finetune its hyperparameters to optimise the loss/error function on val set. This step is mandatory. So, let’s build a helper function</p>
+<div id="cell-6" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> train_test_split(X, y, test_size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.2</span>, random_state<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">42</span>):</span>
+<span id="cb3-2">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">""" splits the data into train and test sets"""</span></span>
+<span id="cb3-3"></span>
+<span id="cb3-4">    np.random.seed(random_state)</span>
+<span id="cb3-5">    n <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> X.shape[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>]</span>
+<span id="cb3-6"></span>
+<span id="cb3-7">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">isinstance</span>(test_size, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">float</span>) <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">and</span> test_size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>:</span>
+<span id="cb3-8">        test_size <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">int</span>(n<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>test_size)</span>
+<span id="cb3-9">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">elif</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">isinstance</span>(test_size, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">int</span>):</span>
+<span id="cb3-10">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">pass</span></span>
+<span id="cb3-11">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span>:</span>
+<span id="cb3-12">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">raise</span> <span class="pp" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">ValueError</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"test size must be a float/ int"</span>)</span>
+<span id="cb3-13">    </span>
+<span id="cb3-14">    shuffled_indices <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.permutation(n)</span>
+<span id="cb3-15">    test_indices <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> shuffled_indices[:test_size]</span>
+<span id="cb3-16">    train_indices <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> shuffled_indices[test_size:]</span>
+<span id="cb3-17">    X_train <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> X[train_indices]</span>
+<span id="cb3-18">    X_test <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> X[test_indices]</span>
+<span id="cb3-19">    y_train <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> y[train_indices]</span>
+<span id="cb3-20">    y_test <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> y[test_indices]</span>
+<span id="cb3-21">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> X_train, X_test, y_train, y_test</span></code></pre></div>
+</div>
+<div id="cell-7" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1">X_train, X_val, y_train, y_val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> train_test_split(X,y, test_size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">20</span>, random_state<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>)</span>
+<span id="cb4-2"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">f'Train size: </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>X_train<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>shape[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>]<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">, Test size: </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>X_val<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>shape[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>]<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span>)</span>
+<span id="cb4-3"></span>
+<span id="cb4-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># plot the train and val data to see the split</span></span>
+<span id="cb4-5">fig, ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.subplots(figsize <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>))</span>
+<span id="cb4-6">ax.scatter(X_train,y_train, c<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'blue'</span>, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'train'</span>)</span>
+<span id="cb4-7">ax.scatter(X_val,y_val, c<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'red'</span>, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'val'</span>)</span>
+<span id="cb4-8">ax.legend()</span>
+<span id="cb4-9">plt.show()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Train size: 80, Test size: 20</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://mgupta70.github.io/posts/2025-05-018-linear-regression-basics/2_linear_regression_files/figure-html/cell-5-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Now, the question is how do we decide the size of <code>val</code> set and how we should create it?</strong></p>
+<p>Answer: There is no strict metric on how to decide the size of <code>val</code> set. The most important aspect to consider while creating <code>val</code> set is - it should be a representative of <code>train</code> set. This means, the points in the val set should have a good spread throughout the training data. What does this mean ? - Suppose, all <code>val</code> points (red) occur together and not separated from one another, then it is not a good split. Because this <code>val</code> data does not capture the distribution of <code>train</code> data and since the ultimate use of <code>val</code> data is to optimize the model, then it means we will end up optimizing the model only for a short spread of the data and not the entirety of it. Hence, we perform mostly the random sampling to make sure, we get different and spread-out points that <em>hopefully</em> would be a representative of the entire training data. To achieve this, we can choose 20% of the data or 30% or 5% depending upon the distrubution of the data we are dealing with. Typical value is 15-25% sampled randomly. <em>(But both the val data percentage and sampling method will vary depending upon the nature of the problem)</em></p>
+<p>After creating the splits of <code>train</code> and <code>val</code> data, we can now write code to build a regression model.</p>
+<p>(FYI, if normalization of features is required as mentioned above, then normalization is performed after the data splitting. Various normalization constants are calculated from the <code>train</code> split of the data and stored for processing <code>val</code> and real <code>test</code> data that comes during the production stage.)</p>
+<p>We are now writing a code for a simplistic model: yhat = wx + b</p>
+<p>where w and b are randomly initialized and</p>
+<p>optimized by Gradient Descent</p>
+<p>In Linear regression, we use mean square error as loss function for optimiztion via Gradient Descent</p>
+<div id="cell-12" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># hyperparameter</span></span>
+<span id="cb6-2">lr <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.001</span></span>
+<span id="cb6-3">epochs <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">101</span></span>
+<span id="cb6-4"></span>
+<span id="cb6-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># initialize weights and biases randomly</span></span>
+<span id="cb6-6">w <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.rand()</span>
+<span id="cb6-7">b <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.rand()</span>
+<span id="cb6-8"></span>
+<span id="cb6-9"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Gradient Descent </span></span>
+<span id="cb6-10">train_losses <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> []</span>
+<span id="cb6-11">val_losses <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> []</span>
+<span id="cb6-12"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> epoch <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(epochs):</span>
+<span id="cb6-13">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Go through TRAIN data</span></span>
+<span id="cb6-14">    yhat <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> w<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>X_train <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> b</span>
+<span id="cb6-15">    yhat <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.squeeze(yhat)</span>
+<span id="cb6-16">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># mean square error loss</span></span>
+<span id="cb6-17">    mse_loss <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.mean((y_train<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>yhat)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">**</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb6-18">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (epoch)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">20</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>:</span>
+<span id="cb6-19">        <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">f"EPOCH: </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>epoch<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">, Train LOSS:</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(mse_loss, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span>
+<span id="cb6-20">    train_losses.append(mse_loss)</span>
+<span id="cb6-21">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># step of Gradient Descent</span></span>
+<span id="cb6-22">    w <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> w <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> lr<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>(yhat<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>y_train)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">@</span>X_train</span>
+<span id="cb6-23">    x0 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.ones((X_train.shape[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>],<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>))</span>
+<span id="cb6-24">    b <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> b <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> lr<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>(yhat<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>y_train)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">@</span>x0 <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># or : b = b - lr * np.sum(yhat - y_train)</span></span>
+<span id="cb6-25">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">## Monitor performance on VAL data</span></span>
+<span id="cb6-26">    yhat <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> w<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>X_val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> b</span>
+<span id="cb6-27">    yhat <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.squeeze(yhat)</span>
+<span id="cb6-28">    mse_loss <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.mean((y_val<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>yhat)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">**</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb6-29">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (epoch)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">20</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>:</span>
+<span id="cb6-30">        <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">f"EPOCH: </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>epoch<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">, Val LOSS:</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(mse_loss, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span>
+<span id="cb6-31">    val_losses.append(mse_loss)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>EPOCH: 0, Train LOSS:1567.608
+EPOCH: 0, Val LOSS:1552.406
+EPOCH: 20, Train LOSS:145.819
+EPOCH: 20, Val LOSS:168.799
+EPOCH: 40, Train LOSS:40.83
+EPOCH: 40, Val LOSS:73.231
+EPOCH: 60, Train LOSS:31.699
+EPOCH: 60, Val LOSS:68.759
+EPOCH: 80, Train LOSS:30.857
+EPOCH: 80, Val LOSS:69.459
+EPOCH: 100, Train LOSS:30.777
+EPOCH: 100, Val LOSS:69.843</code></pre>
+</div>
+</div>
+<div id="cell-13" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1">fig, ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.subplots(figsize <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>))</span>
+<span id="cb8-2">ax.plot(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(epochs),train_losses, c<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"b"</span>, label <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'train loss'</span>)</span>
+<span id="cb8-3">ax.plot(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(epochs),val_losses, c<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>, label <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'val loss'</span>)</span>
+<span id="cb8-4">ax.legend()</span>
+<span id="cb8-5">plt.show()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://mgupta70.github.io/posts/2025-05-018-linear-regression-basics/2_linear_regression_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Usually, you should see decreasing error/loss values. If this does not happen, few things need to be checked: 1. Reduce learning rate, <code>lr</code> and retry 2. Always, check if the shapes of variables are correct. For ex: bias, <code>b</code> shape must be (1,); <code>w</code>: (1, ), <code>mse_loss</code>: (1,), yhat: (num_samples in train/val, ) and so on. I have seen many times, while working with numpy, if you are not careful of matrix multiplication and dot product rules, the shapes of your variables become incorrect causing weird model training. You could also see an <strong>up and down behaviour in train loss</strong>. For example: If you miss to account for <code>x0</code> while calculating bias <code>b</code> ➡ it will cause massive shape issues throughout.</p>
+<div id="cell-15" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">f"Linear Regression Model: wx+b = </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>w<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">*x+</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>b<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear Regression Model: wx+b = [44.0082033]*x+[0.38012626]</code></pre>
+</div>
+</div>
+<div id="cell-16" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1">xmin <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">min</span>(X)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span> yhat_min  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> w<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>xmin<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span>b</span>
+<span id="cb11-2">xmax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">max</span>(X)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span> yhat_max  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> w<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>xmax<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span>b</span>
+<span id="cb11-3"></span>
+<span id="cb11-4">fig, ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.subplots(figsize <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>))</span>
+<span id="cb11-5">ax.scatter(X,y, label <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'data'</span>)</span>
+<span id="cb11-6">ax.plot([xmin, xmax], [yhat_min, yhat_max], c<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'fitted model'</span>)</span>
+<span id="cb11-7">ax.legend()</span>
+<span id="cb11-8">plt.show()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://mgupta70.github.io/posts/2025-05-018-linear-regression-basics/2_linear_regression_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The trained model fits really well visually. <strong>But how do we quantify the quality of fit?</strong></p>
+<p>Answer: r2-score</p>
+<p>I often used to forget the formula for r2-score, until I understood the reasoning behind it and then, I no longer needed to memorize it. I could reproduce the formula within seconds by following pure logic. In fact, I feel this is the best way to also sharpen your data understanding skills. Being able to reason about the data stuff and write it in terms of maths - this is the skill that will make you a data scientist with sharp eyes and mind.</p>
+<section id="r2-score-forumla" class="level4">
+<h4 class="anchored" data-anchor-id="r2-score-forumla">r2-score forumla</h4>
+<p>Let’s understand the r2-score and derive its formula by asking just basic questions i.e.&nbsp;first principle thinking.</p>
+<p>Q. What is the simplest model we could use without any fancy math?</p>
+<p>A. use mean i.e.&nbsp;the average as the answer, <code>yhat</code> for any given <code>x</code></p>
+<p>Q. Now, if we use the simplest model, what is the sum of squares of error?</p>
+<p>A. np.sum((y-mean)**2)</p>
+<p>Q. What is the sum of squares of error from our model?</p>
+<p>A. np.sum((y-yhat)**2)</p>
+<p>Q. If we have trained a good model, it should be better than baseline (simplest model, where we predict average no matter what X is). That is, sum of squares of error from trained model &lt; sum of squares of error from simplest model. But how much better?</p>
+<p>A. 1 - np.sum((y-yhat)<strong>2) /np.sum((y-mean)</strong>2)</p>
+<div id="cell-20" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># simplest model </span></span>
+<span id="cb12-2">ymean <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.mean(y_train) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># use train to calculate the model, where model = mean</span></span>
+<span id="cb12-3">SST <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">sum</span>((y_val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> ymean)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">**</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># calculte sum of square of error on val data</span></span>
+<span id="cb12-4"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'SST: '</span>, SST)</span>
+<span id="cb12-5"></span>
+<span id="cb12-6"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># trained model</span></span>
+<span id="cb12-7">yhat <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> w<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>X_val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> b</span>
+<span id="cb12-8">yhat <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.squeeze(yhat)</span>
+<span id="cb12-9">RSS <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">sum</span>((y_val<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>yhat)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">**</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb12-10"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'RSS: '</span>, RSS)</span>
+<span id="cb12-11"></span>
+<span id="cb12-12"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># R2-score</span></span>
+<span id="cb12-13">r2_score <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>RSS<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>SST</span>
+<span id="cb12-14"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'r2_score: '</span>, r2_score)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>SST:  37726.247861497875
+RSS:  1396.867522387115
+r2_score:  0.9629735899653908</code></pre>
+</div>
+</div>
+<p>For simplest model,</p>
+<p><code>model = ymean</code>, sum of square of error is called <strong>SST</strong> = Total sum of squares</p>
+<p>For trained model,</p>
+<p><code>model = wx+b</code>, sum of square of error is called <strong>RSS</strong> = Sum of square of Residuals</p>
+<p><code>r2_score</code> close to 1 means the model <em>explains</em> the data well.</p>
+<p><code>r2_score</code> ranges from 0 to 1. <strong>Can you think what what does r² = 0 mean?</strong></p>
+
+
+</section>
+
+ ]]></description>
+  <category>Core ML</category>
+  <guid>https://mgupta70.github.io/posts/2025-05-018-linear-regression-basics/2_linear_regression.html</guid>
+  <pubDate>Sun, 18 May 2025 07:00:00 GMT</pubDate>
+  <media:content url="https://mgupta70.github.io/posts/2025-05-018-linear-regression-basics/linear_reg_thumbnail.png" medium="image" type="image/png" height="96" width="144"/>
+</item>
 <item>
   <title>Decision Trees Made Easy</title>
   <dc:creator>Mohit Gupta</dc:creator>
@@ -1462,7 +2193,7 @@ font-style: inherit;"># test accuracy with pruned tree</span></span></code></pre
 </section>
 
  ]]></description>
-  <category>machine learning</category>
+  <category>Core ML</category>
   <guid>https://mgupta70.github.io/posts/2025-05-04-decision-trees-basics/1_basic_decision_tree_for_classification.html</guid>
   <pubDate>Thu, 01 May 2025 07:00:00 GMT</pubDate>
   <media:content url="https://mgupta70.github.io/posts/2025-05-04-decision-trees-basics/dt_thumbnail.png" medium="image" type="image/png" height="82" width="144"/>

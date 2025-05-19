@@ -2,14 +2,18 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://mgupta70.github.io/posts/2025-05-04-decision-trees-basics/1_basic_decision_tree_for_classification.html</loc>
-    <lastmod>2025-05-05T06:12:41.178Z</lastmod>
+    <lastmod>2025-05-19T06:45:12.918Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mgupta70.github.io/index.html</loc>
+    <lastmod>2025-05-05T05:27:23.772Z</lastmod>
   </url>
   <url>
     <loc>https://mgupta70.github.io/about.html</loc>
     <lastmod>2025-05-05T05:57:32.039Z</lastmod>
   </url>
   <url>
-    <loc>https://mgupta70.github.io/index.html</loc>
-    <lastmod>2025-05-05T05:27:23.772Z</lastmod>
+    <loc>https://mgupta70.github.io/posts/2025-05-018-linear-regression-basics/2_linear_regression.html</loc>
+    <lastmod>2025-05-19T06:44:51.483Z</lastmod>
   </url>
 </urlset>
