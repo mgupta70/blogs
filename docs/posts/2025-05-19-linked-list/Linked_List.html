@@ -1126,6 +1126,8 @@ figs--&gt;mango--&gt;grapes--&gt;orange--&gt;
 <span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> remove_by_value(<span class="va">self</span>, data):</span>
 <span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove first node that contains data</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div id="ad33d651" class="cell">
+<details class="code-fold">
+<summary>Show solution code</summary>
 <div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LinkedList:</span>
 <span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
 <span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>        <span class="co"># head is an object always pointing towards the head i.e. start of&nbsp;the&nbsp;linked&nbsp;list</span></span>
@@ -1273,89 +1275,45 @@ figs--&gt;mango--&gt;grapes--&gt;orange--&gt;
 <span id="cb48-145"><a href="#cb48-145" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> counter<span class="op">==</span><span class="va">self</span>.get_length(): <span class="co"># means we could not find data to remove in the linked list</span></span>
 <span id="cb48-146"><a href="#cb48-146" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">Exception</span>(<span class="ss">f'data = </span><span class="sc">{</span>data<span class="sc">}</span><span class="ss"> not found in the Linked List.'</span>)</span>
 <span id="cb48-147"><a href="#cb48-147" aria-hidden="true" tabindex="-1"></a>        <span class="co"># else, remove the same index where we found data</span></span>
-<span id="cb48-148"><a href="#cb48-148" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.remove_at(counter)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="8c612fd2" class="cell">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># test insert_after_value</span></span>
-<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>new_data_list <span class="op">=</span> [<span class="st">'figs'</span>,<span class="st">'banana'</span>, <span class="st">'mango'</span>, <span class="st">'grapes'</span>, <span class="st">'orange'</span>]</span>
-<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>ll <span class="op">=</span> LinkedList()</span>
-<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>ll.insert_values(new_data_list)</span>
-<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Original'</span>)</span>
-<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>ll.<span class="bu">print</span>()</span>
-<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>ll.insert_after_value(<span class="st">'banana'</span>, <span class="st">'Mousami'</span>)</span>
-<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Modified'</span>)</span>
-<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>ll.<span class="bu">print</span>()</span>
-<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">''</span>)</span>
-<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>ll.insert_after_value(<span class="st">'orange'</span>, <span class="st">'Pineapple'</span>)</span>
-<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Modified-2'</span>)</span>
-<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a>ll.<span class="bu">print</span>()</span>
-<span id="cb49-14"><a href="#cb49-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">''</span>)</span>
-<span id="cb49-15"><a href="#cb49-15" aria-hidden="true" tabindex="-1"></a>ll.insert_after_value(<span class="st">'Apple'</span>, <span class="st">'Custard Apple'</span>)</span>
-<span id="cb49-16"><a href="#cb49-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Modified-3'</span>)</span>
-<span id="cb49-17"><a href="#cb49-17" aria-hidden="true" tabindex="-1"></a>ll.<span class="bu">print</span>()</span>
-<span id="cb49-18"><a href="#cb49-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">''</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Original
-figs--&gt;banana--&gt;mango--&gt;grapes--&gt;orange--&gt;
-Modified
-figs--&gt;banana--&gt;Mousami--&gt;mango--&gt;grapes--&gt;orange--&gt;
-
-Modified-2
-figs--&gt;banana--&gt;Mousami--&gt;mango--&gt;grapes--&gt;orange--&gt;Pineapple--&gt;
-</code></pre>
-</div>
-<div class="cell-output cell-output-error">
-<div class="ansi-escaped-output">
-<pre><span class="ansi-red-fg ansi-bold">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg ansi-bold">Exception</span>                                 Traceback (most recent call last)
-Cell <span class="ansi-green-fg ansi-bold">In[112], line 17</span>
-<span class="ansi-green-fg">     13</span> ll<span style="color:rgb(98,98,98)">.</span>print()
-<span class="ansi-green-fg">     14</span> <span style="color:rgb(0,135,0)">print</span>(<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">'</span>)
-<span class="ansi-green-fg ansi-bold">---&gt; 17</span> ll<span style="color:rgb(98,98,98)">.</span>insert_after_value(<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">Apple</span><span style="color:rgb(175,0,0)">'</span>, <span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">Custard Apple</span><span style="color:rgb(175,0,0)">'</span>)
-<span class="ansi-green-fg">     18</span> <span style="color:rgb(0,135,0)">print</span>(<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">Modified-3</span><span style="color:rgb(175,0,0)">'</span>)
-<span class="ansi-green-fg">     19</span> ll<span style="color:rgb(98,98,98)">.</span>print()
-
-Cell <span class="ansi-green-fg ansi-bold">In[110], line 126</span>, in <span class="ansi-cyan-fg">LinkedList.insert_after_value</span><span class="ansi-blue-fg ansi-bold">(self, data_after, data_to_insert)</span>
-<span class="ansi-green-fg">    123</span>     itr <span style="color:rgb(98,98,98)">=</span> itr<span style="color:rgb(98,98,98)">.</span>next
-<span class="ansi-green-fg">    125</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> counter<span style="color:rgb(98,98,98)">==</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>get_length(): <span style="font-style:italic;color:rgb(95,135,135)"># means we could not find data_after in the linked list</span>
-<span class="ansi-green-fg ansi-bold">--&gt; 126</span>     <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> <span style="font-weight:bold;color:rgb(215,95,95)">Exception</span>(<span style="color:rgb(175,0,0)">f</span><span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">data_after = </span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>data_after<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)"> not found in the Linked List.</span><span style="color:rgb(175,0,0)">'</span>)
-<span class="ansi-green-fg">    127</span> <span style="font-style:italic;color:rgb(95,135,135)"># else, insert at 1 index away from where we found data_after</span>
-<span class="ansi-green-fg">    128</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>insert_at(counter<span style="color:rgb(98,98,98)">+</span><span style="color:rgb(98,98,98)">1</span>, data<span style="color:rgb(98,98,98)">=</span>data_to_insert)
-
-<span class="ansi-red-fg ansi-bold">Exception</span>: data_after = Apple not found in the Linked List.</pre>
-</div>
-</div>
-</div>
-<div id="0c6674e5" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># test remove_by_value</span></span>
-<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>new_data_list <span class="op">=</span> [<span class="st">'figs'</span>,<span class="st">'banana'</span>, <span class="st">'mango'</span>, <span class="st">'grapes'</span>, <span class="st">'orange'</span>]</span>
-<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>ll <span class="op">=</span> LinkedList()</span>
-<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>ll.insert_values(new_data_list)</span>
-<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Original'</span>)</span>
-<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>ll.<span class="bu">print</span>()</span>
-<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>ll.remove_by_value(<span class="st">'mango'</span>)</span>
-<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Modified'</span>)</span>
-<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>ll.<span class="bu">print</span>()</span>
-<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>ll.remove_by_value(<span class="st">'figs'</span>)</span>
-<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Modified-2'</span>)</span>
-<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a>ll.<span class="bu">print</span>()</span>
-<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a>ll.remove_by_value(<span class="st">'mango'</span>)</span>
-<span id="cb51-14"><a href="#cb51-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Modified-3'</span>)</span>
-<span id="cb51-15"><a href="#cb51-15" aria-hidden="true" tabindex="-1"></a>ll.<span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<div class="ansi-escaped-output">
-<pre><span class="ansi-red-fg ansi-bold">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg ansi-bold">NameError</span>                                 Traceback (most recent call last)
-Cell <span class="ansi-green-fg ansi-bold">In[1], line 3</span>
-<span class="ansi-green-fg">      1</span> <span style="font-style:italic;color:rgb(95,135,135)"># test remove_by_value</span>
-<span class="ansi-green-fg">      2</span> new_data_list <span style="color:rgb(98,98,98)">=</span> [<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">figs</span><span style="color:rgb(175,0,0)">'</span>,<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">banana</span><span style="color:rgb(175,0,0)">'</span>, <span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">mango</span><span style="color:rgb(175,0,0)">'</span>, <span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">grapes</span><span style="color:rgb(175,0,0)">'</span>, <span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">orange</span><span style="color:rgb(175,0,0)">'</span>]
-<span class="ansi-green-fg ansi-bold">----&gt; 3</span> ll <span style="color:rgb(98,98,98)">=</span> LinkedList()
-<span class="ansi-green-fg">      4</span> ll<span style="color:rgb(98,98,98)">.</span>insert_values(new_data_list)
-<span class="ansi-green-fg">      5</span> <span style="color:rgb(0,135,0)">print</span>(<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">Original</span><span style="color:rgb(175,0,0)">'</span>)
-
-<span class="ansi-red-fg ansi-bold">NameError</span>: name 'LinkedList' is not defined</pre>
-</div>
-</div>
+<span id="cb48-148"><a href="#cb48-148" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.remove_at(counter)</span>
+<span id="cb48-149"><a href="#cb48-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-150"><a href="#cb48-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-151"><a href="#cb48-151" aria-hidden="true" tabindex="-1"></a><span class="co">##########################</span></span>
+<span id="cb48-152"><a href="#cb48-152" aria-hidden="true" tabindex="-1"></a><span class="co"># Test the code developed</span></span>
+<span id="cb48-153"><a href="#cb48-153" aria-hidden="true" tabindex="-1"></a><span class="co">##########################</span></span>
+<span id="cb48-154"><a href="#cb48-154" aria-hidden="true" tabindex="-1"></a>new_data_list <span class="op">=</span> [<span class="st">'figs'</span>,<span class="st">'banana'</span>, <span class="st">'mango'</span>, <span class="st">'grapes'</span>, <span class="st">'orange'</span>]</span>
+<span id="cb48-155"><a href="#cb48-155" aria-hidden="true" tabindex="-1"></a>ll <span class="op">=</span> LinkedList()</span>
+<span id="cb48-156"><a href="#cb48-156" aria-hidden="true" tabindex="-1"></a>ll.insert_values(new_data_list)</span>
+<span id="cb48-157"><a href="#cb48-157" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Original'</span>)</span>
+<span id="cb48-158"><a href="#cb48-158" aria-hidden="true" tabindex="-1"></a>ll.<span class="bu">print</span>()</span>
+<span id="cb48-159"><a href="#cb48-159" aria-hidden="true" tabindex="-1"></a>ll.insert_after_value(<span class="st">'banana'</span>, <span class="st">'Mousami'</span>)</span>
+<span id="cb48-160"><a href="#cb48-160" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Modified'</span>)</span>
+<span id="cb48-161"><a href="#cb48-161" aria-hidden="true" tabindex="-1"></a>ll.<span class="bu">print</span>()</span>
+<span id="cb48-162"><a href="#cb48-162" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">''</span>)</span>
+<span id="cb48-163"><a href="#cb48-163" aria-hidden="true" tabindex="-1"></a>ll.insert_after_value(<span class="st">'orange'</span>, <span class="st">'Pineapple'</span>)</span>
+<span id="cb48-164"><a href="#cb48-164" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Modified-2'</span>)</span>
+<span id="cb48-165"><a href="#cb48-165" aria-hidden="true" tabindex="-1"></a>ll.<span class="bu">print</span>()</span>
+<span id="cb48-166"><a href="#cb48-166" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">''</span>)</span>
+<span id="cb48-167"><a href="#cb48-167" aria-hidden="true" tabindex="-1"></a>ll.insert_after_value(<span class="st">'Apple'</span>, <span class="st">'Custard Apple'</span>)</span>
+<span id="cb48-168"><a href="#cb48-168" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Modified-3'</span>)</span>
+<span id="cb48-169"><a href="#cb48-169" aria-hidden="true" tabindex="-1"></a>ll.<span class="bu">print</span>()</span>
+<span id="cb48-170"><a href="#cb48-170" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">''</span>)</span>
+<span id="cb48-171"><a href="#cb48-171" aria-hidden="true" tabindex="-1"></a><span class="co"># test remove_by_value</span></span>
+<span id="cb48-172"><a href="#cb48-172" aria-hidden="true" tabindex="-1"></a>new_data_list <span class="op">=</span> [<span class="st">'figs'</span>,<span class="st">'banana'</span>, <span class="st">'mango'</span>, <span class="st">'grapes'</span>, <span class="st">'orange'</span>]</span>
+<span id="cb48-173"><a href="#cb48-173" aria-hidden="true" tabindex="-1"></a>ll <span class="op">=</span> LinkedList()</span>
+<span id="cb48-174"><a href="#cb48-174" aria-hidden="true" tabindex="-1"></a>ll.insert_values(new_data_list)</span>
+<span id="cb48-175"><a href="#cb48-175" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Original'</span>)</span>
+<span id="cb48-176"><a href="#cb48-176" aria-hidden="true" tabindex="-1"></a>ll.<span class="bu">print</span>()</span>
+<span id="cb48-177"><a href="#cb48-177" aria-hidden="true" tabindex="-1"></a>ll.remove_by_value(<span class="st">'mango'</span>)</span>
+<span id="cb48-178"><a href="#cb48-178" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Modified'</span>)</span>
+<span id="cb48-179"><a href="#cb48-179" aria-hidden="true" tabindex="-1"></a>ll.<span class="bu">print</span>()</span>
+<span id="cb48-180"><a href="#cb48-180" aria-hidden="true" tabindex="-1"></a>ll.remove_by_value(<span class="st">'figs'</span>)</span>
+<span id="cb48-181"><a href="#cb48-181" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Modified-2'</span>)</span>
+<span id="cb48-182"><a href="#cb48-182" aria-hidden="true" tabindex="-1"></a>ll.<span class="bu">print</span>()</span>
+<span id="cb48-183"><a href="#cb48-183" aria-hidden="true" tabindex="-1"></a>ll.remove_by_value(<span class="st">'mango'</span>)</span>
+<span id="cb48-184"><a href="#cb48-184" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Modified-3'</span>)</span>
+<span id="cb48-185"><a href="#cb48-185" aria-hidden="true" tabindex="-1"></a>ll.<span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 </section>
 <section id="exercise-2-can-you-test-for-yourself-by-looking-at-the-code-above-why-this-table-is-correct" class="level3">
@@ -1365,173 +1323,173 @@ Cell <span class="ansi-green-fg ansi-bold">In[1], line 3</span>
 <section id="excercise-3-try-creating-a-doubly-linked-list-by-yourself." class="level3">
 <h3 class="anchored" data-anchor-id="excercise-3-try-creating-a-doubly-linked-list-by-yourself.">Excercise-3: Try creating a <strong>doubly Linked List</strong> by yourself.</h3>
 <p><strong>Hint</strong>:The only difference with regular linked list is that double linked has prev node reference as well. That way you can iterate in forward and backward direction. Your node class will look this this:</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Node:</span>
-<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, data<span class="op">=</span><span class="va">None</span>, <span class="bu">next</span><span class="op">=</span><span class="va">None</span>, prev<span class="op">=</span><span class="va">None</span>):</span>
-<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.data <span class="op">=</span> data</span>
-<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.<span class="bu">next</span> <span class="op">=</span> <span class="bu">next</span></span>
-<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.prev <span class="op">=</span> prev</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Node:</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, data<span class="op">=</span><span class="va">None</span>, <span class="bu">next</span><span class="op">=</span><span class="va">None</span>, prev<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.data <span class="op">=</span> data</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.<span class="bu">next</span> <span class="op">=</span> <span class="bu">next</span></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.prev <span class="op">=</span> prev</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <section id="insert_at-1" class="level4">
 <h4 class="anchored" data-anchor-id="insert_at-1">insert_at</h4>
 <p><img src="dll_insert_at.png" alt="dll" width="500" height="250"></p>
 <div id="bd898bbf" class="cell">
 <details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Node:</span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, data<span class="op">=</span><span class="va">None</span>, <span class="bu">next</span><span class="op">=</span><span class="va">None</span>, prev<span class="op">=</span><span class="va">None</span>):</span>
-<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.data <span class="op">=</span> data</span>
-<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.<span class="bu">next</span> <span class="op">=</span> <span class="bu">next</span></span>
-<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.prev <span class="op">=</span> prev</span>
-<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> DoublyLinkedList:</span>
-<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
-<span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a>        <span class="co"># initialize an empty doubly linked list. head is the start node (always)</span></span>
-<span id="cb53-11"><a href="#cb53-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.head <span class="op">=</span> <span class="va">None</span> <span class="co"># make a None start node as head</span></span>
-<span id="cb53-12"><a href="#cb53-12" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb53-13"><a href="#cb53-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> insert_at_beginning(<span class="va">self</span>, data: Union[<span class="bu">str</span>, <span class="bu">int</span>]):</span>
-<span id="cb53-14"><a href="#cb53-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-15"><a href="#cb53-15" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Case-1: We start with an empty Linked List</span></span>
-<span id="cb53-16"><a href="#cb53-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.head <span class="op">==</span> <span class="va">None</span>:</span>
-<span id="cb53-17"><a href="#cb53-17" aria-hidden="true" tabindex="-1"></a>            <span class="co"># make a node of the data, point next of this node to old head, point prev of this node to null/None as it is the new head (i.e. start)</span></span>
-<span id="cb53-18"><a href="#cb53-18" aria-hidden="true" tabindex="-1"></a>            node <span class="op">=</span> Node(data, <span class="bu">next</span><span class="op">=</span><span class="va">self</span>.head, prev<span class="op">=</span><span class="va">None</span>)</span>
-<span id="cb53-19"><a href="#cb53-19" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.head <span class="op">=</span> node <span class="co"># make the new node as the new head (i.e. start)</span></span>
-<span id="cb53-20"><a href="#cb53-20" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
-<span id="cb53-21"><a href="#cb53-21" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb53-22"><a href="#cb53-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb53-23"><a href="#cb53-23" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Case-2: We have some nodes in place</span></span>
-<span id="cb53-24"><a href="#cb53-24" aria-hidden="true" tabindex="-1"></a>            node <span class="op">=</span> Node(data, <span class="bu">next</span><span class="op">=</span><span class="va">self</span>.head, prev<span class="op">=</span><span class="va">None</span>) <span class="co"># make a node, point next to old head, point prev to none</span></span>
-<span id="cb53-25"><a href="#cb53-25" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.head.prev <span class="op">=</span> node <span class="co"># point old head's prev to new node</span></span>
-<span id="cb53-26"><a href="#cb53-26" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.head <span class="op">=</span> node <span class="co"># make the new node as the new head (i.e. start)</span></span>
-<span id="cb53-27"><a href="#cb53-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-28"><a href="#cb53-28" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb53-29"><a href="#cb53-29" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> print_forward(<span class="va">self</span>):</span>
-<span id="cb53-30"><a href="#cb53-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.head <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb53-31"><a href="#cb53-31" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">"Linked List is empty!"</span>)</span>
-<span id="cb53-32"><a href="#cb53-32" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
-<span id="cb53-33"><a href="#cb53-33" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb53-34"><a href="#cb53-34" aria-hidden="true" tabindex="-1"></a>        <span class="co"># else we will print it. </span></span>
-<span id="cb53-35"><a href="#cb53-35" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Iterate over the head, starting from the first node and moving 1 step further.</span></span>
-<span id="cb53-36"><a href="#cb53-36" aria-hidden="true" tabindex="-1"></a>        itr <span class="op">=</span> <span class="va">self</span>.head</span>
-<span id="cb53-37"><a href="#cb53-37" aria-hidden="true" tabindex="-1"></a>        llstr <span class="op">=</span> <span class="st">""</span></span>
-<span id="cb53-38"><a href="#cb53-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> itr:</span>
-<span id="cb53-39"><a href="#cb53-39" aria-hidden="true" tabindex="-1"></a>            llstr<span class="op">+=</span> <span class="bu">str</span>(itr.data)</span>
-<span id="cb53-40"><a href="#cb53-40" aria-hidden="true" tabindex="-1"></a>            llstr<span class="op">+=</span><span class="st">'--&gt;'</span></span>
-<span id="cb53-41"><a href="#cb53-41" aria-hidden="true" tabindex="-1"></a>            itr <span class="op">=</span> itr.<span class="bu">next</span></span>
-<span id="cb53-42"><a href="#cb53-42" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(llstr)</span>
-<span id="cb53-43"><a href="#cb53-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-44"><a href="#cb53-44" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_last_node(<span class="va">self</span>):</span>
-<span id="cb53-45"><a href="#cb53-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.head <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb53-46"><a href="#cb53-46" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">"Linked List is empty!"</span>)</span>
-<span id="cb53-47"><a href="#cb53-47" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
-<span id="cb53-48"><a href="#cb53-48" aria-hidden="true" tabindex="-1"></a>        <span class="co"># else, iterate and get the last node</span></span>
-<span id="cb53-49"><a href="#cb53-49" aria-hidden="true" tabindex="-1"></a>        itr<span class="op">=</span><span class="va">self</span>.head</span>
-<span id="cb53-50"><a href="#cb53-50" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> itr.<span class="bu">next</span>: <span class="co"># NOT itr. Why?🤔</span></span>
-<span id="cb53-51"><a href="#cb53-51" aria-hidden="true" tabindex="-1"></a>            itr <span class="op">=</span> itr.<span class="bu">next</span></span>
-<span id="cb53-52"><a href="#cb53-52" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> itr</span>
-<span id="cb53-53"><a href="#cb53-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-54"><a href="#cb53-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-55"><a href="#cb53-55" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> print_backward(<span class="va">self</span>):</span>
-<span id="cb53-56"><a href="#cb53-56" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.head <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb53-57"><a href="#cb53-57" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">"Linked List is empty!"</span>)</span>
-<span id="cb53-58"><a href="#cb53-58" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
-<span id="cb53-59"><a href="#cb53-59" aria-hidden="true" tabindex="-1"></a>        <span class="co"># else we will print it. </span></span>
-<span id="cb53-60"><a href="#cb53-60" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Iterate over the head, starting from the first node and moving 1 step further.</span></span>
-<span id="cb53-61"><a href="#cb53-61" aria-hidden="true" tabindex="-1"></a>        itr <span class="op">=</span> <span class="va">self</span>.get_last_node()</span>
-<span id="cb53-62"><a href="#cb53-62" aria-hidden="true" tabindex="-1"></a>        llstr <span class="op">=</span> <span class="st">""</span></span>
-<span id="cb53-63"><a href="#cb53-63" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> itr:</span>
-<span id="cb53-64"><a href="#cb53-64" aria-hidden="true" tabindex="-1"></a>            llstr<span class="op">+=</span> <span class="bu">str</span>(itr.data)</span>
-<span id="cb53-65"><a href="#cb53-65" aria-hidden="true" tabindex="-1"></a>            llstr<span class="op">+=</span><span class="st">'--&gt;'</span></span>
-<span id="cb53-66"><a href="#cb53-66" aria-hidden="true" tabindex="-1"></a>            itr <span class="op">=</span> itr.prev</span>
-<span id="cb53-67"><a href="#cb53-67" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(llstr)</span>
-<span id="cb53-68"><a href="#cb53-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-69"><a href="#cb53-69" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> insert_at_end(<span class="va">self</span>, data: Union[<span class="bu">str</span>, <span class="bu">int</span>]):</span>
-<span id="cb53-70"><a href="#cb53-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-71"><a href="#cb53-71" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Case-1: We start with an empty Linked List</span></span>
-<span id="cb53-72"><a href="#cb53-72" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.head <span class="op">==</span> <span class="va">None</span>:</span>
-<span id="cb53-73"><a href="#cb53-73" aria-hidden="true" tabindex="-1"></a>            <span class="co"># make a node of the data, point next of this node to old head, point prev of this node to null/None as it is the new head (i.e. start)</span></span>
-<span id="cb53-74"><a href="#cb53-74" aria-hidden="true" tabindex="-1"></a>            node <span class="op">=</span> Node(data, <span class="bu">next</span><span class="op">=</span><span class="va">self</span>.head, prev<span class="op">=</span><span class="va">None</span>)</span>
-<span id="cb53-75"><a href="#cb53-75" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.head <span class="op">=</span> node <span class="co"># make the new node as the new head (i.e. start)</span></span>
-<span id="cb53-76"><a href="#cb53-76" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
-<span id="cb53-77"><a href="#cb53-77" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb53-78"><a href="#cb53-78" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb53-79"><a href="#cb53-79" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Case-2: We have some nodes in place</span></span>
-<span id="cb53-80"><a href="#cb53-80" aria-hidden="true" tabindex="-1"></a>            last_node <span class="op">=</span> <span class="va">self</span>.get_last_node() <span class="co"># get the last node</span></span>
-<span id="cb53-81"><a href="#cb53-81" aria-hidden="true" tabindex="-1"></a>            node <span class="op">=</span> Node(data, <span class="bu">next</span><span class="op">=</span><span class="va">None</span>, prev<span class="op">=</span>last_node) <span class="co"># make a node, point next to None, point prev to last node in linked_list</span></span>
-<span id="cb53-82"><a href="#cb53-82" aria-hidden="true" tabindex="-1"></a>            last_node.<span class="bu">next</span> <span class="op">=</span> node <span class="co"># point last node's next to new node</span></span>
-<span id="cb53-83"><a href="#cb53-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-84"><a href="#cb53-84" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_length(<span class="va">self</span>):</span>
-<span id="cb53-85"><a href="#cb53-85" aria-hidden="true" tabindex="-1"></a>        counter <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb53-86"><a href="#cb53-86" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Edge case: if linked list is empty. Then we need to check the `head`</span></span>
-<span id="cb53-87"><a href="#cb53-87" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.head <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb53-88"><a href="#cb53-88" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="dv">0</span></span>
-<span id="cb53-89"><a href="#cb53-89" aria-hidden="true" tabindex="-1"></a>        <span class="co"># else, iterate over head</span></span>
-<span id="cb53-90"><a href="#cb53-90" aria-hidden="true" tabindex="-1"></a>        itr <span class="op">=</span> <span class="va">self</span>.head</span>
-<span id="cb53-91"><a href="#cb53-91" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> itr:</span>
-<span id="cb53-92"><a href="#cb53-92" aria-hidden="true" tabindex="-1"></a>            itr <span class="op">=</span> itr.<span class="bu">next</span></span>
-<span id="cb53-93"><a href="#cb53-93" aria-hidden="true" tabindex="-1"></a>            counter<span class="op">+=</span><span class="dv">1</span></span>
-<span id="cb53-94"><a href="#cb53-94" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> counter</span>
-<span id="cb53-95"><a href="#cb53-95" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb53-96"><a href="#cb53-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-97"><a href="#cb53-97" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> insert_at(<span class="va">self</span>, index: <span class="bu">int</span>, data: Union[<span class="bu">str</span>, <span class="bu">int</span>]):</span>
-<span id="cb53-98"><a href="#cb53-98" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Edgecases: adding element at the start, or at the end </span></span>
-<span id="cb53-99"><a href="#cb53-99" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> index<span class="op">==</span><span class="dv">0</span>:</span>
-<span id="cb53-100"><a href="#cb53-100" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.insert_at_beginning(data)</span>
-<span id="cb53-101"><a href="#cb53-101" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
-<span id="cb53-102"><a href="#cb53-102" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> index <span class="op">==</span> <span class="va">self</span>.get_length():</span>
-<span id="cb53-103"><a href="#cb53-103" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.insert_at_end(data)</span>
-<span id="cb53-104"><a href="#cb53-104" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
-<span id="cb53-105"><a href="#cb53-105" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> index<span class="op">&lt;</span><span class="dv">0</span> <span class="kw">or</span> index<span class="op">&gt;</span><span class="va">self</span>.get_length():</span>
-<span id="cb53-106"><a href="#cb53-106" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">Exception</span>(<span class="ss">f"index= </span><span class="sc">{</span>index<span class="sc">}</span><span class="ss"> is Out of Range!"</span>)</span>
-<span id="cb53-107"><a href="#cb53-107" aria-hidden="true" tabindex="-1"></a>        <span class="co"># By now, we are adding element in a non-empty list and somewhere in the middle</span></span>
-<span id="cb53-108"><a href="#cb53-108" aria-hidden="true" tabindex="-1"></a>        <span class="co"># begin from the head (i.e. start of a doubly linked list)</span></span>
-<span id="cb53-109"><a href="#cb53-109" aria-hidden="true" tabindex="-1"></a>        itr <span class="op">=</span> <span class="va">self</span>.head</span>
-<span id="cb53-110"><a href="#cb53-110" aria-hidden="true" tabindex="-1"></a>        counter <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb53-111"><a href="#cb53-111" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> counter<span class="op">&lt;</span>index<span class="op">-</span><span class="dv">1</span>:</span>
-<span id="cb53-112"><a href="#cb53-112" aria-hidden="true" tabindex="-1"></a>            itr <span class="op">=</span> itr.<span class="bu">next</span></span>
-<span id="cb53-113"><a href="#cb53-113" aria-hidden="true" tabindex="-1"></a>            counter<span class="op">+=</span><span class="dv">1</span></span>
-<span id="cb53-114"><a href="#cb53-114" aria-hidden="true" tabindex="-1"></a>        <span class="co"># above loop will break as soon as we are at node just before where we want to add the new data</span></span>
-<span id="cb53-115"><a href="#cb53-115" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb53-116"><a href="#cb53-116" aria-hidden="true" tabindex="-1"></a>        node <span class="op">=</span> Node(data, <span class="bu">next</span><span class="op">=</span>itr.<span class="bu">next</span>, prev<span class="op">=</span>itr)<span class="co"># Create node of new data; point it's next to the next node in the original linked list; point it's prev to current itr node</span></span>
-<span id="cb53-117"><a href="#cb53-117" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> node.<span class="bu">next</span>:</span>
-<span id="cb53-118"><a href="#cb53-118" aria-hidden="true" tabindex="-1"></a>            node.<span class="bu">next</span>.prev <span class="op">=</span> node <span class="co"># if next node exists, point its prev to new node</span></span>
-<span id="cb53-119"><a href="#cb53-119" aria-hidden="true" tabindex="-1"></a>        itr.<span class="bu">next</span> <span class="op">=</span> node <span class="co"># point previous node's next pointer to the new node just added</span></span>
-<span id="cb53-120"><a href="#cb53-120" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-121"><a href="#cb53-121" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> insert_values(<span class="va">self</span>, data_list: List):</span>
-<span id="cb53-122"><a href="#cb53-122" aria-hidden="true" tabindex="-1"></a>        <span class="co"># initialize a new linked list</span></span>
-<span id="cb53-123"><a href="#cb53-123" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.head <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb53-124"><a href="#cb53-124" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-125"><a href="#cb53-125" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Use the insert_at_end function</span></span>
-<span id="cb53-126"><a href="#cb53-126" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> data <span class="kw">in</span> data_list:</span>
-<span id="cb53-127"><a href="#cb53-127" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.insert_at_end(data)</span>
-<span id="cb53-128"><a href="#cb53-128" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-129"><a href="#cb53-129" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-130"><a href="#cb53-130" aria-hidden="true" tabindex="-1"></a><span class="co">##########################</span></span>
-<span id="cb53-131"><a href="#cb53-131" aria-hidden="true" tabindex="-1"></a><span class="co"># Test the code developed</span></span>
-<span id="cb53-132"><a href="#cb53-132" aria-hidden="true" tabindex="-1"></a><span class="co">##########################</span></span>
-<span id="cb53-133"><a href="#cb53-133" aria-hidden="true" tabindex="-1"></a>dll <span class="op">=</span> DoublyLinkedList()</span>
-<span id="cb53-134"><a href="#cb53-134" aria-hidden="true" tabindex="-1"></a>dll.print_forward()</span>
-<span id="cb53-135"><a href="#cb53-135" aria-hidden="true" tabindex="-1"></a>dll.print_backward()</span>
-<span id="cb53-136"><a href="#cb53-136" aria-hidden="true" tabindex="-1"></a><span class="co"># insert_at_beginning</span></span>
-<span id="cb53-137"><a href="#cb53-137" aria-hidden="true" tabindex="-1"></a>dll.insert_at_beginning(<span class="st">'apple'</span>)</span>
-<span id="cb53-138"><a href="#cb53-138" aria-hidden="true" tabindex="-1"></a>dll.insert_at_beginning(<span class="st">'banana'</span>)</span>
-<span id="cb53-139"><a href="#cb53-139" aria-hidden="true" tabindex="-1"></a>dll.insert_at_beginning(<span class="st">'mango'</span>)</span>
-<span id="cb53-140"><a href="#cb53-140" aria-hidden="true" tabindex="-1"></a>dll.print_forward()</span>
-<span id="cb53-141"><a href="#cb53-141" aria-hidden="true" tabindex="-1"></a>dll.print_backward()</span>
-<span id="cb53-142"><a href="#cb53-142" aria-hidden="true" tabindex="-1"></a><span class="co"># insert_at_end</span></span>
-<span id="cb53-143"><a href="#cb53-143" aria-hidden="true" tabindex="-1"></a>dll.insert_at_end(<span class="st">'grapes'</span>)</span>
-<span id="cb53-144"><a href="#cb53-144" aria-hidden="true" tabindex="-1"></a>dll.print_forward()</span>
-<span id="cb53-145"><a href="#cb53-145" aria-hidden="true" tabindex="-1"></a><span class="co"># insert_at</span></span>
-<span id="cb53-146"><a href="#cb53-146" aria-hidden="true" tabindex="-1"></a>dll.insert_at(<span class="dv">1</span>, <span class="st">'mausami'</span>)</span>
-<span id="cb53-147"><a href="#cb53-147" aria-hidden="true" tabindex="-1"></a>dll.print_forward()</span>
-<span id="cb53-148"><a href="#cb53-148" aria-hidden="true" tabindex="-1"></a>dll.insert_at(<span class="dv">0</span>, <span class="st">'0'</span>)</span>
-<span id="cb53-149"><a href="#cb53-149" aria-hidden="true" tabindex="-1"></a>dll.print_forward()</span>
-<span id="cb53-150"><a href="#cb53-150" aria-hidden="true" tabindex="-1"></a>dll.insert_at(<span class="dv">6</span>, <span class="st">'6'</span>)</span>
-<span id="cb53-151"><a href="#cb53-151" aria-hidden="true" tabindex="-1"></a>dll.print_forward()</span>
-<span id="cb53-152"><a href="#cb53-152" aria-hidden="true" tabindex="-1"></a><span class="co"># insert_values</span></span>
-<span id="cb53-153"><a href="#cb53-153" aria-hidden="true" tabindex="-1"></a>dll <span class="op">=</span> DoublyLinkedList()</span>
-<span id="cb53-154"><a href="#cb53-154" aria-hidden="true" tabindex="-1"></a>fruits_list <span class="op">=</span> [<span class="st">'apple'</span>, <span class="st">'banana'</span>]</span>
-<span id="cb53-155"><a href="#cb53-155" aria-hidden="true" tabindex="-1"></a>dll.insert_values(fruits_list)</span>
-<span id="cb53-156"><a href="#cb53-156" aria-hidden="true" tabindex="-1"></a>dll.print_forward()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<summary>Show solution code</summary>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Node:</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, data<span class="op">=</span><span class="va">None</span>, <span class="bu">next</span><span class="op">=</span><span class="va">None</span>, prev<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.data <span class="op">=</span> data</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.<span class="bu">next</span> <span class="op">=</span> <span class="bu">next</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.prev <span class="op">=</span> prev</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> DoublyLinkedList:</span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>        <span class="co"># initialize an empty doubly linked list. head is the start node (always)</span></span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.head <span class="op">=</span> <span class="va">None</span> <span class="co"># make a None start node as head</span></span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb50-13"><a href="#cb50-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> insert_at_beginning(<span class="va">self</span>, data: Union[<span class="bu">str</span>, <span class="bu">int</span>]):</span>
+<span id="cb50-14"><a href="#cb50-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-15"><a href="#cb50-15" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Case-1: We start with an empty Linked List</span></span>
+<span id="cb50-16"><a href="#cb50-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.head <span class="op">==</span> <span class="va">None</span>:</span>
+<span id="cb50-17"><a href="#cb50-17" aria-hidden="true" tabindex="-1"></a>            <span class="co"># make a node of the data, point next of this node to old head, point prev of this node to null/None as it is the new head (i.e. start)</span></span>
+<span id="cb50-18"><a href="#cb50-18" aria-hidden="true" tabindex="-1"></a>            node <span class="op">=</span> Node(data, <span class="bu">next</span><span class="op">=</span><span class="va">self</span>.head, prev<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb50-19"><a href="#cb50-19" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.head <span class="op">=</span> node <span class="co"># make the new node as the new head (i.e. start)</span></span>
+<span id="cb50-20"><a href="#cb50-20" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb50-21"><a href="#cb50-21" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb50-22"><a href="#cb50-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb50-23"><a href="#cb50-23" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Case-2: We have some nodes in place</span></span>
+<span id="cb50-24"><a href="#cb50-24" aria-hidden="true" tabindex="-1"></a>            node <span class="op">=</span> Node(data, <span class="bu">next</span><span class="op">=</span><span class="va">self</span>.head, prev<span class="op">=</span><span class="va">None</span>) <span class="co"># make a node, point next to old head, point prev to none</span></span>
+<span id="cb50-25"><a href="#cb50-25" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.head.prev <span class="op">=</span> node <span class="co"># point old head's prev to new node</span></span>
+<span id="cb50-26"><a href="#cb50-26" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.head <span class="op">=</span> node <span class="co"># make the new node as the new head (i.e. start)</span></span>
+<span id="cb50-27"><a href="#cb50-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-28"><a href="#cb50-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb50-29"><a href="#cb50-29" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> print_forward(<span class="va">self</span>):</span>
+<span id="cb50-30"><a href="#cb50-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.head <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb50-31"><a href="#cb50-31" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">"Linked List is empty!"</span>)</span>
+<span id="cb50-32"><a href="#cb50-32" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb50-33"><a href="#cb50-33" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb50-34"><a href="#cb50-34" aria-hidden="true" tabindex="-1"></a>        <span class="co"># else we will print it. </span></span>
+<span id="cb50-35"><a href="#cb50-35" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Iterate over the head, starting from the first node and moving 1 step further.</span></span>
+<span id="cb50-36"><a href="#cb50-36" aria-hidden="true" tabindex="-1"></a>        itr <span class="op">=</span> <span class="va">self</span>.head</span>
+<span id="cb50-37"><a href="#cb50-37" aria-hidden="true" tabindex="-1"></a>        llstr <span class="op">=</span> <span class="st">""</span></span>
+<span id="cb50-38"><a href="#cb50-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> itr:</span>
+<span id="cb50-39"><a href="#cb50-39" aria-hidden="true" tabindex="-1"></a>            llstr<span class="op">+=</span> <span class="bu">str</span>(itr.data)</span>
+<span id="cb50-40"><a href="#cb50-40" aria-hidden="true" tabindex="-1"></a>            llstr<span class="op">+=</span><span class="st">'--&gt;'</span></span>
+<span id="cb50-41"><a href="#cb50-41" aria-hidden="true" tabindex="-1"></a>            itr <span class="op">=</span> itr.<span class="bu">next</span></span>
+<span id="cb50-42"><a href="#cb50-42" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(llstr)</span>
+<span id="cb50-43"><a href="#cb50-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-44"><a href="#cb50-44" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_last_node(<span class="va">self</span>):</span>
+<span id="cb50-45"><a href="#cb50-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.head <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb50-46"><a href="#cb50-46" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">"Linked List is empty!"</span>)</span>
+<span id="cb50-47"><a href="#cb50-47" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb50-48"><a href="#cb50-48" aria-hidden="true" tabindex="-1"></a>        <span class="co"># else, iterate and get the last node</span></span>
+<span id="cb50-49"><a href="#cb50-49" aria-hidden="true" tabindex="-1"></a>        itr<span class="op">=</span><span class="va">self</span>.head</span>
+<span id="cb50-50"><a href="#cb50-50" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> itr.<span class="bu">next</span>: <span class="co"># NOT itr. Why?🤔</span></span>
+<span id="cb50-51"><a href="#cb50-51" aria-hidden="true" tabindex="-1"></a>            itr <span class="op">=</span> itr.<span class="bu">next</span></span>
+<span id="cb50-52"><a href="#cb50-52" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> itr</span>
+<span id="cb50-53"><a href="#cb50-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-54"><a href="#cb50-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-55"><a href="#cb50-55" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> print_backward(<span class="va">self</span>):</span>
+<span id="cb50-56"><a href="#cb50-56" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.head <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb50-57"><a href="#cb50-57" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">"Linked List is empty!"</span>)</span>
+<span id="cb50-58"><a href="#cb50-58" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb50-59"><a href="#cb50-59" aria-hidden="true" tabindex="-1"></a>        <span class="co"># else we will print it. </span></span>
+<span id="cb50-60"><a href="#cb50-60" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Iterate over the head, starting from the first node and moving 1 step further.</span></span>
+<span id="cb50-61"><a href="#cb50-61" aria-hidden="true" tabindex="-1"></a>        itr <span class="op">=</span> <span class="va">self</span>.get_last_node()</span>
+<span id="cb50-62"><a href="#cb50-62" aria-hidden="true" tabindex="-1"></a>        llstr <span class="op">=</span> <span class="st">""</span></span>
+<span id="cb50-63"><a href="#cb50-63" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> itr:</span>
+<span id="cb50-64"><a href="#cb50-64" aria-hidden="true" tabindex="-1"></a>            llstr<span class="op">+=</span> <span class="bu">str</span>(itr.data)</span>
+<span id="cb50-65"><a href="#cb50-65" aria-hidden="true" tabindex="-1"></a>            llstr<span class="op">+=</span><span class="st">'--&gt;'</span></span>
+<span id="cb50-66"><a href="#cb50-66" aria-hidden="true" tabindex="-1"></a>            itr <span class="op">=</span> itr.prev</span>
+<span id="cb50-67"><a href="#cb50-67" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(llstr)</span>
+<span id="cb50-68"><a href="#cb50-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-69"><a href="#cb50-69" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> insert_at_end(<span class="va">self</span>, data: Union[<span class="bu">str</span>, <span class="bu">int</span>]):</span>
+<span id="cb50-70"><a href="#cb50-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-71"><a href="#cb50-71" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Case-1: We start with an empty Linked List</span></span>
+<span id="cb50-72"><a href="#cb50-72" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.head <span class="op">==</span> <span class="va">None</span>:</span>
+<span id="cb50-73"><a href="#cb50-73" aria-hidden="true" tabindex="-1"></a>            <span class="co"># make a node of the data, point next of this node to old head, point prev of this node to null/None as it is the new head (i.e. start)</span></span>
+<span id="cb50-74"><a href="#cb50-74" aria-hidden="true" tabindex="-1"></a>            node <span class="op">=</span> Node(data, <span class="bu">next</span><span class="op">=</span><span class="va">self</span>.head, prev<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb50-75"><a href="#cb50-75" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.head <span class="op">=</span> node <span class="co"># make the new node as the new head (i.e. start)</span></span>
+<span id="cb50-76"><a href="#cb50-76" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb50-77"><a href="#cb50-77" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb50-78"><a href="#cb50-78" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb50-79"><a href="#cb50-79" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Case-2: We have some nodes in place</span></span>
+<span id="cb50-80"><a href="#cb50-80" aria-hidden="true" tabindex="-1"></a>            last_node <span class="op">=</span> <span class="va">self</span>.get_last_node() <span class="co"># get the last node</span></span>
+<span id="cb50-81"><a href="#cb50-81" aria-hidden="true" tabindex="-1"></a>            node <span class="op">=</span> Node(data, <span class="bu">next</span><span class="op">=</span><span class="va">None</span>, prev<span class="op">=</span>last_node) <span class="co"># make a node, point next to None, point prev to last node in linked_list</span></span>
+<span id="cb50-82"><a href="#cb50-82" aria-hidden="true" tabindex="-1"></a>            last_node.<span class="bu">next</span> <span class="op">=</span> node <span class="co"># point last node's next to new node</span></span>
+<span id="cb50-83"><a href="#cb50-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-84"><a href="#cb50-84" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_length(<span class="va">self</span>):</span>
+<span id="cb50-85"><a href="#cb50-85" aria-hidden="true" tabindex="-1"></a>        counter <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb50-86"><a href="#cb50-86" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Edge case: if linked list is empty. Then we need to check the `head`</span></span>
+<span id="cb50-87"><a href="#cb50-87" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.head <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb50-88"><a href="#cb50-88" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb50-89"><a href="#cb50-89" aria-hidden="true" tabindex="-1"></a>        <span class="co"># else, iterate over head</span></span>
+<span id="cb50-90"><a href="#cb50-90" aria-hidden="true" tabindex="-1"></a>        itr <span class="op">=</span> <span class="va">self</span>.head</span>
+<span id="cb50-91"><a href="#cb50-91" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> itr:</span>
+<span id="cb50-92"><a href="#cb50-92" aria-hidden="true" tabindex="-1"></a>            itr <span class="op">=</span> itr.<span class="bu">next</span></span>
+<span id="cb50-93"><a href="#cb50-93" aria-hidden="true" tabindex="-1"></a>            counter<span class="op">+=</span><span class="dv">1</span></span>
+<span id="cb50-94"><a href="#cb50-94" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> counter</span>
+<span id="cb50-95"><a href="#cb50-95" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb50-96"><a href="#cb50-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-97"><a href="#cb50-97" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> insert_at(<span class="va">self</span>, index: <span class="bu">int</span>, data: Union[<span class="bu">str</span>, <span class="bu">int</span>]):</span>
+<span id="cb50-98"><a href="#cb50-98" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Edgecases: adding element at the start, or at the end </span></span>
+<span id="cb50-99"><a href="#cb50-99" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> index<span class="op">==</span><span class="dv">0</span>:</span>
+<span id="cb50-100"><a href="#cb50-100" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.insert_at_beginning(data)</span>
+<span id="cb50-101"><a href="#cb50-101" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb50-102"><a href="#cb50-102" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> index <span class="op">==</span> <span class="va">self</span>.get_length():</span>
+<span id="cb50-103"><a href="#cb50-103" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.insert_at_end(data)</span>
+<span id="cb50-104"><a href="#cb50-104" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb50-105"><a href="#cb50-105" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> index<span class="op">&lt;</span><span class="dv">0</span> <span class="kw">or</span> index<span class="op">&gt;</span><span class="va">self</span>.get_length():</span>
+<span id="cb50-106"><a href="#cb50-106" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">Exception</span>(<span class="ss">f"index= </span><span class="sc">{</span>index<span class="sc">}</span><span class="ss"> is Out of Range!"</span>)</span>
+<span id="cb50-107"><a href="#cb50-107" aria-hidden="true" tabindex="-1"></a>        <span class="co"># By now, we are adding element in a non-empty list and somewhere in the middle</span></span>
+<span id="cb50-108"><a href="#cb50-108" aria-hidden="true" tabindex="-1"></a>        <span class="co"># begin from the head (i.e. start of a doubly linked list)</span></span>
+<span id="cb50-109"><a href="#cb50-109" aria-hidden="true" tabindex="-1"></a>        itr <span class="op">=</span> <span class="va">self</span>.head</span>
+<span id="cb50-110"><a href="#cb50-110" aria-hidden="true" tabindex="-1"></a>        counter <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb50-111"><a href="#cb50-111" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> counter<span class="op">&lt;</span>index<span class="op">-</span><span class="dv">1</span>:</span>
+<span id="cb50-112"><a href="#cb50-112" aria-hidden="true" tabindex="-1"></a>            itr <span class="op">=</span> itr.<span class="bu">next</span></span>
+<span id="cb50-113"><a href="#cb50-113" aria-hidden="true" tabindex="-1"></a>            counter<span class="op">+=</span><span class="dv">1</span></span>
+<span id="cb50-114"><a href="#cb50-114" aria-hidden="true" tabindex="-1"></a>        <span class="co"># above loop will break as soon as we are at node just before where we want to add the new data</span></span>
+<span id="cb50-115"><a href="#cb50-115" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb50-116"><a href="#cb50-116" aria-hidden="true" tabindex="-1"></a>        node <span class="op">=</span> Node(data, <span class="bu">next</span><span class="op">=</span>itr.<span class="bu">next</span>, prev<span class="op">=</span>itr)<span class="co"># Create node of new data; point it's next to the next node in the original linked list; point it's prev to current itr node</span></span>
+<span id="cb50-117"><a href="#cb50-117" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> node.<span class="bu">next</span>:</span>
+<span id="cb50-118"><a href="#cb50-118" aria-hidden="true" tabindex="-1"></a>            node.<span class="bu">next</span>.prev <span class="op">=</span> node <span class="co"># if next node exists, point its prev to new node</span></span>
+<span id="cb50-119"><a href="#cb50-119" aria-hidden="true" tabindex="-1"></a>        itr.<span class="bu">next</span> <span class="op">=</span> node <span class="co"># point previous node's next pointer to the new node just added</span></span>
+<span id="cb50-120"><a href="#cb50-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-121"><a href="#cb50-121" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> insert_values(<span class="va">self</span>, data_list: List):</span>
+<span id="cb50-122"><a href="#cb50-122" aria-hidden="true" tabindex="-1"></a>        <span class="co"># initialize a new linked list</span></span>
+<span id="cb50-123"><a href="#cb50-123" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.head <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb50-124"><a href="#cb50-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-125"><a href="#cb50-125" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Use the insert_at_end function</span></span>
+<span id="cb50-126"><a href="#cb50-126" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> data <span class="kw">in</span> data_list:</span>
+<span id="cb50-127"><a href="#cb50-127" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.insert_at_end(data)</span>
+<span id="cb50-128"><a href="#cb50-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-129"><a href="#cb50-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-130"><a href="#cb50-130" aria-hidden="true" tabindex="-1"></a><span class="co">##########################</span></span>
+<span id="cb50-131"><a href="#cb50-131" aria-hidden="true" tabindex="-1"></a><span class="co"># Test the code developed</span></span>
+<span id="cb50-132"><a href="#cb50-132" aria-hidden="true" tabindex="-1"></a><span class="co">##########################</span></span>
+<span id="cb50-133"><a href="#cb50-133" aria-hidden="true" tabindex="-1"></a>dll <span class="op">=</span> DoublyLinkedList()</span>
+<span id="cb50-134"><a href="#cb50-134" aria-hidden="true" tabindex="-1"></a>dll.print_forward()</span>
+<span id="cb50-135"><a href="#cb50-135" aria-hidden="true" tabindex="-1"></a>dll.print_backward()</span>
+<span id="cb50-136"><a href="#cb50-136" aria-hidden="true" tabindex="-1"></a><span class="co"># insert_at_beginning</span></span>
+<span id="cb50-137"><a href="#cb50-137" aria-hidden="true" tabindex="-1"></a>dll.insert_at_beginning(<span class="st">'apple'</span>)</span>
+<span id="cb50-138"><a href="#cb50-138" aria-hidden="true" tabindex="-1"></a>dll.insert_at_beginning(<span class="st">'banana'</span>)</span>
+<span id="cb50-139"><a href="#cb50-139" aria-hidden="true" tabindex="-1"></a>dll.insert_at_beginning(<span class="st">'mango'</span>)</span>
+<span id="cb50-140"><a href="#cb50-140" aria-hidden="true" tabindex="-1"></a>dll.print_forward()</span>
+<span id="cb50-141"><a href="#cb50-141" aria-hidden="true" tabindex="-1"></a>dll.print_backward()</span>
+<span id="cb50-142"><a href="#cb50-142" aria-hidden="true" tabindex="-1"></a><span class="co"># insert_at_end</span></span>
+<span id="cb50-143"><a href="#cb50-143" aria-hidden="true" tabindex="-1"></a>dll.insert_at_end(<span class="st">'grapes'</span>)</span>
+<span id="cb50-144"><a href="#cb50-144" aria-hidden="true" tabindex="-1"></a>dll.print_forward()</span>
+<span id="cb50-145"><a href="#cb50-145" aria-hidden="true" tabindex="-1"></a><span class="co"># insert_at</span></span>
+<span id="cb50-146"><a href="#cb50-146" aria-hidden="true" tabindex="-1"></a>dll.insert_at(<span class="dv">1</span>, <span class="st">'mausami'</span>)</span>
+<span id="cb50-147"><a href="#cb50-147" aria-hidden="true" tabindex="-1"></a>dll.print_forward()</span>
+<span id="cb50-148"><a href="#cb50-148" aria-hidden="true" tabindex="-1"></a>dll.insert_at(<span class="dv">0</span>, <span class="st">'0'</span>)</span>
+<span id="cb50-149"><a href="#cb50-149" aria-hidden="true" tabindex="-1"></a>dll.print_forward()</span>
+<span id="cb50-150"><a href="#cb50-150" aria-hidden="true" tabindex="-1"></a>dll.insert_at(<span class="dv">6</span>, <span class="st">'6'</span>)</span>
+<span id="cb50-151"><a href="#cb50-151" aria-hidden="true" tabindex="-1"></a>dll.print_forward()</span>
+<span id="cb50-152"><a href="#cb50-152" aria-hidden="true" tabindex="-1"></a><span class="co"># insert_values</span></span>
+<span id="cb50-153"><a href="#cb50-153" aria-hidden="true" tabindex="-1"></a>dll <span class="op">=</span> DoublyLinkedList()</span>
+<span id="cb50-154"><a href="#cb50-154" aria-hidden="true" tabindex="-1"></a>fruits_list <span class="op">=</span> [<span class="st">'apple'</span>, <span class="st">'banana'</span>]</span>
+<span id="cb50-155"><a href="#cb50-155" aria-hidden="true" tabindex="-1"></a>dll.insert_values(fruits_list)</span>
+<span id="cb50-156"><a href="#cb50-156" aria-hidden="true" tabindex="-1"></a>dll.print_forward()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
