@@ -250,7 +250,12 @@ gtag('config', 'G-YQ6KB81L7R', { 'anonymize_ip': true});
 <p>Before diving into the code, it’s a good idea to pause for a moment and think what different methods/functionalities we want our <code>HashTable</code>to support. Once we have a clear understanding of these requirements, writing the code becomes much simpler.</p>
 <p>Throughout this blog, I will include visual diagrams to help illustrate what we’re aiming to build with the <code>HashTable</code>. These images will serve as mental maps, making it easier to write and understand the code. (Being able to visualize how data structures work is key to mastering them. Once you can visualize them, you’ll be able to code them effortlessly—without memorizing a single line.)</p>
 <p><strong>Q. What functions we want in <code>HashTable</code>?</strong></p>
-<p>Answer: 1. We want to <code>add</code> a key-value pair 2. We want to <code>get</code> value by supplying key 3. We want to <code>remove</code> by supplying key</p>
+<p><strong>Answer: </strong></p>
+<ol type="1">
+<li><p>We want to <code>add</code> a key-value pair</p></li>
+<li><p>We want to <code>get</code> value by supplying key</p></li>
+<li><p>We want to <code>remove</code> by supplying key</p></li>
+</ol>
 <p>To implement any of the above functionalities, we’ll first need a way to hash a key into an integer index—since computers operate on numbers, not strings. (Technically, computers can handle strings, but only by converting them to numerical codes, which is abstracted away from us.)</p>
 <p>Once we have this index, we’ll use it to internally manipulate data in the array to achieve the desired functionality.</p>
 <p>Based on the information presented above, the simplest signature of <code>HashTable</code> would look like this:</p>
