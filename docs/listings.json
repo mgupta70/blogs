@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2025-06-04-yolo/yolo.html",
       "/posts/2025-05-21-stack/stack.html",
       "/posts/2025-05-20-hash-map/Hash Table.html",
       "/posts/2025-05-19-linked-list/Linked_List.html",

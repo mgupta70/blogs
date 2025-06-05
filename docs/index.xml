@@ -10,7 +10,487 @@
 <atom:link href="https://mgupta70.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>AI/ML blogs from Mohit, Ph.D. Computer Vision</description>
 <generator>quarto-1.8.1</generator>
-<lastBuildDate>Wed, 21 May 2025 07:00:00 GMT</lastBuildDate>
+<lastBuildDate>Wed, 04 Jun 2025 07:00:00 GMT</lastBuildDate>
+<item>
+  <title>YOLO Made Easy</title>
+  <dc:creator>Mohit Gupta</dc:creator>
+  <link>https://mgupta70.github.io/posts/2025-06-04-yolo/yolo.html</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>History of Object Detection</p>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/obj_detectors.avif" width="500"></p>
+<p>Timeline</p>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolo_timeline.avif" width="500"></p>
+<p>Yolo Models’ performance with time</p>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolo_models.webp" width="500"></p>
+<section id="yolo-v1" class="level3">
+<h3 class="anchored" data-anchor-id="yolo-v1">YOLO v1</h3>
+<ul>
+<li><p>One key advantage of YOLO over other object detection methods is its speed (~45fps), making it suitable for real-time object detection tasks.</p></li>
+<li><p>However, it tends to be less accurate with small objects and objects that are close together due to the grid system it uses.</p></li>
+</ul>
+<p>Dataset: PASCALVOC</p>
+<p>Image: 7x7 Grids</p>
+<p>Image: 448x448 fixed</p>
+</section>
+<section id="yolo-v2" class="level3">
+<h3 class="anchored" data-anchor-id="yolo-v2">YOLO v2</h3>
+<ul>
+<li>Introduced anchor boxes, the Darknet-19 architecture, and fully convolutional predictions.</li>
+</ul>
+<p>Dataset: PASCALVOC + COCO</p>
+<p>Image: 13x13 Grids</p>
+<p>Image: 320x320 - 608x608 for Detections for variable input size</p>
+<ul>
+<li><p>Anchor Boxes</p></li>
+<li><p>Batch Norm</p></li>
+</ul>
+<p>Arch: DarkNet-19: <strong>Variant of vgg</strong></p>
+</section>
+<section id="yolo-v3" class="level3">
+<h3 class="anchored" data-anchor-id="yolo-v3">YOLO v3</h3>
+<p>Introduced <strong>Backbone</strong> + <strong>Neck</strong> based architecture naming</p>
+<p>Arch: DarkNet-53: <strong>Variant of ResNet</strong></p>
+<p>+Residual Connections</p>
+<p>Introduces the concept of “feature pyramid networks” (FPN)</p>
+<p>+Multi-scale predictions: 13x13, 26x26, 52x52 # multi-scale predictions</p>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov3_ms.png" width="500"></p>
+</section>
+<section id="yolo-v4" class="level3">
+<h3 class="anchored" data-anchor-id="yolo-v4">YOLO V4</h3>
+<p>paper with more emphasis on optimizing the network hyperparameters and an IOU-based loss function.</p>
+<p>Architecture: CSP: <strong>inspired by ResNet</strong></p>
+<p><strong>Backbone</strong> + <strong>Neck</strong> + <strong>Head</strong></p>
+<p>k-means clustering for Anchor Boxes</p>
+</section>
+<section id="yolo-v5" class="level3">
+<h3 class="anchored" data-anchor-id="yolo-v5">Yolo v5</h3>
+<p>Arch: based on the EfficientNet</p>
+<p><em>Dynamic</em> Anchor Boxes</p>
+<p>CIoU loss</p>
+<p>Improved SPP from Yolov4</p>
+</section>
+<section id="yolo-v6" class="level3">
+<h3 class="anchored" data-anchor-id="yolo-v6">Yolo v6</h3>
+<p>Arch: Based on EfficientNet architecture called EfficientNet-L2</p>
+<p><em>Dense</em> Anchor Boxes</p>
+</section>
+<section id="yolo-v7" class="level3">
+<h3 class="anchored" data-anchor-id="yolo-v7">Yolo v7</h3>
+<p>Focal Loss</p>
+<p>608x608 while earlier versions were 416x416</p>
+</section>
+<section id="yolov8" class="level3">
+<h3 class="anchored" data-anchor-id="yolov8">YOLOv8</h3>
+<p>built on these advancements, introduced features like anchor-free detection and Neural Architecture Search (NAS), making the model even more adaptive and efficient. YOLOv8 also enhanced real-time performance and accuracy, particularly in complex, dynamic environments.</p>
+</section>
+<section id="yolov9" class="level3">
+<h3 class="anchored" data-anchor-id="yolov9">YOLOv9</h3>
+<p>(released in early 2024) introduced Programmable Gradient Information (PGI) and GELAN to improve training efficiency and feature aggregation, offering faster and more accurate object detection without increasing computational costs. These innovations enhance its performance in real-time tasks.</p>
+</section>
+<section id="yolov10" class="level3">
+<h3 class="anchored" data-anchor-id="yolov10">YOLOv10</h3>
+<p>(released in May 2024) builds on these advancements with a dual-pathway system that eliminates Non-Maximum Suppression (NMS) during inference, improving both speed and accuracy. YOLOv10 also introduces large-kernel convolutions and partial self-attention, making it highly efficient for dynamic, real-time applications like autonomous driving and industrial automation​</p>
+</section>
+<section id="yolo-v1-1" class="level2">
+<h2 class="anchored" data-anchor-id="yolo-v1-1">YOLO V1</h2>
+<p><a href="https://arxiv.org/pdf/1506.02640">Official Paper</a></p>
+<section id="a.-labeling-the-data" class="level3">
+<h3 class="anchored" data-anchor-id="a.-labeling-the-data">A. Labeling the data:</h3>
+<p>In YOLO v1 the grid size is 7 x 7.</p>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov1_labeling.jpg" width="500"></p>
+<p>A grid cell is labeled to contain an object only if the center of the bounding box is in it. If the grid cell contains a center, the “objectness” is labeled 1 and 0 otherwise.</p>
+</section>
+<section id="b.-predictions" class="level3">
+<h3 class="anchored" data-anchor-id="b.-predictions">B. Predictions:</h3>
+<p>For 1 grid cell we predict: 5B + C paramters</p>
+<p>For whole image divided into S x S grids, we predict: S X S X (5B + C) params</p>
+<p>where,</p>
+<p>5: 4 bbox values (x,y,w,h) + 1 (confidence score) : (Formally, confidence = Probab(Object) x IOU(truth,pred). If no object exists in a cell, the confidence scores should be zero. Otherwise confidence score will be equal to the IOU b/w predicted box and the ground truth.)</p>
+<p>B: number of bboxes predicted per grid cell, B=2 (author’s choice) (B is not related to the number of classes.)</p>
+<p>C: number of classes (class probabilities) : (conditional class probabilities, Pr(class_i|Object))</p>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov1_pred.jpg" width="500"></p>
+<p>If we call P(object) the probability there is an object in a box b and P(c|object) the probability that the object is of class c, then the score for the class c in the box b in simply</p>
+<p><img src="https://latex.codecogs.com/png.latex?P(c)%20=%20P(c%7C%5Ctext%7Bobject%7D)%5Ctimes%20P(%5Ctext%7Bobject%7D)"></p>
+</section>
+<section id="architecture" class="level3">
+<h3 class="anchored" data-anchor-id="architecture">Architecture</h3>
+<p>Fine-details: 1. To improve the speed of the network, they alternated convolutional layers with 3x3 kernel size and convolutional layers with 1x1 kernel size. How?</p>
+<p>Ans:</p>
+<p>Let’s, we have a feature map of size 56 x 56 x 192 and we want to apply a convolution layer of 256 filters of kernel size 3 x 3. For each filter, we have:</p>
+<p><img src="https://latex.codecogs.com/png.latex?56%20%5Ctimes%2056%20%5Ctimes%20192%20%5Ctimes%203%20%5Ctimes%203%20=%20%205,419,008%20%5Ctext%7B%20computations%7D"></p>
+<p>For all the filters we have:</p>
+<p><img src="https://latex.codecogs.com/png.latex?5,419,008%20%5Ctimes%20256%20=%20%5Csim%201.4%20%5Ctext%7BB%20computations%7D"></p>
+<p>vs</p>
+<p>let’s apply a convolution layer of 128 filters of kernel size 1 x 1 first:</p>
+<p><img src="https://latex.codecogs.com/png.latex?56%20%5Ctimes%2056%20%5Ctimes%20192%20%5Ctimes%201%20%5Ctimes%201%20%5Ctimes%20128%20=%20%2077,070,336%20%5Ctext%7B%20computations%7D"></p>
+<p>and the resulting feature map is of size 56 x 56 x 128. Now, let’s apply our convolution layer of 256 filters with kernel size 3 x 3</p>
+<p><img src="https://latex.codecogs.com/png.latex?56%20%5Ctimes%2056%20%5Ctimes%20128%20%5Ctimes%203%20%5Ctimes%203%20%5Ctimes%20256=%20%20924,844,032%20%5Ctext%7B%20computations%7D"></p>
+<p>Adding 77,070,336 +924,844,032=1</p>
+<p>Therefore applying a 1 x 1 convolution prior to the 3 x 3 convolution reduces the dimensionality of the tensors and saves ~ 0.4B computations.</p>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov1_arch.png" width="500"></p>
+<p>The architecture uses Conv, Maxpool and Linear layers such that at the end the output should be 7x7x30. This was done because image was divided into 7x7 grids and for each grid, we are predicting 20 class probabs and 2 bboxes containing 5 values each (4 xywh + 1 conf). This was a customized setting applicable for PASCAL VOC dataset that had 20 classes. (Actualy the last layer is a FC layer not COnv layer. <code>nn.Linear (4096, 7*7*30)</code>)</p>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov1_arch2.png" width="500"></p>
+<section id="training" class="level4">
+<h4 class="anchored" data-anchor-id="training">Training</h4>
+<p>For each image we prepare ground truth as 7x7x30 tensor as explained in the start. Model also outputs 7x7x30 tensor then, using the loss explained below the model was trained.</p>
+</section>
+<section id="loss" class="level4">
+<h4 class="anchored" data-anchor-id="loss">Loss</h4>
+<p>Mean squared error loss for everything!!!</p>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov1_loss.png" width="500"></p>
+<p>Let’s break loss line by line</p>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov1_identity.webp" width="50"></p>
+<p>The identity function is <code>0</code> when there is no object or the current bounding box isn’t the responsible one. In other words, we only calculate the loss for the best bounding box. So the first line of the equation is the sum of squared differences between the predicted and actual midpoints of the objects in all grid cells <strong>which have an object</strong> in them and are the responsible bounding box.</p>
+<p>The second line is the sum of the squared differences between the square roots of the predicted and actual widths and heights in all grid cells <strong>which have an object</strong> in them. These are square rooted for reasons explained earlier.</p>
+<p>The third line is just the squared difference between the predicted class probabilities and the actual class probabilities in all cells <strong>which have an object</strong>.</p>
+<p>The fourth line is the same but for all cells <strong>which don’t have an object</strong> in them.</p>
+<p>The reason these two (3rd and 4th lines) are split up is so that we can multiply the fourth line by the noobj coefficient to punish the model less severely if it misclassifies when there is no object present.</p>
+<p><strong>Q: Why square root used for bbox size loss and not normal dimension?</strong></p>
+<p>A: Because it gives different weights to bboxes of different sizes. We want to make this error larger for smaller bboxes</p>
+<p>Let’s understand by example.</p>
+<p>Case-1 : Actual width = 100, Predicted width = 98</p>
+<p>Case-2 : Actual width = 4, Predicted width = 2</p>
+<p>In both the case the deviation is same i.e.&nbsp;2 but the quality of bbox for small bbox (Case-2) is very poor while quality of BBox predicted in Case-1 is really good.</p>
+<p><em>Loss with normal width</em></p>
+<p>Case-1 Loss: (100-98)**2 = 4</p>
+<p>Case-2 Loss: (4-2)**2 = 4</p>
+<p><em>Loss with square-root width</em></p>
+<p>Case-1 Loss: (10-9.899)**2 = 0.01</p>
+<p>Case-2 Loss: (2-1.414)**2 = 0.343</p>
+<div style="background-color:rgb(255, 0, 0); display: flex; gap: 20px; padding: 10px; justify-content: center;">
+<figure style="margin: 0; text-align: center;" class="figure">
+<figcaption>
+<b>NO</b>
+</figcaption>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov1_loss_q1.webp" width="300" class="figure-img"></p>
+</figure>
+<figure style="margin: 0; text-align: center;" class="figure">
+<figcaption>
+<b>YES</b>
+</figcaption>
+<img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov1_loss_q.webp" width="300" class="figure-img">
+</figure>
+</div>
+</section>
+<section id="nms" class="level4">
+<h4 class="anchored" data-anchor-id="nms">NMS</h4>
+<ol type="1">
+<li>Find all the boxes with a high objectness score. This is the level of confidence of the model that there is an object in the grid cell. We typically have a confidence threshold, so any box with a lower score is not considered.</li>
+</ol>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/iou_step1.png" width="500"></p>
+<ol start="2" type="1">
+<li>We then choose the box with the high confidence scores and remove the boxes that have high overlap i.e.&nbsp;IoU with the the highest confidence bbox. (Overlap is decided by IOU IoU)</li>
+</ol>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/iou_step2.png" width="500"></p>
+<p><strong>Exact Algo</strong></p>
+<p>Suppose we have B: bboxes preds, C_thresh: confidence thresh (objectness score) for each bbox<br>
+iou_thresh: iou overlap threshold</p>
+<ol type="1">
+<li><p>Filter bboxes with confidence &gt; C_thresh. Suppose now B -&gt; B_new</p></li>
+<li><p>Sort bboxes in B_new by confidence scores in descending order</p></li>
+<li><p>Initialize a new variable F_bboxes to store final bboxes</p></li>
+<li><p>while B_new is not empty:</p>
+<p>4.1 for b1 bbox in B_new</p>
+<p>4.2 Add b1 to F_bboxes</p>
+<p>4.3 Remove b1 from B_new</p>
+<p>4.4 for remaining b2 in B_new:</p>
+<p>4.4.1 if IoU(b1, b2) &gt;= iou_thresh -&gt; remove b2 from B_new</p></li>
+</ol>
+<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Suppose B contains BBoxes as list of list of 5 coordinates (x,y,w,h,c) : where c is confidence (objectness score)</span></span>
+<span id="cb1-2"></span>
+<span id="cb1-3">B <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">sorted</span>(B, key<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">lambda</span> x: x[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>], reverse<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># initial_bboxes</span></span>
+<span id="cb1-4">F <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> [] <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># final_bboxes</span></span>
+<span id="cb1-5"></span>
+<span id="cb1-6"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">while</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(B)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>:</span>
+<span id="cb1-7">    b1 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> B.pop(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>)</span>
+<span id="cb1-8">    F.append(b1)</span>
+<span id="cb1-9"></span>
+<span id="cb1-10">    remaining_bboxes <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> []</span>
+<span id="cb1-11">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> b2 <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> B:</span>
+<span id="cb1-12">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> iou(b1, b2) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;</span> iou_thresh:</span>
+<span id="cb1-13">            remaining_bboxes.append(b2)</span>
+<span id="cb1-14">    B <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> b2</span></code></pre></div>
+</section>
+</section>
+<section id="problems" class="level3">
+<h3 class="anchored" data-anchor-id="problems">Problems:</h3>
+<p>1.1 Did not account for this Edge case: In the case the grid cell contains 2 objects, suppose cat and a dog, we need to choose one of the classes as the label for the training data.</p>
+<p>1.2 YOLO can only predict a limited number of bounding boxes per grid cell, 2 in the original research paper. And though that number can be increased, only one class prediction can be made per cell, limiting the detections when multiple objects appear in a single grid cell. Thus, it struggles with bounding groups of small objects, such as flocks of birds, or multiple small objects of different classes.</p>
+<ol start="2" type="1">
+<li><p>YOLO imposes strong spatial constraints on bounding box predictions since each grid cell only predicts two boxes and can only have one class. This spatial constraint limits the number of nearby objects that our model can predict.</p></li>
+<li><p>The model struggled with small objects that appear in groups, such as flocks of birds</p></li>
+<li><p>THeir loss function treats errors the same in small bounding boxes versus large bounding boxes. A small error in a large box is generally benign but a small error in a small box has a much greater effect on IOU</p></li>
+<li><p>Detections at multi-scale not supported.</p></li>
+</ol>
+</section>
+</section>
+<section id="yolov2-aka-yolo9000" class="level2">
+<h2 class="anchored" data-anchor-id="yolov2-aka-yolo9000">YOLOv2 (aka YOLO9000)</h2>
+<p><a href="https://arxiv.org/pdf/1612.08242">Official Paper</a></p>
+<section id="whats-different-from-yolov1" class="level3">
+<h3 class="anchored" data-anchor-id="whats-different-from-yolov1">What’s different from YOLOv1?</h3>
+<p>Introduced Anchor Boxes: This allows the algorithm to handle a wider range of object sizes and aspect ratios. Used BatchNorm Expanded dataset: PASCAL VOC + COCO Flexible Image Size: 320x320 to 608x608: Multi-scale training. This helps to improve the detection performance of small objects.</p>
+<p>In YOLOv2 (and beyond), instead of predicting arbitrary bounding boxes directly, the model <strong>predicts offsets from a fixed set of predefined boxes</strong>, called <strong>anchor boxes</strong> or <strong>prior boxes</strong>.</p>
+<p>The different classes are this time passed through a Softmax activation function and the loss function is using cross-entropy instead of MSE.</p>
+<p>Grid size = 13x13 to ensure better detection of smaller objects</p>
+</section>
+<section id="anchor-boxes" class="level3">
+<h3 class="anchored" data-anchor-id="anchor-boxes">Anchor Boxes</h3>
+<p>Anchor Boxes: Sort of priors about object shapes; they guide the model in doing better predictions.</p>
+<p>Instead of directly predicting the <code>x</code> &amp; <code>y</code> i.e.&nbsp;bbox centers, the model predicts <code>tx</code> and <code>ty</code> such that:</p>
+<p><img src="https://latex.codecogs.com/png.latex?x%20=%20%5Csigma(t_x)"></p>
+<p><img src="https://latex.codecogs.com/png.latex?y%20=%20%5Csigma(t_y)"></p>
+<p>where, <img src="https://latex.codecogs.com/png.latex?%5Csigma"> is sigmoid: <img src="https://latex.codecogs.com/png.latex?%5Csigma(a)%20=%20%5Cfrac%7B1%7D%7B1%20+%20%5Cexp%20-%20a%7D"></p>
+<p>To get width <code>bw</code> and <code>bh</code> for the bbox, the model predicts <code>tw</code> and <code>th</code> such that</p>
+<p><img src="https://latex.codecogs.com/png.latex?b_w%20=%20p_w%20e%5E%7Bt_w%7D"></p>
+<p><img src="https://latex.codecogs.com/png.latex?b_h%20=%20p_h%20e%5E%7Bt_h%7D"></p>
+<p>where, <img src="https://latex.codecogs.com/png.latex?p_w"> and <img src="https://latex.codecogs.com/png.latex?p_h"> are already known when we calculated anchor boxes (explained later).</p>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov2_anchor_box.png" width="500"></p>
+<p>The model predicts <code>to</code> (objectness score) also such that:</p>
+<p><img src="https://latex.codecogs.com/png.latex?P(%5Ctext%7Bobject%7D)=%20%5Csigma(t_o)"></p>
+<p><strong>Q: Why <img src="https://latex.codecogs.com/png.latex?%5Csigma">?</strong></p>
+<p>A: Makes <code>x</code> and <code>y</code> bounded between 0 and 1 -&gt; center is always within the cell</p>
+<section id="how-to-calculate-anchor-boxes" class="level4">
+<h4 class="anchored" data-anchor-id="how-to-calculate-anchor-boxes">How to calculate anchor boxes?</h4>
+<p>K-means algorithm with K=5 (i.e.&nbsp;compute 5 anchors) over the trainig data, clustering together similar shapes.</p>
+<p>Steps:</p>
+<ol type="1">
+<li><p>They ran K-Means clustering on the bounding boxes in the training set.</p></li>
+<li><p>Each bounding box is treated as a 2D point: [w,h]</p></li>
+<li><p>Traditional K-Means uses Euclidean distance, but that doesn’t work well for boxes (e.g., a tall-skinny box and short-wide box can have the same area and Euclidean norm but behave very differently).</p></li>
+<li><p>Instead, they used a custom distance function:</p></li>
+</ol>
+<p><strong>d=1−IoU(box,&nbsp;cluster&nbsp;center)</strong></p>
+<p>So two boxes are close if their IoU is high.</p>
+<ol start="5" type="1">
+<li><p>After clustering:</p>
+<p>5.1 They used the average width and height of each cluster to define an anchor box.</p>
+<p>5.2 They selected K = 5, meaning each grid cell has 5 anchor boxes it can predict from.</p></li>
+<li><p>Model Output:</p></li>
+</ol>
+<p>For each anchor box, YOLOv2 predicts:</p>
+<p>[tx, ty, tw, th, to] Where:</p>
+<p>tx,ty : offsets from the cell</p>
+<p>tw ,th: log-scale offset from anchor box dimensions</p>
+<p>to: objectness score</p>
+<p><strong>NOTES:</strong></p>
+<ol type="1">
+<li>Normalize bounding box widths and heights to [0, 1] before clustering.</li>
+</ol>
+</section>
+<section id="why-is-this-better-than-yolov1" class="level4">
+<h4 class="anchored" data-anchor-id="why-is-this-better-than-yolov1">Why is this better than YOLOv1?</h4>
+<p>Ans: YOLOv1 predicted 2 arbitrary boxes per grid cell, regardless of dataset statistics.</p>
+<p>YOLOv2 learns K well-distributed, representative shapes — making the model better at fitting real-world object shapes.</p>
+</section>
+</section>
+<section id="architecture-1" class="level3">
+<h3 class="anchored" data-anchor-id="architecture-1">Architecture</h3>
+<p><strong>Variant of vgg</strong></p>
+<p>DarkNet-19: Similar to Yolov1, but had BatchNorm for regularization, replaced last linear layer with conv layer</p>
+<div style="background-color: #f0f0f0; display: inline-block; padding: 10px;">
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov2_arch.png" width="500"> <img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov2_arch2.png" width="500"></p>
+</div>
+</section>
+</section>
+<section id="yolov3" class="level2">
+<h2 class="anchored" data-anchor-id="yolov3">YOLOv3</h2>
+<p><a href="https://arxiv.org/pdf/1804.02767">Original Paper</a></p>
+<p>What’s different from YOLOv2?</p>
+<p>Ans: 1. Introduced Residual connections 2. Multi-scale predictions: 13x13, 26x26, 52x52 3. At each scale, 3 bboxes are predicted</p>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov3_ms.png" width="500"></p>
+<p>This multi-scale module is going to be referred to as “neck“</p>
+<section id="anchor-boxes-1" class="level3">
+<h3 class="anchored" data-anchor-id="anchor-boxes-1">Anchor Boxes</h3>
+<p>At each scale 3 anchor boxes so, total 9 anchor boxes were used in Yolov3.</p>
+</section>
+<section id="architecture-backbone-neck" class="level3">
+<h3 class="anchored" data-anchor-id="architecture-backbone-neck">Architecture (Backbone + Neck)</h3>
+<p><strong>Variant of ResNet</strong></p>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov3_ms2.png" width="500"></p>
+<p>At each scale, we predict 3 boxes (9 total). For each box, we predict <code>[tx, ty, tw, th, to]</code> as well as the probabilities of the different classes. If <code>C</code> is the number of classes, for each scale we predict:</p>
+<p><img src="https://latex.codecogs.com/png.latex?N%5Ctimes%20N%20%5Ctimes%203%20%5Ctimes%20(5%20+%20C)%20%5Ctext%7B%20parameters%7D"></p>
+<p>This multi-scale module is going to be referred to as “neck“</p>
+</section>
+<section id="training-1" class="level3">
+<h3 class="anchored" data-anchor-id="training-1">Training:</h3>
+<p>Classes and the objectness score are activated by logistic regression and optimized using cross-entropy</p>
+<p><img src="https://latex.codecogs.com/png.latex?L_%7B%5Ctext%7Bobjectness%7D%7D=%5Csum_%7Bi%20%5Cin%20%5Ctext%7Bgrid%7D%7D%5Csum_%7Bj%20%5Cin%20%5Ctext%7Bboxes%7D%7DC_i%5Clog%5Chat%7BC%7D_i"></p>
+<p><img src="https://latex.codecogs.com/png.latex?L_%7B%5Ctext%7Bclasses%7D%7D%20=%5Csum_%7Bi%20%5Cin%20%5Ctext%7Bgrid%7D%7D%5Cmathbb%7BI%7D_%7B%5C%7B%5Ctext%7Bif%20object%20in%20%7D%20i%5C%7D%7D%5Csum_%7Bc%5Cin%20%5Ctext%7Bclasses%7D%7D%20p_i(c)%5Clog%5Chat%7Bp%7D_i(c)"></p>
+</section>
+</section>
+<section id="yolov4" class="level2">
+<h2 class="anchored" data-anchor-id="yolov4">YOLOv4</h2>
+<p><a href="https://arxiv.org/pdf/2004.10934">Original Paper</a></p>
+<p><strong>Q: What’s new from YOLOv3?</strong></p>
+<p>Ans:</p>
+<ol type="1">
+<li>Formally introduced network in 3 parts: Backbone, Neck, Head</li>
+<li>LeakyReLU replaced by Mish activation</li>
+<li>Residual blocks are replaced by Cross Stage Partial (CSP) blocks</li>
+<li>Ability to detect even smaller sized objects: 19 x 19, 38 x 38, and 76 x 76 grids</li>
+<li>Did a thorough evaluation of activation functions, bbox regression loss, data augmentation strategies, regularization methods, skip-connections, etc. in order to optimize the model</li>
+<li>Introduced IoU loss (CIoU loss) for regressing bbox coordinates.</li>
+</ol>
+<section id="architecture-2" class="level3">
+<h3 class="anchored" data-anchor-id="architecture-2">Architecture</h3>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov4_bnh.png" width="500"></p>
+<ol type="1">
+<li><strong>Backbone</strong>: learns the feature map representations of the image</li>
+<li><strong>Neck</strong>: that is the network that improves the receptive field of the backbone and allows for multi-scale predictions.</li>
+<li><strong>Head</strong>: that is the end of the model that is responsible for making the predictions.</li>
+</ol>
+<section id="backbone" class="level4">
+<h4 class="anchored" data-anchor-id="backbone">Backbone</h4>
+<p>Residual Blocks from YOLOv3 replaced by CSP Blocks</p>
+<div style="background-color:rgb(10, 1, 1); display: flex; gap: 20px; padding: 10px; justify-content: center;">
+<figure style="margin: 0; text-align: center;" class="figure">
+<figcaption>
+<b>YOLOv3 Residual Block</b>
+</figcaption>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov3_residual_block.png" width="500" class="figure-img"></p>
+</figure>
+<figure style="margin: 0; text-align: center;" class="figure">
+<figcaption>
+<b>YOLOv4 CSP Block</b>
+</figcaption>
+<img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov4_csp_block.png" width="500" class="figure-img">
+</figure>
+</div>
+<p>And replaced leakyrelu by mish</p>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/leaky_mish.jpg" width="500"></p>
+</section>
+<section id="neck" class="level4">
+<h4 class="anchored" data-anchor-id="neck">Neck</h4>
+<p>Neck is composed of a Spatial pyramid pooling (SPP) and a Path aggregation network (PANet).</p>
+<ol type="1">
+<li><strong>SPP</strong> - helps with image inputs of <strong>different sizes and resolution</strong>.</li>
+<li><strong>PANet</strong> - is the network used to <strong>enable multi-scale predictions</strong>. The grid sizes are now 19 x 19, 38 x 38, and 76 x 76 allowing to detect very small objects.</li>
+</ol>
+<figure style="margin: 0; text-align: center;" class="figure">
+<figcaption>
+<b>YOLOv4 SPP</b>
+</figcaption>
+<img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov4_neck.png" width="500" class="figure-img">
+</figure>
+<figure style="margin: 0; text-align: center;" class="figure">
+<figcaption>
+<b>YOLOv4 PANet</b>
+</figcaption>
+<img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/yolov4_neck_pannet.png" width="500" class="figure-img">
+</figure>
+</section>
+<section id="training-2" class="level4">
+<h4 class="anchored" data-anchor-id="training-2">Training</h4>
+<p>IoU loss</p>
+<p><img src="https://latex.codecogs.com/png.latex?L_%7B%5Ctext%7Bposition-shape%7D%7D%20=%201%20-%20IoU(%5Ctext%7Bpred%7D,%20%5Ctext%7Btruth%7D)"></p>
+<p>However, this loss only works when the bounding boxes overlap, and would not provide any moving gradient for non-overlapping cases. This is resolved by adding a penalty term, capturing the distance between the bounding box centers:</p>
+<p>CIoU Complete IoU loss</p>
+<p><img src="https://latex.codecogs.com/png.latex?L_%7B%5Ctext%7Bposition-shape%7D%7D%20=%201%20-%20IoU(%5Ctext%7Bpred%7D,%20%5Ctext%7Btruth%7D)%20+%20R(%5Ctext%7Bpred%7D,%20%5Ctext%7Btruth%7D)"></p>
+<p>where</p>
+<p><img src="https://latex.codecogs.com/png.latex?R(%5Ctext%7Bpred%7D,%20%5Ctext%7Btruth%7D)%20=%5Cfrac%7B%5Crho%5E2(b,%20b%5E%7Bth%7D)%7D%7Bc%5E2%7D%20+%20%5Calpha%20v"></p>
+<p>where <code>⍴(b, bth)</code> is the Euclidean distance between the bounding box centers, <code>c</code> is the diagonal length of the smallest enclosing box covering the two boxes, and <code>v</code> imposes the consistency of the aspect ratio.</p>
+<p>Resources:</p>
+<ol type="1">
+<li>https://arxiv.org/pdf/1506.02640 (YOLOv1)</li>
+<li>https://arxiv.org/pdf/1612.08242 (YOLOv2)</li>
+<li>https://arxiv.org/pdf/1804.02767 (YOLOv3)</li>
+<li>https://arxiv.org/pdf/2004.10934 (YOLOv4)</li>
+<li>https://arxiv.org/pdf/2304.00501 (Comparisons from YOLOv1 to YOLOv8)</li>
+<li>https://newsletter.theaiedge.io/p/deep-dive-how-yolo-works-part-1-from (Summary from YOLOv1 to YOLOv4)</li>
+<li>https://www.v7labs.com/blog/yolo-object-detection (Summary from YOLOv1 to YOLOv7)</li>
+<li>https://medium.com/analytics-vidhya/yolo-explained-5b6f4564f31 (Summary of Yolo v1)</li>
+</ol>
+<p>Questions</p>
+<ol type="1">
+<li>1D convolution</li>
+<li>1x1 kernel size convolution</li>
+<li>why 1x1 and not 3x3 ?</li>
+</ol>
+<p>Ans: Speeds up computation. For each prediction in 3x3, we need to perform 9 computations. whereas for 1x1 only 1 computation is required.</p>
+<ol start="4" type="1">
+<li>Yolov1 architecture</li>
+<li>Why once? How once? Why grids? What adv? What disadv?</li>
+<li>IoU loss? Modern yolo loss vs old yolo losses?</li>
+<li>NMS code</li>
+<li>Why LeakyRelu?</li>
+<li>Why replace LeakyRelu by Mish activations?</li>
+</ol>
+<p><img src="https://mgupta70.github.io/posts/2025-06-04-yolo/media/leaky_mish.jpg" width="500"></p>
+<ol start="10" type="1">
+<li>Class label smoothing?</li>
+<li>Problem with IoU loss? and solutions around it?</li>
+<li>Exact difference in training pipeline of 2 stage vs 1 stage object detection</li>
+<li>Code for Anchor Boxes with K-Means?</li>
+</ol>
+
+
+</section>
+</section>
+</section>
+
+ ]]></description>
+  <category>Vision</category>
+  <guid>https://mgupta70.github.io/posts/2025-06-04-yolo/yolo.html</guid>
+  <pubDate>Wed, 04 Jun 2025 07:00:00 GMT</pubDate>
+  <media:content url="https://mgupta70.github.io/posts/2025-06-04-yolo/yolo_thumb.png" medium="image" type="image/png" height="57" width="144"/>
+</item>
 <item>
   <title>Stack Made Easy</title>
   <dc:creator>Mohit Gupta</dc:creator>
