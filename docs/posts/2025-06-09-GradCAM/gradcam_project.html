@@ -6,8 +6,11 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Mohit Gupta">
+<meta name="dcterms.date" content="2025-06-09">
+<meta name="description" content="A basic overview on the working principle of GradCAM">
 
-<title>AI Blogs</title>
+<title>GradCAM Review – AI Blogs</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,28 +23,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-443ac161e34e8c1eedb78f958e3d9213.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-5b8a677417396a6e7de0ff5891f330dc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-443ac161e34e8c1eedb78f958e3d9213.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-5b8a677417396a6e7de0ff5891f330dc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -69,35 +105,6 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
 <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-YQ6KB81L7R"></script>
 
 <script type="text/javascript">
@@ -138,17 +145,17 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="styles.css">
-<link rel="alternate" type="application/rss+xml" title="AI Blogs" href="index.xml" data-external="1"></head>
+<link rel="stylesheet" href="../../styles.css">
+</head>
 
-<body class="nav-fixed quarto-light">
+<body class="nav-fixed fullcontent quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">AI Blogs</span>
     </a>
   </div>
@@ -159,7 +166,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About Me</span></a>
   </li>  
   <li class="nav-item compact">
@@ -182,252 +189,183 @@ window.Quarto = {
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
-      <h1 class="title">AI Blogs</h1>
-                      </div>
+    <div class="quarto-title column-body">
+      <h1 class="title">GradCAM Review</h1>
+                  <div>
+        <div class="description">
+          A basic overview on the working principle of GradCAM
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">Vision</div>
+              </div>
+                  </div>
   </div>
     
   
-  <div class="quarto-title-meta column-page-left">
+  <div class="quarto-title-meta">
 
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Mohit Gupta </p>
+            </div>
+    </div>
       
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">June 9, 2025</p>
+      </div>
+    </div>
     
+      <div>
+      <div class="quarto-title-meta-heading">Modified</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date-modified">June 9, 2025</p>
+      </div>
+    </div>
       
     </div>
     
   
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(7)</span></div><div class="category" data-category="Q29yZSUyME1M">Core ML <span class="quarto-category-count">(2)</span></div><div class="category" data-category="RFNB">DSA <span class="quarto-category-count">(3)</span></div><div class="category" data-category="VmlzaW9u">Vision <span class="quarto-category-count">(2)</span></div></div></div>
+    
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content quarto-banner-title-block" id="quarto-document-content">
 
 
 
 
 
+<section id="full-form-of-gradcam" class="level4">
+<h4 class="anchored" data-anchor-id="full-form-of-gradcam">Full-form of GradCAM</h4>
+<p>Gradient-Weighted Class Activation Mapping</p>
+</section>
+<section id="working-principle-of-gradcam" class="level4">
+<h4 class="anchored" data-anchor-id="working-principle-of-gradcam">Working principle of GradCAM?</h4>
+<p><img src="media/grad_cam_workflow.webp" width="750"></p>
+<p>5 step process:</p>
+<p>Step 1: Forward Pass - Pass the input (image/signal) through the CNN to get the feature maps from the last convolutional layer: <span class="math inline">\(A^k\)</span> - Get raw outputs (logits) before softmax</p>
+<p>Step 2: Select the Target Class - Choose the class <em>c</em> we want to explain (usually the predicted class with highest score) and calculate its score (logit i.e.&nbsp;output before softmax): <span class="math inline">\(y^c\)</span></p>
+<p>Step 3: Compute the Gradients - Compute the gradient of the target class score <span class="math inline">\(y^c\)</span> with respect to the feature maps <span class="math inline">\(A^k\)</span> of the selected convolutional layer, i.e., <span class="math inline">\(\frac{\partial y^c}{\partial A^k}\)</span></p>
+<ul>
+<li>These gradients show how important each feature map is for the target class.</li>
+</ul>
+<p>Step 4: Compute the Grad-CAM - For each filter <em>k</em>, global average pool the gradients spatially (over width <em>i</em> and height <em>j</em>) to get a single scalar weight <span class="math inline">\({a_k}^c\)</span>:</p>
+<p><span class="math inline">\(\alpha_k^c = \frac{1}{Z} \sum_{i} \sum_{j} \frac{\partial y^c}{\partial A_{ij}^k}\)</span></p>
+<ul>
+<li><span class="math inline">\(\alpha_k^c\)</span> is the importance weight for kth feature map in <span class="math inline">\(A^k\)</span></li>
+<li>Finally, to calculate the final Grad-CAM, multiply each feature map <span class="math inline">\(A^k\)</span> by its corresponding importance weight <span class="math inline">\(\alpha_k^c\)</span> and then sum.</li>
+<li>Apply a ReLU activation to keep only the parts that positively influence the target class. This makes the Grad-CAM map focus only on features that support the class, not those that suppress it.</li>
+</ul>
+<p><span class="math inline">\(L^c_{Grad-CAM} = ReLU (\sum_{k} \alpha_k^c A^k)\)</span></p>
+<p>Step 5: Post-processing - Resize the Grad-CAM map to the same spatial size as the input</p>
+</section>
+<section id="why-we-used-feature-maps-ak-from-last-convolutional-layer" class="level4">
+<h4 class="anchored" data-anchor-id="why-we-used-feature-maps-ak-from-last-convolutional-layer">Why we used feature maps <span class="math inline">\(A^k\)</span> from last convolutional layer?</h4>
+<p>Grad-CAM uses the feature maps from the last conv layer because it typically has the most high-level, semantically rich features but still retains some spatial information. Using earlier layers would provide too much low-level information (edges, textures) and not enough conceptual understanding.</p>
+</section>
+<section id="global-average-pooling" class="level4">
+<h4 class="anchored" data-anchor-id="global-average-pooling">Global Average Pooling?</h4>
+<p>It computes the average of all pixel values within each feature map, effectively collapsing each map into a single scalar value. This process reduces the number of parameters in the model, making it less prone to overfitting and more robust to spatial translations.</p>
+<p>The global average pooling means that you have a 3D 8,8,10 tensor and compute the average over the 8,8 slices, you end up with a 3D tensor of shape 1,1,10 that you reshape into a 1D vector of shape 10. And then you add a softmax operator without any operation in between. The tensor before the average pooling is supposed to have as many channels as your model has classification categories.</p>
+<p>global average pooling as implemented in SqueezeNet:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>final_conv <span class="op">=</span> nn.Conv2d(<span class="dv">512</span>, <span class="va">self</span>.num_classes, kernel_size<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="va">self</span>.classifier <span class="op">=</span> nn.Sequential(</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    nn.Dropout(p<span class="op">=</span><span class="fl">0.5</span>),</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    final_conv,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    nn.ReLU(inplace<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    nn.AvgPool2d(<span class="dv">13</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>(512 is the number of channels in the feature maps feeding in to this layer, and 13 is the number of rows and columns in the feature maps going in to this layer. You’ll need to change these depending on your network structure.)</p>
+</section>
+<section id="what-is-adaptive-pooling" class="level4">
+<h4 class="anchored" data-anchor-id="what-is-adaptive-pooling">What is Adaptive Pooling?</h4>
+<ul>
+<li>In average-pooling or max-pooling, you essentially set the stride and kernel-size by your own, setting them as hyper-parameters. You will have to re-configure them if you happen to change your input size.</li>
+</ul>
+<p>In Adaptive Pooling on the other hand, we specify the output size instead. And the stride and kernel-size are automatically selected to adapt to the needs. The following equations are used to calculate the value in the source code.</p>
+<p>Stride = (input_size//output_size)<br>
+Kernel size = input_size - (output_size-1)*stride<br>
+Padding = 0</p>
+<p>(Not related to global average pooling as such but we can also use <code>adaptive_avg_pool2d</code> to achieve global average pooling, just set the output size to (1, 1),</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn.functional <span class="im">as</span> F</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> F.adaptive_avg_pool2d(x, (<span class="dv">1</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>)</p>
+</section>
+<section id="other-approaches-to-xai-in-computer-vision" class="level4">
+<h4 class="anchored" data-anchor-id="other-approaches-to-xai-in-computer-vision">Other Approaches to XAI in Computer Vision</h4>
+<ol type="1">
+<li>Visualizing features learned in different layers</li>
+<li>GradCAM</li>
+<li>Guided Backpropagation</li>
+<li>DeepDream (Need to verify)</li>
+<li>Dimensionality Reduction &amp; Feature Visualization (like PCA for last FC layers)</li>
+<li>Sensitivity Analysis: (how much each part of the input image is involved in the decision of network’s classifier. The algorithm blocks out different regions of an input image with a sliding gray square and then it runs these occluded images through the network and displays their probabilities for correct class using a heatmap)</li>
+<li>Saliency Map (General)</li>
+<li>Local Interpretable ModelAgnostic Explanations (LIME)</li>
+<li>SHapely Additive exPlanations (SHAP)</li>
+</ol>
+</section>
+<section id="list-of-xai-works-in-computer-vision" class="level4">
+<h4 class="anchored" data-anchor-id="list-of-xai-works-in-computer-vision">List of xAI works in Computer Vision</h4>
+<p>Reference: <a href="https://arxiv.org/pdf/2102.01792">Paper</a></p>
+<p><img src="media/xai_vision.png" width="750"> .. <img src="media/xai_vision_2.png" width="750"> .. <img src="media/xai_vision_3.png" width="750"></p>
+</section>
+<section id="t-sne-vs-pca" class="level4">
+<h4 class="anchored" data-anchor-id="t-sne-vs-pca">t-SNE vs PCA?</h4>
+<p>Ans: t-SNE for local structure; PCA for global. “In high-dimensional data, it is usually impossible to keep similar data-points close to each other using linear projections (like in PCA). Hence, non-linear methods (like t-SNE) are more suitable in such cases, as they can preserve the local structure of data very well.”</p>
+</section>
+<section id="why-explainability" class="level4">
+<h4 class="anchored" data-anchor-id="why-explainability">Why explainability?</h4>
+<p>Having appropriate answers to: - (i) Verification of the model; - (ii) Improving a model by understanding its failure points; - (iii) Extracting new insights and hidden laws of the model, and; - (iv) Identifying modules responsible for incorrect decisions.</p>
+</section>
+<section id="difference-bw-vgg-resnet-densenet-squeezenet-inceptionnet" class="level4">
+<h4 class="anchored" data-anchor-id="difference-bw-vgg-resnet-densenet-squeezenet-inceptionnet">Difference b/w VGG, ResNet, DenseNet, SqueezeNet, InceptionNet?</h4>
+<p><strong>🔷 1. VGG (e.g., VGG16, VGG19)</strong></p>
+<p>Uniqueness: Very simple and deep architecture using only 3x3 convolutions and stacked layers.</p>
+<p>Pros: Easy to implement and understand.</p>
+<p>Cons: Large number of parameters (≈138M), leading to slow training and high memory usage.</p>
+<p>Key Idea: Depth over architectural complexity.</p>
+<p><strong>🔷 2. ResNet (Residual Network)</strong></p>
+<p>Uniqueness: Introduces skip connections (residual connections) to allow gradient flow through very deep networks.</p>
+<p>Pros: Enables training of networks with 100+ layers without vanishing gradient issues.</p>
+<p>Cons: Slightly more complex architecture.</p>
+<p>Key Idea: Learn residuals: F(x) + x instead of just F(x).</p>
+<p><strong>🔷 3. DenseNet (Densely Connected Network)</strong></p>
+<p>Uniqueness: Each layer receives input from all previous layers (dense connectivity).</p>
+<p>Pros: Encourages feature reuse, fewer parameters than ResNet with similar performance.</p>
+<p>Cons: High memory usage due to many connections.</p>
+<p>Key Idea: Dense connectivity between layers: x_l = H([x_0, x_1, …, x_{l-1}]).</p>
+<p><strong>🔷 4. SqueezeNet</strong></p>
+<p>Uniqueness: Achieves AlexNet-level accuracy with 50x fewer parameters.</p>
+<p>Pros: Very lightweight, ideal for edge devices or deployment in resource-constrained environments.</p>
+<p>Cons: Slightly lower accuracy on large datasets.</p>
+<p>Key Idea: Replace 3x3 filters with 1x1, use Fire modules (squeeze + expand).</p>
+<p><strong>🔷 5. InceptionNet (GoogLeNet and its variants)</strong></p>
+<p>Uniqueness: Uses Inception modules to capture multi-scale features (1x1, 3x3, 5x5 convolutions in parallel).</p>
+<p>Pros: Efficient and computationally optimized, better utilization of model capacity.</p>
+<p>Cons: More complex to design and tune.</p>
+<p>Key Idea: Parallel filters with different sizes + dimensionality reduction via 1x1 convolutions.</p>
+</section>
+<section id="resources" class="level4">
+<h4 class="anchored" data-anchor-id="resources">Resources</h4>
+<ol type="1">
+<li>https://arxiv.org/pdf/2102.01792</li>
+<li>https://research.google/blog/inceptionism-going-deeper-into-neural-networks/</li>
+<li>https://cs.stanford.edu/people/karpathy/convnetjs/demo/cifar10.html</li>
+<li>https://cs.stanford.edu/people/karpathy/cnnembed/</li>
+<li>https://github.com/jacobgil/pytorch-grad-cam</li>
+<li>https://xai-tutorials.readthedocs.io/en/latest/_model_specific_xai/Grad-CAM.html</li>
+</ol>
 
 
+</section>
 
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="VmlzaW9u" data-listing-date-sort="1749452400000" data-listing-file-modified-sort="1749533390076" data-listing-date-modified-sort="1749452400000" data-listing-reading-time-sort="6" data-listing-word-count-sort="1017">
-<div class="thumbnail"><a href="./posts/2025-06-09-GradCAM/gradcam_project.html" class="no-external">
-
-<img loading="lazy" src="./posts/2025-06-09-GradCAM/gcam_thumb.png" class="thumbnail-image">
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2025-06-09-GradCAM/gradcam_project.html" class="no-external">GradCAM Review</a>
-</h3>
-<div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('VmlzaW9u'); return false;">Vision</div>
-
-</div>
-<div class="delink listing-description"><a href="./posts/2025-06-09-GradCAM/gradcam_project.html" class="no-external">
-<p>A basic overview on the working principle of GradCAM</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/2025-06-09-GradCAM/gradcam_project.html" class="no-external">
-<div class="listing-date">
-Jun 9, 2025
-</div>
-<div class="listing-author">
-Mohit Gupta
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="VmlzaW9u" data-listing-date-sort="1749020400000" data-listing-file-modified-sort="1749172982497" data-listing-date-modified-sort="1749106800000" data-listing-reading-time-sort="14" data-listing-word-count-sort="2745">
-<div class="thumbnail"><a href="./posts/2025-06-04-yolo/yolo.html" class="no-external">
-
-<img loading="lazy" src="./posts/2025-06-04-yolo/yolo_thumb.png" class="thumbnail-image">
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2025-06-04-yolo/yolo.html" class="no-external">YOLO Made Easy</a>
-</h3>
-<div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('VmlzaW9u'); return false;">Vision</div>
-
-</div>
-<div class="delink listing-description"><a href="./posts/2025-06-04-yolo/yolo.html" class="no-external">
-<p>Understand the inner workings of an object detection model, YOLO. The architecture, The losses, The innovations…</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/2025-06-04-yolo/yolo.html" class="no-external">
-<div class="listing-date">
-Jun 4, 2025
-</div>
-<div class="listing-author">
-Mohit Gupta
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="RFNB" data-listing-date-sort="1747810800000" data-listing-file-modified-sort="1747867285740" data-listing-date-modified-sort="1747810800000" data-listing-reading-time-sort="4" data-listing-word-count-sort="732">
-<div class="thumbnail"><a href="./posts/2025-05-21-stack/stack.html" class="no-external">
-
-<img loading="lazy" src="./posts/2025-05-21-stack/stack_thumb.png" class="thumbnail-image">
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2025-05-21-stack/stack.html" class="no-external">Stack Made Easy</a>
-</h3>
-<div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('RFNB'); return false;">DSA</div>
-
-</div>
-<div class="delink listing-description"><a href="./posts/2025-05-21-stack/stack.html" class="no-external">
-<p>Build stack with deque. And, learn why list or array is not ideal for a Stack.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/2025-05-21-stack/stack.html" class="no-external">
-<div class="listing-date">
-May 21, 2025
-</div>
-<div class="listing-author">
-Mohit Gupta
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-categories="RFNB" data-listing-date-sort="1747724400000" data-listing-file-modified-sort="1747859379761" data-listing-date-modified-sort="1747724400000" data-listing-reading-time-sort="6" data-listing-word-count-sort="1113">
-<div class="thumbnail"><a href="./posts/2025-05-20-hash-map/Hash Table.html" class="no-external">
-
-<img loading="lazy" src="./posts/2025-05-20-hash-map/ht_thumb.png" class="thumbnail-image">
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2025-05-20-hash-map/Hash Table.html" class="no-external">Hash Table Made Easy</a>
-</h3>
-<div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('RFNB'); return false;">DSA</div>
-
-</div>
-<div class="delink listing-description"><a href="./posts/2025-05-20-hash-map/Hash Table.html" class="no-external">
-<p>Code &amp; Collision Handling in Hash Table.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/2025-05-20-hash-map/Hash Table.html" class="no-external">
-<div class="listing-date">
-May 20, 2025
-</div>
-<div class="listing-author">
-Mohit Gupta
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="4" data-categories="RFNB" data-listing-date-sort="1747638000000" data-listing-file-modified-sort="1748107926935" data-listing-date-modified-sort="1747638000000" data-listing-reading-time-sort="6" data-listing-word-count-sort="1023">
-<div class="thumbnail"><a href="./posts/2025-05-19-linked-list/Linked_List.html" class="no-external">
-
-<img loading="lazy" src="./posts/2025-05-19-linked-list/ll_thumbnail.png" class="thumbnail-image">
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2025-05-19-linked-list/Linked_List.html" class="no-external">Linked List Made Easy</a>
-</h3>
-<div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('RFNB'); return false;">DSA</div>
-
-</div>
-<div class="delink listing-description"><a href="./posts/2025-05-19-linked-list/Linked_List.html" class="no-external">
-<p>Code &amp; Debug Linked Lists.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/2025-05-19-linked-list/Linked_List.html" class="no-external">
-<div class="listing-date">
-May 19, 2025
-</div>
-<div class="listing-author">
-Mohit Gupta
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="5" data-categories="Q29yZSUyME1M" data-listing-date-sort="1747551600000" data-listing-file-modified-sort="1747637706862" data-listing-date-modified-sort="1747551600000" data-listing-reading-time-sort="5" data-listing-word-count-sort="983">
-<div class="thumbnail"><a href="./posts/2025-05-18-linear-regression-basics/2_linear_regression.html" class="no-external">
-
-<img loading="lazy" src="./posts/2025-05-18-linear-regression-basics/linear_reg_thumbnail.png" class="thumbnail-image">
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2025-05-18-linear-regression-basics/2_linear_regression.html" class="no-external">Linear Regression Made Easy</a>
-</h3>
-<div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('Q29yZSUyME1M'); return false;">Core ML</div>
-
-</div>
-<div class="delink listing-description"><a href="./posts/2025-05-18-linear-regression-basics/2_linear_regression.html" class="no-external">
-<p>Understanding and implementing core concepts related to Linear Regression.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/2025-05-18-linear-regression-basics/2_linear_regression.html" class="no-external">
-<div class="listing-date">
-May 18, 2025
-</div>
-<div class="listing-author">
-Mohit Gupta
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="6" data-categories="Q29yZSUyME1M" data-listing-date-sort="1746082800000" data-listing-file-modified-sort="1747637112918" data-listing-date-modified-sort="1746342000000" data-listing-reading-time-sort="7" data-listing-word-count-sort="1371">
-<div class="thumbnail"><a href="./posts/2025-05-04-decision-trees-basics/1_basic_decision_tree_for_classification.html" class="no-external">
-
-<img loading="lazy" src="./posts/2025-05-04-decision-trees-basics/dt_thumbnail.png" class="thumbnail-image">
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2025-05-04-decision-trees-basics/1_basic_decision_tree_for_classification.html" class="no-external">Decision Trees Made Easy</a>
-</h3>
-<div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('Q29yZSUyME1M'); return false;">Core ML</div>
-
-</div>
-<div class="delink listing-description"><a href="./posts/2025-05-04-decision-trees-basics/1_basic_decision_tree_for_classification.html" class="no-external">
-<p>Understanding and implementing core concepts related to decision trees.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/2025-05-04-decision-trees-basics/1_basic_decision_tree_for_classification.html" class="no-external">
-<div class="listing-date">
-May 1, 2025
-</div>
-<div class="listing-author">
-Mohit Gupta
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";

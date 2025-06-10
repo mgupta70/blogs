@@ -10,7 +10,182 @@
 <atom:link href="https://mgupta70.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>AI/ML blogs from Mohit, Ph.D. Computer Vision</description>
 <generator>quarto-1.8.1</generator>
-<lastBuildDate>Wed, 04 Jun 2025 07:00:00 GMT</lastBuildDate>
+<lastBuildDate>Mon, 09 Jun 2025 07:00:00 GMT</lastBuildDate>
+<item>
+  <title>GradCAM Review</title>
+  <dc:creator>Mohit Gupta</dc:creator>
+  <link>https://mgupta70.github.io/posts/2025-06-09-GradCAM/gradcam_project.html</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="full-form-of-gradcam" class="level4">
+<h4 class="anchored" data-anchor-id="full-form-of-gradcam">Full-form of GradCAM</h4>
+<p>Gradient-Weighted Class Activation Mapping</p>
+</section>
+<section id="working-principle-of-gradcam" class="level4">
+<h4 class="anchored" data-anchor-id="working-principle-of-gradcam">Working principle of GradCAM?</h4>
+<p><img src="https://mgupta70.github.io/posts/2025-06-09-GradCAM/media/grad_cam_workflow.webp" width="750"></p>
+<p>5 step process:</p>
+<p>Step 1: Forward Pass - Pass the input (image/signal) through the CNN to get the feature maps from the last convolutional layer: <img src="https://latex.codecogs.com/png.latex?A%5Ek"> - Get raw outputs (logits) before softmax</p>
+<p>Step 2: Select the Target Class - Choose the class <em>c</em> we want to explain (usually the predicted class with highest score) and calculate its score (logit i.e.&nbsp;output before softmax): <img src="https://latex.codecogs.com/png.latex?y%5Ec"></p>
+<p>Step 3: Compute the Gradients - Compute the gradient of the target class score <img src="https://latex.codecogs.com/png.latex?y%5Ec"> with respect to the feature maps <img src="https://latex.codecogs.com/png.latex?A%5Ek"> of the selected convolutional layer, i.e., <img src="https://latex.codecogs.com/png.latex?%5Cfrac%7B%5Cpartial%20y%5Ec%7D%7B%5Cpartial%20A%5Ek%7D"></p>
+<ul>
+<li>These gradients show how important each feature map is for the target class.</li>
+</ul>
+<p>Step 4: Compute the Grad-CAM - For each filter <em>k</em>, global average pool the gradients spatially (over width <em>i</em> and height <em>j</em>) to get a single scalar weight <img src="https://latex.codecogs.com/png.latex?%7Ba_k%7D%5Ec">:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Calpha_k%5Ec%20=%20%5Cfrac%7B1%7D%7BZ%7D%20%5Csum_%7Bi%7D%20%5Csum_%7Bj%7D%20%5Cfrac%7B%5Cpartial%20y%5Ec%7D%7B%5Cpartial%20A_%7Bij%7D%5Ek%7D"></p>
+<ul>
+<li><img src="https://latex.codecogs.com/png.latex?%5Calpha_k%5Ec"> is the importance weight for kth feature map in <img src="https://latex.codecogs.com/png.latex?A%5Ek"></li>
+<li>Finally, to calculate the final Grad-CAM, multiply each feature map <img src="https://latex.codecogs.com/png.latex?A%5Ek"> by its corresponding importance weight <img src="https://latex.codecogs.com/png.latex?%5Calpha_k%5Ec"> and then sum.</li>
+<li>Apply a ReLU activation to keep only the parts that positively influence the target class. This makes the Grad-CAM map focus only on features that support the class, not those that suppress it.</li>
+</ul>
+<p><img src="https://latex.codecogs.com/png.latex?L%5Ec_%7BGrad-CAM%7D%20=%20ReLU%20(%5Csum_%7Bk%7D%20%5Calpha_k%5Ec%20A%5Ek)"></p>
+<p>Step 5: Post-processing - Resize the Grad-CAM map to the same spatial size as the input</p>
+</section>
+<section id="why-we-used-feature-maps-ak-from-last-convolutional-layer" class="level4">
+<h4 class="anchored" data-anchor-id="why-we-used-feature-maps-ak-from-last-convolutional-layer">Why we used feature maps <img src="https://latex.codecogs.com/png.latex?A%5Ek"> from last convolutional layer?</h4>
+<p>Grad-CAM uses the feature maps from the last conv layer because it typically has the most high-level, semantically rich features but still retains some spatial information. Using earlier layers would provide too much low-level information (edges, textures) and not enough conceptual understanding.</p>
+</section>
+<section id="global-average-pooling" class="level4">
+<h4 class="anchored" data-anchor-id="global-average-pooling">Global Average Pooling?</h4>
+<p>It computes the average of all pixel values within each feature map, effectively collapsing each map into a single scalar value. This process reduces the number of parameters in the model, making it less prone to overfitting and more robust to spatial translations.</p>
+<p>The global average pooling means that you have a 3D 8,8,10 tensor and compute the average over the 8,8 slices, you end up with a 3D tensor of shape 1,1,10 that you reshape into a 1D vector of shape 10. And then you add a softmax operator without any operation in between. The tensor before the average pooling is supposed to have as many channels as your model has classification categories.</p>
+<p>global average pooling as implemented in SqueezeNet:</p>
+<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1">final_conv <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> nn.Conv2d(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">512</span>, <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>.num_classes, kernel_size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb1-2"><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>.classifier <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> nn.Sequential(</span>
+<span id="cb1-3">    nn.Dropout(p<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>),</span>
+<span id="cb1-4">    final_conv,</span>
+<span id="cb1-5">    nn.ReLU(inplace<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>),</span>
+<span id="cb1-6">    nn.AvgPool2d(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">13</span>)</span>
+<span id="cb1-7">)</span></code></pre></div>
+<p>(512 is the number of channels in the feature maps feeding in to this layer, and 13 is the number of rows and columns in the feature maps going in to this layer. You’ll need to change these depending on your network structure.)</p>
+</section>
+<section id="what-is-adaptive-pooling" class="level4">
+<h4 class="anchored" data-anchor-id="what-is-adaptive-pooling">What is Adaptive Pooling?</h4>
+<ul>
+<li>In average-pooling or max-pooling, you essentially set the stride and kernel-size by your own, setting them as hyper-parameters. You will have to re-configure them if you happen to change your input size.</li>
+</ul>
+<p>In Adaptive Pooling on the other hand, we specify the output size instead. And the stride and kernel-size are automatically selected to adapt to the needs. The following equations are used to calculate the value in the source code.</p>
+<p>Stride = (input_size//output_size)<br>
+Kernel size = input_size - (output_size-1)*stride<br>
+Padding = 0</p>
+<p>(Not related to global average pooling as such but we can also use <code>adaptive_avg_pool2d</code> to achieve global average pooling, just set the output size to (1, 1),</p>
+<div class="sourceCode" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> torch.nn.functional <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> F</span>
+<span id="cb2-2">x <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> F.adaptive_avg_pool2d(x, (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>))</span></code></pre></div>
+<p>)</p>
+</section>
+<section id="other-approaches-to-xai-in-computer-vision" class="level4">
+<h4 class="anchored" data-anchor-id="other-approaches-to-xai-in-computer-vision">Other Approaches to XAI in Computer Vision</h4>
+<ol type="1">
+<li>Visualizing features learned in different layers</li>
+<li>GradCAM</li>
+<li>Guided Backpropagation</li>
+<li>DeepDream (Need to verify)</li>
+<li>Dimensionality Reduction &amp; Feature Visualization (like PCA for last FC layers)</li>
+<li>Sensitivity Analysis: (how much each part of the input image is involved in the decision of network’s classifier. The algorithm blocks out different regions of an input image with a sliding gray square and then it runs these occluded images through the network and displays their probabilities for correct class using a heatmap)</li>
+<li>Saliency Map (General)</li>
+<li>Local Interpretable ModelAgnostic Explanations (LIME)</li>
+<li>SHapely Additive exPlanations (SHAP)</li>
+</ol>
+</section>
+<section id="list-of-xai-works-in-computer-vision" class="level4">
+<h4 class="anchored" data-anchor-id="list-of-xai-works-in-computer-vision">List of xAI works in Computer Vision</h4>
+<p>Reference: <a href="https://arxiv.org/pdf/2102.01792">Paper</a></p>
+<p><img src="https://mgupta70.github.io/posts/2025-06-09-GradCAM/media/xai_vision.png" width="750"> .. <img src="https://mgupta70.github.io/posts/2025-06-09-GradCAM/media/xai_vision_2.png" width="750"> .. <img src="https://mgupta70.github.io/posts/2025-06-09-GradCAM/media/xai_vision_3.png" width="750"></p>
+</section>
+<section id="t-sne-vs-pca" class="level4">
+<h4 class="anchored" data-anchor-id="t-sne-vs-pca">t-SNE vs PCA?</h4>
+<p>Ans: t-SNE for local structure; PCA for global. “In high-dimensional data, it is usually impossible to keep similar data-points close to each other using linear projections (like in PCA). Hence, non-linear methods (like t-SNE) are more suitable in such cases, as they can preserve the local structure of data very well.”</p>
+</section>
+<section id="why-explainability" class="level4">
+<h4 class="anchored" data-anchor-id="why-explainability">Why explainability?</h4>
+<p>Having appropriate answers to: - (i) Verification of the model; - (ii) Improving a model by understanding its failure points; - (iii) Extracting new insights and hidden laws of the model, and; - (iv) Identifying modules responsible for incorrect decisions.</p>
+</section>
+<section id="difference-bw-vgg-resnet-densenet-squeezenet-inceptionnet" class="level4">
+<h4 class="anchored" data-anchor-id="difference-bw-vgg-resnet-densenet-squeezenet-inceptionnet">Difference b/w VGG, ResNet, DenseNet, SqueezeNet, InceptionNet?</h4>
+<p><strong>🔷 1. VGG (e.g., VGG16, VGG19)</strong></p>
+<p>Uniqueness: Very simple and deep architecture using only 3x3 convolutions and stacked layers.</p>
+<p>Pros: Easy to implement and understand.</p>
+<p>Cons: Large number of parameters (≈138M), leading to slow training and high memory usage.</p>
+<p>Key Idea: Depth over architectural complexity.</p>
+<p><strong>🔷 2. ResNet (Residual Network)</strong></p>
+<p>Uniqueness: Introduces skip connections (residual connections) to allow gradient flow through very deep networks.</p>
+<p>Pros: Enables training of networks with 100+ layers without vanishing gradient issues.</p>
+<p>Cons: Slightly more complex architecture.</p>
+<p>Key Idea: Learn residuals: F(x) + x instead of just F(x).</p>
+<p><strong>🔷 3. DenseNet (Densely Connected Network)</strong></p>
+<p>Uniqueness: Each layer receives input from all previous layers (dense connectivity).</p>
+<p>Pros: Encourages feature reuse, fewer parameters than ResNet with similar performance.</p>
+<p>Cons: High memory usage due to many connections.</p>
+<p>Key Idea: Dense connectivity between layers: x_l = H([x_0, x_1, …, x_{l-1}]).</p>
+<p><strong>🔷 4. SqueezeNet</strong></p>
+<p>Uniqueness: Achieves AlexNet-level accuracy with 50x fewer parameters.</p>
+<p>Pros: Very lightweight, ideal for edge devices or deployment in resource-constrained environments.</p>
+<p>Cons: Slightly lower accuracy on large datasets.</p>
+<p>Key Idea: Replace 3x3 filters with 1x1, use Fire modules (squeeze + expand).</p>
+<p><strong>🔷 5. InceptionNet (GoogLeNet and its variants)</strong></p>
+<p>Uniqueness: Uses Inception modules to capture multi-scale features (1x1, 3x3, 5x5 convolutions in parallel).</p>
+<p>Pros: Efficient and computationally optimized, better utilization of model capacity.</p>
+<p>Cons: More complex to design and tune.</p>
+<p>Key Idea: Parallel filters with different sizes + dimensionality reduction via 1x1 convolutions.</p>
+</section>
+<section id="resources" class="level4">
+<h4 class="anchored" data-anchor-id="resources">Resources</h4>
+<ol type="1">
+<li>https://arxiv.org/pdf/2102.01792</li>
+<li>https://research.google/blog/inceptionism-going-deeper-into-neural-networks/</li>
+<li>https://cs.stanford.edu/people/karpathy/convnetjs/demo/cifar10.html</li>
+<li>https://cs.stanford.edu/people/karpathy/cnnembed/</li>
+<li>https://github.com/jacobgil/pytorch-grad-cam</li>
+<li>https://xai-tutorials.readthedocs.io/en/latest/_model_specific_xai/Grad-CAM.html</li>
+</ol>
+
+
+</section>
+
+ ]]></description>
+  <category>Vision</category>
+  <guid>https://mgupta70.github.io/posts/2025-06-09-GradCAM/gradcam_project.html</guid>
+  <pubDate>Mon, 09 Jun 2025 07:00:00 GMT</pubDate>
+  <media:content url="https://mgupta70.github.io/posts/2025-06-09-GradCAM/gcam_thumb.png" medium="image" type="image/png" height="39" width="144"/>
+</item>
 <item>
   <title>YOLO Made Easy</title>
   <dc:creator>Mohit Gupta</dc:creator>

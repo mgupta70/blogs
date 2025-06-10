@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2025-06-09-GradCAM/gradcam_project.html",
       "/posts/2025-06-04-yolo/yolo.html",
       "/posts/2025-05-21-stack/stack.html",
       "/posts/2025-05-20-hash-map/Hash Table.html",
