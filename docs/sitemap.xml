@@ -2,11 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://mgupta70.github.io/posts/2025-06-18-PyLosses/pytorch_losses.html</loc>
-    <lastmod>2025-06-18T18:53:53.540Z</lastmod>
+    <lastmod>2025-06-18T21:07:46.025Z</lastmod>
   </url>
   <url>
     <loc>https://mgupta70.github.io/posts/2025-06-04-yolo/yolo.html</loc>
-    <lastmod>2025-06-10T18:16:28.626Z</lastmod>
+    <lastmod>2025-06-18T20:22:44.785Z</lastmod>
   </url>
   <url>
     <loc>https://mgupta70.github.io/posts/2025-05-20-hash-map/Hash Table.html</loc>
@@ -38,6 +38,6 @@
   </url>
   <url>
     <loc>https://mgupta70.github.io/posts/2025-06-09-GradCAM/gradcam_project.html</loc>
-    <lastmod>2025-06-18T18:50:37.284Z</lastmod>
+    <lastmod>2025-06-18T20:22:31.014Z</lastmod>
   </url>
 </urlset>

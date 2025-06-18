@@ -241,13 +241,13 @@ window.Quarto = {
 
 
 
-<div id="cell-1" class="cell" data-execution_count="2">
+<div id="cell-1" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="regression-losses" class="level3">
 <h3 class="anchored" data-anchor-id="regression-losses">Regression Losses</h3>
-<div id="cell-3" class="cell" data-execution_count="18">
+<div id="cell-3" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>y_true <span class="op">=</span> torch.tensor([[<span class="fl">3.0</span>], [<span class="fl">0.0</span>], [<span class="fl">2.0</span>], [<span class="fl">8.0</span>]]) </span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>y_pred <span class="op">=</span> torch.tensor([[<span class="fl">1.5</span>], [<span class="fl">3.5</span>], [<span class="fl">4.5</span>], [<span class="fl">8.5</span>]]) <span class="co"># error: -1.5, 3.5, 2.5, 0.5</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -315,7 +315,7 @@ Huber
 </section>
 <section id="multi-class-classification-losses" class="level3">
 <h3 class="anchored" data-anchor-id="multi-class-classification-losses">Multi-class classification losses</h3>
-<div id="cell-6" class="cell">
+<div id="cell-6" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> torch.tensor([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">4</span>])</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>logits <span class="op">=</span> torch.randn(<span class="dv">3</span>, <span class="dv">5</span>, requires_grad<span class="op">=</span><span class="va">True</span>) <span class="co"># logits are the raw, unnormalized scores output by the model for each class</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Logits: '</span>, logits, <span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)</span>
@@ -338,17 +338,32 @@ Huber
 <span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'NLL Loss: '</span>, loss)</span>
 <span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Logits:  tensor([[-2.3067, -0.4415,  1.2303, -0.1116,  1.0671],
-        [ 0.6613, -0.7587, -0.2258, -1.0881,  0.5560],
-        [-0.2371, -0.8510, -1.8690, -1.0833,  0.8148]], requires_grad=True) 
+<pre><code>Logits:  tensor([[-0.5214,  0.4200, -0.5788, -0.2010, -0.8349],
+        [ 1.4741, -1.7601, -1.3311, -1.6192, -1.0451],
+        [ 0.2042,  0.6382,  0.4343,  0.7187, -0.8201]], requires_grad=True) 
 
-Cross Entropy Loss:  tensor(1.3611, grad_fn=&lt;NllLossBackward0&gt;)
-Cross Entropy Loss with label smoothing:  tensor(1.4266, grad_fn=&lt;AddBackward0&gt;)
-NLL Loss:  tensor(1.3611, grad_fn=&lt;NllLossBackward0&gt;)
-BCEWithLogitsLoss:  tensor(1.9423)
-BCELoss:  tensor(1.9423)</code></pre>
+Cross Entropy Loss:  tensor(1.3132, grad_fn=&lt;NllLossBackward0&gt;)
+Cross Entropy Loss with label smoothing:  tensor(1.3812, grad_fn=&lt;AddBackward0&gt;)
+NLL Loss:  tensor(1.3132, grad_fn=&lt;NllLossBackward0&gt;)</code></pre>
 </div>
 </div>
+<section id="cross-entropy-loss-explained" class="level4">
+<h4 class="anchored" data-anchor-id="cross-entropy-loss-explained"><span style="color: green"> <strong>Cross Entropy Loss explained…</strong></span></h4>
+<p>Suppose data is:</p>
+<p><img src="media/ce_loss_data.webp" width="750"></p>
+<p>We used normalized logits i.e.&nbsp;after softmac to calculate loss w.r.t. GT</p>
+<p><img src="media/ce_loss.webp" width="350"></p>
+<p>Formula:</p>
+<p><img src="media/ce_loss_2.webp" width="500"></p>
+<p>Calculation:</p>
+<p><img src="media/ce_loss_3.webp" width="500"></p>
+<p><span style="color: red"><strong>NOTE:</strong></span> In Pytorch if one uses the <code>nn.CrossEntropyLoss</code> the input must be unnormalized raw value (aka logits), the target must be class index instead of one hot encoded vectors.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>criterion <span class="op">=</span> nn.CrossEntropyLoss()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">input</span> <span class="op">=</span> torch.tensor([[<span class="fl">3.2</span>, <span class="fl">1.3</span>,<span class="fl">0.2</span>, <span class="fl">0.8</span>]],dtype<span class="op">=</span>torch.<span class="bu">float</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> torch.tensor([<span class="dv">0</span>], dtype<span class="op">=</span>torch.<span class="bu">long</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>criterion(<span class="bu">input</span>, target)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Output: <code>tensor(0.2547)</code></p>
+</section>
 <section id="what-is-input-to-nn.crossentropyloss" class="level4">
 <h4 class="anchored" data-anchor-id="what-is-input-to-nn.crossentropyloss"><span style="color: green"> <strong>What is input to nn.CrossEntropyLoss()?</strong></span></h4>
 <p>Logits not softmaxed logits</p>
@@ -375,36 +390,55 @@ BCELoss:  tensor(1.9423)</code></pre>
 <li><p>We keep C = <img src="media/softmax_4.png" width="150"></p></li>
 <li><p>Basically this means we make largest term = 0</p></li>
 </ul>
-<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> np.array([<span class="dv">123</span>, <span class="dv">456</span>, <span class="dv">789</span>]) <span class="co"># example with 3 classes and each having large scores</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> np.exp(f) <span class="op">/</span> np.<span class="bu">sum</span>(np.exp(f)) <span class="co"># Bad: Numeric problem, potential blowup</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># instead: first shift the values of f so that the highest number is 0:</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>f <span class="op">-=</span> np.<span class="bu">max</span>(f) <span class="co"># f becomes [-666, -333, 0]</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> np.exp(f) <span class="op">/</span> np.<span class="bu">sum</span>(np.exp(f)) <span class="co"># safe to do, gives the correct answer</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> np.array([<span class="dv">123</span>, <span class="dv">456</span>, <span class="dv">789</span>]) <span class="co"># example with 3 classes and each having large scores</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> np.exp(f) <span class="op">/</span> np.<span class="bu">sum</span>(np.exp(f)) <span class="co"># Bad: Numeric problem, potential blowup</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># instead: first shift the values of f so that the highest number is 0:</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>f <span class="op">-=</span> np.<span class="bu">max</span>(f) <span class="co"># f becomes [-666, -333, 0]</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> np.exp(f) <span class="op">/</span> np.<span class="bu">sum</span>(np.exp(f)) <span class="co"># safe to do, gives the correct answer</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="logsoftmax" class="level4">
 <h4 class="anchored" data-anchor-id="logsoftmax"><span style="color: green"> <strong>LogSoftmax?</strong></span></h4>
 <p><span class="math inline">\(\text{LogSoftmax}(x_{i})=\log \left(\frac{\exp (x_{i})}{\sum _{j}\exp (x_{j})}\right)\)</span></p>
+<p>Why we need Logsoftmax? Consider this:</p>
+<p><img src="media/logsoftmax_1.webp" width="300"></p>
+<p>As the numbers are too big the exponents will probably blow up (computer cannot handle such big numbers) giving Nan as output. Also, dividing large numbers for softmax calculation, can be numerically unstable.</p>
+<p><strong>Another advantage of taking log of probabilities:</strong> Since the probabilities of independent events multiply, and logarithms convert multiplication to addition, log probabilities of independent events add. Log probabilities are thus practical for computations.</p>
+</section>
+<section id="under-the-hood-nn.crossentropyloss-combines-logsoftmax-and-nllloss." class="level4">
+<h4 class="anchored" data-anchor-id="under-the-hood-nn.crossentropyloss-combines-logsoftmax-and-nllloss."><span style="color: green"> <strong>Under the hood: <code>nn.CrossEntropyLoss</code> combines <code>LogSoftmax</code> and <code>NLLLoss</code>.</strong></span></h4>
 </section>
 <section id="why-softmax-is-used-for-normalization-why-not-other-function" class="level4">
 <h4 class="anchored" data-anchor-id="why-softmax-is-used-for-normalization-why-not-other-function"><span style="color: cyan"> <strong>Why softmax is used for normalization? Why not other function?</strong></span></h4>
-<p>Why Softmax 1. <span class="math inline">\(e^x\)</span> is always positive no matter the sign of x. This is good because to read anything as probab or chances, it has to be + 2. training neural networks with <span class="math inline">\(e^x\)</span> is easy because derivative calculation is easy 3. quashes low values. For example: - softmax([1,2]) # blurry image of a ferret - [0.26894142, 0.73105858] # it is a cat perhaps !? - softmax([10,20]) # crisp image of a cat - [0.0000453978687, 0.999954602] # it is definitely a CAT !</p>
+<p>Why Softmax 1. <span class="math inline">\(e^x\)</span> is always positive no matter the sign of x. This is good because to read anything as probab or chances, it has to be + 2. training neural networks with <span class="math inline">\(e^x\)</span> is easy because derivative calculation is easy 3. quashes low values. For example: - softmax([1,2])<br>
+- [0.26894142, 0.73105858] # it is a cat perhaps !? - softmax([10,20])<br>
+- [0.0000453978687, 0.999954602] # it is definitely a CAT !</p>
 <p>​Why not others:</p>
 <ol type="1">
-<li>Min-Max normalization (or standard normalization)</li>
+<li>Min-Max normalization OR Standard normalization</li>
 </ol>
 <ul>
-<li>Not differentiable at min/max boundaries.</li>
-<li>Doesn’t sum to 1 → not valid for probability.</li>
-<li></li>
-<li>std_norm([1,2]) # blurry image of a ferret
+<li><p>Softmax normalization reacts to small and large variation/change differently but standard normalization does not differentiate the stimulus by intensity so longest the proportion is the same, for example,</p></li>
+<li><p>std_norm([1,2])</p>
 <ul>
-<li>[0.3333333333333333, 0.6666666666666666] # it is a cat perhaps !?</li>
+<li>[0.333, 0.667] # it is a cat perhaps !?</li>
 </ul></li>
-<li>std_norm([10,20]) # crisp image of a cat
+<li><p>std_norm([10,20])</p>
 <ul>
-<li>[0.3333333333333333, 0.6666666666666666] # it is a cat perhaps !?</li>
+<li>[0.333, 0.667] # it is a cat perhaps !?</li>
+</ul>
+<p>BUT</p></li>
+<li><p>softmax([1,2])</p>
+<ul>
+<li>[0.26894142, 0.73105858] # it is a cat perhaps !?</li>
 </ul></li>
+<li><p>softmax([10,20])</p>
+<ul>
+<li>[0.0000453978687, 0.999954602] # it is definitely a CAT !</li>
+</ul></li>
+<li><p>Not differentiable at min/max boundaries.</p></li>
+<li><p>Doesn’t sum to 1 → not valid for probability.</p></li>
+<li><p>Another problem arises when there are negative values in the logits. In that case, you will end up with negative probabilities in the output (if using standard normalization). The Softmax is not affected with negative values because exponent of any value (positive or negative) is always a positive value.</p></li>
 </ul>
 <p>Other Benefits of Softmax:</p>
 <ol type="1">
@@ -413,22 +447,36 @@ BCELoss:  tensor(1.9423)</code></pre>
 <li>Relative Comparison: It models relative confidence — a higher <span class="math inline">\(z_i\)</span> leads to much higher <span class="math inline">\(𝑝_𝑖\)</span></li>
 </ol>
 </section>
+<section id="categorical-cross-entropy-vs-sparse-categorical-cross-entropy" class="level4">
+<h4 class="anchored" data-anchor-id="categorical-cross-entropy-vs-sparse-categorical-cross-entropy"><span style="color: cyan"> <strong>Categorical cross-entropy vs sparse categorical cross-entropy ?</strong></span></h4>
+<p>Basically they are same thing. It is just unncessary jargon which can cause confusion.</p>
+<ul>
+<li><strong>Categorical cross-entropy</strong>: is used when true labels are one-hot encoded, for example, we have the following true values for 3-class classification problem [1,0,0], [0,1,0] and [0,0,1].</li>
+<li>In <strong>sparse categorical cross-entropy</strong> , truth labels are integer encoded, for example, [1], [2] and [3] for 3-class problem.</li>
+</ul>
+</section>
 </section>
 <section id="binary-classification-losses" class="level3">
 <h3 class="anchored" data-anchor-id="binary-classification-losses">Binary classification losses</h3>
-<div id="cell-11" class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># BCEWithLogitsLoss</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">## used for binary classification</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> torch.tensor([[<span class="dv">1</span>], [<span class="dv">0</span>], [<span class="dv">1</span>]])</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>logits <span class="op">=</span> torch.tensor([[<span class="op">-</span><span class="fl">2.5</span>], [<span class="fl">3.2</span>], [<span class="fl">4.8</span>]])</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>criterion <span class="op">=</span> nn.BCEWithLogitsLoss()</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> criterion(logits, target.<span class="bu">float</span>())</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'BCEWithLogitsLoss: '</span>, loss)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># BCELoss</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>criterion <span class="op">=</span> nn.BCELoss()</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> criterion(logits.sigmoid(), target.<span class="bu">float</span>())</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'BCELoss: '</span>, loss)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-12" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># binary classification</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> torch.tensor([[<span class="dv">1</span>], [<span class="dv">0</span>], [<span class="dv">1</span>]])</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>logits <span class="op">=</span> torch.tensor([[<span class="op">-</span><span class="fl">2.5</span>], [<span class="fl">3.2</span>], [<span class="fl">4.8</span>]])</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># BCEWithLogitsLoss</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">## used for binary classification</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>criterion <span class="op">=</span> nn.BCEWithLogitsLoss() <span class="co"># takes raw logits</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> criterion(logits, target.<span class="bu">float</span>())</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'BCEWithLogitsLoss: '</span>, loss)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co"># BCELoss</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>criterion <span class="op">=</span> nn.BCELoss() <span class="co"># takes sigmoided logits</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> criterion(logits.sigmoid(), target.<span class="bu">float</span>())</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'BCELoss: '</span>, loss)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>BCEWithLogitsLoss:  tensor(1.9423)
+BCELoss:  tensor(1.9423)</code></pre>
+</div>
 </div>
 <section id="gradient-clipping-in-binary-cross-entropy" class="level4">
 <h4 class="anchored" data-anchor-id="gradient-clipping-in-binary-cross-entropy"><span style="color: cyan"> <strong>Gradient clipping in Binary Cross Entropy?</strong></span></h4>
@@ -469,14 +517,14 @@ BCELoss:  tensor(1.9423)</code></pre>
 <p><strong>3. Inference</strong></p>
 <ul>
 <li><p>Multi-class:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply softmax to get probabilities (optional)</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>probs <span class="op">=</span> torch.softmax(logits, dim<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Get predicted class (index of highest probability)</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>preds <span class="op">=</span> torch.argmax(logits, dim<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply softmax to get probabilities (optional)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>probs <span class="op">=</span> torch.softmax(logits, dim<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Get predicted class (index of highest probability)</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>preds <span class="op">=</span> torch.argmax(logits, dim<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Multi-label:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>probs <span class="op">=</span> torch.sigmoid(logits)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> (probs <span class="op">&gt;</span> <span class="fl">0.5</span>).<span class="bu">int</span>()  <span class="co"># thresholding</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>probs <span class="op">=</span> torch.sigmoid(logits)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> (probs <span class="op">&gt;</span> <span class="fl">0.5</span>).<span class="bu">int</span>()  <span class="co"># thresholding</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ul>
 <p>(conceptually: replace softmax with sigmoid)</p>
 <ul>
@@ -540,6 +588,28 @@ BCELoss:  tensor(1.9423)</code></pre>
 <li><p>D_KL(P || Q) = ∑ P(x) * log(P(x) / Q(x))</p></li>
 <li><p>=&gt; H(P, Q) = H(P) + D_KL(P || Q)</p></li>
 </ul>
+</section>
+<section id="entropy-explained-also-why-is-there-a-negative-sign-in-entropy" class="level4">
+<h4 class="anchored" data-anchor-id="entropy-explained-also-why-is-there-a-negative-sign-in-entropy"><span style="color: cyan"> <strong>Entropy explained… Also why is there a negative sign in Entropy?</strong></span></h4>
+<p>Formula:</p>
+<p><img src="media/entropy.webp" width="300"></p>
+<p><u><strong>Why -ve sign?</strong></u></p>
+<p>Look at the graph of log(x)</p>
+<div style="background-color:rgb(255, 255, 255); display: flex; gap: 20px; padding: 10px; justify-content: center;">
+<figure style="margin: 0; text-align: center;" class="figure">
+<figcaption>
+<b>Graph of log(x)</b>
+</figcaption>
+<img src="media/entropy2.png" width="300" class="figure-img">
+</figure>
+</div>
+<p>We can see that - log(0.00001) -&gt; it is close to -infinity - log(0.99999) -&gt; it is close to 0 (like -0.0000001)</p>
+<p>Now, Entropy reflects Randomness.</p>
+<p>Suppose <span class="math inline">\(p = probability of us being correct\)</span></p>
+<p>If p is low =&gt; less confidence =&gt; more Entropy (aka randomness) - if -ve sign is not there then, log(0.00001) = -inf =&gt; meaning very less randomness: which is contradictory.</p>
+<p>Similarly, if p is high =&gt; less confidence =&gt; more Entropy (aka randomness) - if -ve sign is not there then, log(0.999999) = -0.000001 =&gt; meaning high randomness on full Real scale ranging from -inf to +inf.</p>
+<p>That is why we use, -ve sign.</p>
+<p>Refer this <a href="https://towardsdatascience.com/cross-entropy-loss-function-f38c4ec8643e/">article</a> for more insights about Entropy and understanding it better!</p>
 
 
 </section>
