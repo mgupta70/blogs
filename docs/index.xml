@@ -10,7 +10,566 @@
 <atom:link href="https://mgupta70.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>AI/ML blogs from Mohit, Ph.D. Computer Vision</description>
 <generator>quarto-1.8.1</generator>
-<lastBuildDate>Mon, 09 Jun 2025 07:00:00 GMT</lastBuildDate>
+<lastBuildDate>Wed, 18 Jun 2025 07:00:00 GMT</lastBuildDate>
+<item>
+  <title>Pytorch Losses Review</title>
+  <dc:creator>Mohit Gupta</dc:creator>
+  <link>https://mgupta70.github.io/posts/2025-06-18-PyLosses/pytorch_losses.html</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<div id="cell-1" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> torch</span>
+<span id="cb1-2"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> torch.nn <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> nn</span></code></pre></div>
+</div>
+<section id="regression-losses" class="level3">
+<h3 class="anchored" data-anchor-id="regression-losses">Regression Losses</h3>
+<div id="cell-3" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1">y_true <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> torch.tensor([[<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3.0</span>], [<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.0</span>], [<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2.0</span>], [<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8.0</span>]]) </span>
+<span id="cb2-2">y_pred <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> torch.tensor([[<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5</span>], [<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3.5</span>], [<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4.5</span>], [<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8.5</span>]]) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># error: -1.5, 3.5, 2.5, 0.5</span></span>
+<span id="cb2-3"></span>
+<span id="cb2-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># L1 Loss aka MAE</span></span>
+<span id="cb2-5">criterion <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> nn.L1Loss(reduction<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'sum'</span>)</span>
+<span id="cb2-6">loss <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> criterion(y_pred, y_true) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># error: |-1.5| + |3.5| + |2.5| + |0.5| = 8</span></span>
+<span id="cb2-7"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'L1 Loss: '</span>, loss)</span>
+<span id="cb2-8"></span>
+<span id="cb2-9"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># L2 Loss aka MSE</span></span>
+<span id="cb2-10">criterion <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> nn.MSELoss(reduction<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'sum'</span>)</span>
+<span id="cb2-11">loss <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> criterion(y_pred, y_true) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># error: (-1.5)^2 + (3.5)^2 + (2.5)^2 + (0.5)^2 = 21</span></span>
+<span id="cb2-12"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'L2 Loss: '</span>, loss)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>L1 Loss:  tensor(8.)
+L2 Loss:  tensor(21.)</code></pre>
+</div>
+</div>
+<section id="when-to-choose-l1-loss-and-when-to-choose-mse-loss" class="level4">
+<h4 class="anchored" data-anchor-id="when-to-choose-l1-loss-and-when-to-choose-mse-loss"><span style="color: green"> <strong>When to choose L1 loss and when to choose MSE loss?</strong></span></h4>
+<ul>
+<li>Use L1 loss when feature selection is required</li>
+<li>Use L1 loss when outliers are present because L2 loss will make outliers even more (because it squares the difference), making loss more sensitive to outliers</li>
+<li>Use L2 loss generally for well-behaved datasets (i.e.&nbsp;less outliers)</li>
+<li>L2 loss is easier to optimize than L1 loss</li>
+</ul>
+</section>
+<section id="smooth-l1-loss" class="level4">
+<h4 class="anchored" data-anchor-id="smooth-l1-loss"><span style="color: green"> <strong>Smooth L1 loss?</strong></span></h4>
+<ul>
+<li>Detail: Creates a criterion that uses a squared term if the absolute element-wise error falls below beta and an L1 term otherwise. It achieves this by transitioning from a quadratic (MSE-like) loss for small errors to a linear (MAE-like) loss for larger errors.</li>
+<li>Primary Advantage: tries to solve the problem discussed above: making L2 loss less sensitive to outlier</li>
+<li>Other Advantages:
+<ul>
+<li>it is less prone to exploding gradients.</li>
+<li>L2 region provides smoothness over L1Loss near 0</li>
+</ul></li>
+</ul>
+<p><img src="https://mgupta70.github.io/posts/2025-06-18-PyLosses/media/smoothl1.png" width="300"></p>
+</section>
+<section id="huber-loss" class="level4">
+<h4 class="anchored" data-anchor-id="huber-loss"><span style="color: cyan"> <strong>Huber Loss?</strong></span></h4>
+<ul>
+<li>similar to <code>Smooth L1</code> loss i.e.&nbsp;it tries to make <code>MSE</code> less sensitive to outliers by transitioning from a quadratic (<code>MSE</code>-like) loss for small errors to a linear (<code>MAE</code>-like) loss for larger errors.</li>
+<li>conceptually, it is similar to <code>Smooth L1</code>, it only differs in parametrization</li>
+</ul>
+<table>
+<tbody><tr>
+<th>
+Smooth L1
+</th>
+<th>
+Huber
+</th>
+</tr>
+<tr>
+<td>
+<img src="https://mgupta70.github.io/posts/2025-06-18-PyLosses/media/smooth_l1.png" width="400">
+</td>
+<td>
+<img src="https://mgupta70.github.io/posts/2025-06-18-PyLosses/media/huber.png" width="400">
+</td>
+</tr>
+</tbody></table>
+</section>
+</section>
+<section id="multi-class-classification-losses" class="level3">
+<h3 class="anchored" data-anchor-id="multi-class-classification-losses">Multi-class classification losses</h3>
+<div id="cell-6" class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1">target <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> torch.tensor([<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>])</span>
+<span id="cb4-2">logits <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> torch.randn(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>, requires_grad<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># logits are the raw, unnormalized scores output by the model for each class</span></span>
+<span id="cb4-3"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Logits: '</span>, logits, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span>)</span>
+<span id="cb4-4"></span>
+<span id="cb4-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Cross Entropy Loss</span></span>
+<span id="cb4-6">criterion <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> nn.CrossEntropyLoss()</span>
+<span id="cb4-7">loss <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> criterion(logits, target)</span>
+<span id="cb4-8"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Cross Entropy Loss: '</span>, loss)</span>
+<span id="cb4-9"></span>
+<span id="cb4-10"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Cross Entropy Loss with label smoothing</span></span>
+<span id="cb4-11">criterion <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> nn.CrossEntropyLoss(label_smoothing<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span>)</span>
+<span id="cb4-12">loss <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> criterion(logits, target)</span>
+<span id="cb4-13"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Cross Entropy Loss with label smoothing: '</span>, loss)</span>
+<span id="cb4-14"></span>
+<span id="cb4-15"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># NLL Loss</span></span>
+<span id="cb4-16">log_softmax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> nn.LogSoftmax(dim<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb4-17">log_softmax_logits <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> log_softmax(logits)</span>
+<span id="cb4-18">criterion <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> nn.NLLLoss()</span>
+<span id="cb4-19">loss <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> criterion(log_softmax_logits, target)</span>
+<span id="cb4-20"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'NLL Loss: '</span>, loss)</span>
+<span id="cb4-21"></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Logits:  tensor([[-2.3067, -0.4415,  1.2303, -0.1116,  1.0671],
+        [ 0.6613, -0.7587, -0.2258, -1.0881,  0.5560],
+        [-0.2371, -0.8510, -1.8690, -1.0833,  0.8148]], requires_grad=True) 
+
+Cross Entropy Loss:  tensor(1.3611, grad_fn=&lt;NllLossBackward0&gt;)
+Cross Entropy Loss with label smoothing:  tensor(1.4266, grad_fn=&lt;AddBackward0&gt;)
+NLL Loss:  tensor(1.3611, grad_fn=&lt;NllLossBackward0&gt;)
+BCEWithLogitsLoss:  tensor(1.9423)
+BCELoss:  tensor(1.9423)</code></pre>
+</div>
+</div>
+<section id="what-is-input-to-nn.crossentropyloss" class="level4">
+<h4 class="anchored" data-anchor-id="what-is-input-to-nn.crossentropyloss"><span style="color: green"> <strong>What is input to nn.CrossEntropyLoss()?</strong></span></h4>
+<p>Logits not softmaxed logits</p>
+<p>Logits are unnormalized raw outputs without activation in the last i.e.&nbsp;output layer</p>
+</section>
+<section id="what-is-label-smoothing" class="level4">
+<h4 class="anchored" data-anchor-id="what-is-label-smoothing"><span style="color: green"> <strong>What is label smoothing?</strong></span></h4>
+<p>Label smoothing replaces the hard label (e.g.,[1.0, 0.0, 0.0]) with a smoothed version (e.g., [0.9, 0.05, 0.05]).</p>
+<p>The uniform distribution acts as a regularizer, preventing the model from becoming overly confident in its predictions for a single class.</p>
+</section>
+<section id="under-the-hood-softmax" class="level4">
+<h4 class="anchored" data-anchor-id="under-the-hood-softmax"><span style="color: cyan"> <strong>Under the hood: Softmax?</strong></span></h4>
+<ul>
+<li><p>Formula: <img src="https://mgupta70.github.io/posts/2025-06-18-PyLosses/media/softmax_1.png" width="75"></p></li>
+<li><p>Under the hood we do not want to compute this directly because if <img src="https://latex.codecogs.com/png.latex?f_i">’s are large then computing their exponential causes numerical instability.</p></li>
+<li><p>To solve this, we use a trick. Multiply numerator and denominator by a constant C</p>
+<ul>
+<li><img src="https://mgupta70.github.io/posts/2025-06-18-PyLosses/media/softmax_2.png" width="150"></li>
+</ul></li>
+<li><p>Use mathematical operations to show</p>
+<ul>
+<li><img src="https://mgupta70.github.io/posts/2025-06-18-PyLosses/media/softmax_3.png" width="200"></li>
+</ul></li>
+<li><p>We keep C = <img src="https://mgupta70.github.io/posts/2025-06-18-PyLosses/media/softmax_4.png" width="150"></p></li>
+<li><p>Basically this means we make largest term = 0</p></li>
+</ul>
+<div class="sourceCode" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1">f <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.array([<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">123</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">456</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">789</span>]) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># example with 3 classes and each having large scores</span></span>
+<span id="cb6-2">p <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.exp(f) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">sum</span>(np.exp(f)) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Bad: Numeric problem, potential blowup</span></span>
+<span id="cb6-3"></span>
+<span id="cb6-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># instead: first shift the values of f so that the highest number is 0:</span></span>
+<span id="cb6-5">f <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-=</span> np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">max</span>(f) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># f becomes [-666, -333, 0]</span></span>
+<span id="cb6-6">p <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.exp(f) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">sum</span>(np.exp(f)) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># safe to do, gives the correct answer</span></span></code></pre></div>
+</section>
+<section id="logsoftmax" class="level4">
+<h4 class="anchored" data-anchor-id="logsoftmax"><span style="color: green"> <strong>LogSoftmax?</strong></span></h4>
+<p><img src="https://latex.codecogs.com/png.latex?%5Ctext%7BLogSoftmax%7D(x_%7Bi%7D)=%5Clog%20%5Cleft(%5Cfrac%7B%5Cexp%20(x_%7Bi%7D)%7D%7B%5Csum%20_%7Bj%7D%5Cexp%20(x_%7Bj%7D)%7D%5Cright)"></p>
+</section>
+<section id="why-softmax-is-used-for-normalization-why-not-other-function" class="level4">
+<h4 class="anchored" data-anchor-id="why-softmax-is-used-for-normalization-why-not-other-function"><span style="color: cyan"> <strong>Why softmax is used for normalization? Why not other function?</strong></span></h4>
+<p>Why Softmax 1. <img src="https://latex.codecogs.com/png.latex?e%5Ex"> is always positive no matter the sign of x. This is good because to read anything as probab or chances, it has to be + 2. training neural networks with <img src="https://latex.codecogs.com/png.latex?e%5Ex"> is easy because derivative calculation is easy 3. quashes low values. For example: - softmax([1,2]) # blurry image of a ferret - [0.26894142, 0.73105858] # it is a cat perhaps !? - softmax([10,20]) # crisp image of a cat - [0.0000453978687, 0.999954602] # it is definitely a CAT !</p>
+<p>​Why not others:</p>
+<ol type="1">
+<li>Min-Max normalization (or standard normalization)</li>
+</ol>
+<ul>
+<li>Not differentiable at min/max boundaries.</li>
+<li>Doesn’t sum to 1 → not valid for probability.</li>
+<li></li>
+<li>std_norm([1,2]) # blurry image of a ferret
+<ul>
+<li>[0.3333333333333333, 0.6666666666666666] # it is a cat perhaps !?</li>
+</ul></li>
+<li>std_norm([10,20]) # crisp image of a cat
+<ul>
+<li>[0.3333333333333333, 0.6666666666666666] # it is a cat perhaps !?</li>
+</ul></li>
+</ul>
+<p>Other Benefits of Softmax:</p>
+<ol type="1">
+<li>Probabilistic Interpretation: Softmax ensures all outputs are in [0,1] and sum to 1 → valid probability vector.</li>
+<li>Differentiability: It is smooth and differentiable → critical for backpropagation in neural nets.</li>
+<li>Relative Comparison: It models relative confidence — a higher <img src="https://latex.codecogs.com/png.latex?z_i"> leads to much higher <img src="https://latex.codecogs.com/png.latex?%F0%9D%91%9D_%F0%9D%91%96"></li>
+</ol>
+</section>
+</section>
+<section id="binary-classification-losses" class="level3">
+<h3 class="anchored" data-anchor-id="binary-classification-losses">Binary classification losses</h3>
+<div id="cell-11" class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># BCEWithLogitsLoss</span></span>
+<span id="cb7-2"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">## used for binary classification</span></span>
+<span id="cb7-3">target <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> torch.tensor([[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], [<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>], [<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]])</span>
+<span id="cb7-4">logits <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> torch.tensor([[<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2.5</span>], [<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3.2</span>], [<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4.8</span>]])</span>
+<span id="cb7-5">criterion <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> nn.BCEWithLogitsLoss()</span>
+<span id="cb7-6">loss <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> criterion(logits, target.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">float</span>())</span>
+<span id="cb7-7"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'BCEWithLogitsLoss: '</span>, loss)</span>
+<span id="cb7-8"></span>
+<span id="cb7-9"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># BCELoss</span></span>
+<span id="cb7-10">criterion <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> nn.BCELoss()</span>
+<span id="cb7-11">loss <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> criterion(logits.sigmoid(), target.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">float</span>())</span>
+<span id="cb7-12"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'BCELoss: '</span>, loss)</span></code></pre></div>
+</div>
+<section id="gradient-clipping-in-binary-cross-entropy" class="level4">
+<h4 class="anchored" data-anchor-id="gradient-clipping-in-binary-cross-entropy"><span style="color: cyan"> <strong>Gradient clipping in Binary Cross Entropy?</strong></span></h4>
+<ul>
+<li>if predicted class probab = 0 -&gt; <img src="https://latex.codecogs.com/png.latex?log(p)%20=%20-inf"> : undesirable
+<ul>
+<li>Moreover, in gradient descent,and <img src="https://latex.codecogs.com/png.latex?%5Cfrac%7Bd%20log(p)%7D%7Bd%20x%7D%20=%20%5Cfrac%7B1%7D%7Bp%7D%20=%20%5Cfrac%7B1%7D%7B0%7D%20=%20inf"> : also Undesirable</li>
+</ul></li>
+<li>Solution: Gradient clipping: Under the hood Pytorch’s <code>BCELoss</code> clamps its log function outputs to be greater than or equal to -100</li>
+</ul>
+</section>
+<section id="how-to-use-bcewithlogitsloss-for-binary-segmentation" class="level4">
+<h4 class="anchored" data-anchor-id="how-to-use-bcewithlogitsloss-for-binary-segmentation"><span style="color: cyan"> <strong>How to use BCEWithLogitsLoss for binary segmentation?</strong></span></h4>
+<ul>
+<li>good practise is to use <code>pos_weight</code> argument to weigh the positive or negative class more.</li>
+<li>But note that since it is <code>BCEWithLogitsLoss</code> i.e.&nbsp;binary meaning there output neuron is 1 in this case. So, <code>pos_weight</code> is the weight for positive class (e.g.&nbsp;foreground) which can be calculated by counting the number of positive and negative pixels for complete training dataset and use the average of these counts to calculate the <code>pos_weight</code>.</li>
+</ul>
+</section>
+<section id="strategies-for-class-imbalance" class="level4">
+<h4 class="anchored" data-anchor-id="strategies-for-class-imbalance"><span style="color: green"> <strong>2 Strategies for class-imbalance?</strong></span></h4>
+<ol type="1">
+<li>use <code>class weights</code> while calculating loss/ training model to give weights to each class: inversely proportional to their frequency count</li>
+<li>use an alternative loss like Focal loss</li>
+</ol>
+</section>
+<section id="how-to-convert-multi-class-classification-into-multi-label-classification-in-pytorch" class="level4">
+<h4 class="anchored" data-anchor-id="how-to-convert-multi-class-classification-into-multi-label-classification-in-pytorch"><span style="color: cyan"> <strong>How to convert multi-class classification into multi-label classification in Pytorch?</strong></span></h4>
+<p><strong>1. Change Target Format</strong></p>
+<ul>
+<li><p>Multi-class: target is a single integer per sample (e.g., tensor([2, 0, 1]))</p></li>
+<li><p>Multi-label: target is a binary vector per sample (e.g., tensor([[0,1,1], [1,1,0], [1,0,0]]))</p></li>
+</ul>
+<p><strong>2. Loss Function</strong></p>
+<ul>
+<li><p>Multi-class: <code>nn.CrossEntropyLoss()</code> (expects class index targets)</p></li>
+<li><p>Multi-label: <code>nn.BCEWithLogitsLoss()</code> (expects multi-hot binary vectors)</p></li>
+</ul>
+<p><strong>3. Inference</strong></p>
+<ul>
+<li><p>Multi-class:</p>
+<div class="sourceCode" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Apply softmax to get probabilities (optional)</span></span>
+<span id="cb8-2">probs <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> torch.softmax(logits, dim<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb8-3"></span>
+<span id="cb8-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Get predicted class (index of highest probability)</span></span>
+<span id="cb8-5">preds <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> torch.argmax(logits, dim<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span></code></pre></div></li>
+<li><p>Multi-label:</p>
+<div class="sourceCode" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1">probs <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> torch.sigmoid(logits)</span>
+<span id="cb9-2">predictions <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> (probs <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>).<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">int</span>()  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># thresholding</span></span></code></pre></div></li>
+</ul>
+<p>(conceptually: replace softmax with sigmoid)</p>
+<ul>
+<li><p>Multi-class: <code>nn.Softmax(dim=1)</code> (during inference)</p></li>
+<li><p>Multi-label: <code>nn.Sigmoid()</code> (applies independently to each class)</p></li>
+</ul>
+</section>
+</section>
+<section id="contrastive-loss" class="level3">
+<h3 class="anchored" data-anchor-id="contrastive-loss">Contrastive Loss</h3>
+<ol type="1">
+<li><code>nn.TripletMarginLoss</code>:
+<ul>
+<li>computes triplet loss = max(d(a,p)-d(a,n)+margin, 0)
+<ul>
+<li>here d(a,p) is distance b/w a and p using norm. Default is L2 norm</li>
+</ul></li>
+</ul></li>
+<li><code>nn.TripletMarginWithDistanceLoss</code>:
+<ul>
+<li>computes triplet loss with a custom distance function = max(d(a,p)-d(a,n)+margin, 0)
+<ul>
+<li>here d(a,p) is a custom function which user can define. Default is pairwise distance</li>
+<li>it can be easily modified to 1-<code>cosine_similarity</code></li>
+</ul></li>
+</ul></li>
+</ol>
+<section id="when-to-choose-euclidean-loss-over-cosine-similarity-loss-or-vice-versa" class="level4">
+<h4 class="anchored" data-anchor-id="when-to-choose-euclidean-loss-over-cosine-similarity-loss-or-vice-versa"><span style="color: cyan"> <strong>When to choose euclidean loss over cosine similarity loss or vice-versa?</strong></span></h4>
+<p>Euclidean Distance - reconstruction (AutoEncoders) - regression - small-dimension size</p>
+<p>Cosine Distance - Large dimensional - textual data - NLP, Retrieval</p>
+</section>
+</section>
+<section id="kl-divergence-loss" class="level3">
+<h3 class="anchored" data-anchor-id="kl-divergence-loss">KL divergence loss</h3>
+<ul>
+<li>is a measure of how one probability distribution differs from another</li>
+<li>KL Divergence helps you understand how much one set of things (like candies in a bag) is different from another set (like another bag of candies)</li>
+<li>used in
+<ul>
+<li>Training VAE</li>
+<li>Knowledge Distillation</li>
+</ul></li>
+<li>The key idea behind KL Divergence Loss is to quantify how much information is lost when we try to approximate one distribution (the “true” distribution) with another (the “predicted” distribution).</li>
+</ul>
+<p>Mathematically, the KL Divergence Loss is defined as:</p>
+<p>KL(P||Q) = Σ P(x) log(P(x) / Q(x))</p>
+<p>Where P is the true distribution and Q is the predicted/approximated distribution. The KL Divergence is a non-symmetric measure — it tells us how much information is lost when using Q to approximate P, but not vice versa.</p>
+<section id="relation-bw-crossentropyloss-and-kl-divergence-loss" class="level4">
+<h4 class="anchored" data-anchor-id="relation-bw-crossentropyloss-and-kl-divergence-loss"><span style="color: cyan"> <strong>Relation b/w CrossEntropyLoss and KL Divergence Loss?</strong></span></h4>
+<ul>
+<li><p>both cross entropy and KL divergence measure the difference between two probability distributions.</p></li>
+<li><p>The difference is that it calculates the the total entropy between the distributions, while KL divergence represents relative entropy.</p></li>
+<li><p>KL divergence measures the information loss when one distribution is used to approximate another</p></li>
+<li><p>Cross entropy is typically used in supervised learning tasks where there is a fixed target distribution, while KL divergence is more suitable for unsupervised learning tasks and applications involving the comparison or approximation of two probability distributions.</p></li>
+<li><p>Mathematically, H(P, Q) = H(P) + D_KL(P || Q)</p>
+<ul>
+<li>where H(P, Q) : Cross Entropy; H(P): Entropy of P</li>
+</ul></li>
+<li><p>H(P, Q) = - ∑ P(x) * log(Q(x))</p></li>
+<li><p>D_KL(P || Q) = ∑ P(x) * log(P(x) / Q(x))</p></li>
+<li><p>=&gt; H(P, Q) = H(P) + D_KL(P || Q)</p></li>
+</ul>
+
+
+</section>
+</section>
+
+ ]]></description>
+  <category>ML</category>
+  <category>DL</category>
+  <guid>https://mgupta70.github.io/posts/2025-06-18-PyLosses/pytorch_losses.html</guid>
+  <pubDate>Wed, 18 Jun 2025 07:00:00 GMT</pubDate>
+  <media:content url="https://mgupta70.github.io/posts/2025-06-18-PyLosses/pyt_logo.png" medium="image" type="image/png" height="36" width="144"/>
+</item>
 <item>
   <title>GradCAM Review</title>
   <dc:creator>Mohit Gupta</dc:creator>
@@ -352,8 +911,9 @@ font-style: inherit;">1</span>))</span></code></pre></div>
 </figure>
 </div>
 </section>
-<section id="nms" class="level4">
-<h4 class="anchored" data-anchor-id="nms">NMS</h4>
+</section>
+<section id="nms" class="level3">
+<h3 class="anchored" data-anchor-id="nms">NMS</h3>
 <ol type="1">
 <li>Find all the boxes with a high objectness score. This is the level of confidence of the model that there is an object in the grid cell. We typically have a confidence threshold, so any box with a lower score is not considered.</li>
 </ol>
@@ -366,7 +926,7 @@ font-style: inherit;">1</span>))</span></code></pre></div>
 <p>Suppose we have B: bboxes preds, C_thresh: confidence thresh (objectness score) for each bbox<br>
 iou_thresh: iou overlap threshold</p>
 <ol type="1">
-<li><p>Filter bboxes with confidence &gt; C_thresh. Suppose now B -&gt; B_new</p></li>
+<li><p>Filter bboxes with confidence &gt; C_thresh. Suppose now B -&gt; updated <em>B</em></p></li>
 <li><p>Sort bboxes in B_new by confidence scores in descending order</p></li>
 <li><p>Initialize a new variable F_bboxes to store final bboxes</p></li>
 <li><p>while B_new is not empty:</p>
@@ -440,8 +1000,7 @@ font-style: inherit;">&lt;</span> iou_thresh:</span>
 <span id="cb1-13">            remaining_bboxes.append(b2)</span>
 <span id="cb1-14">    B <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">=</span> b2</span></code></pre></div>
-</section>
+font-style: inherit;">=</span> remaining_bboxes</span></code></pre></div>
 </section>
 <section id="problems" class="level3">
 <h3 class="anchored" data-anchor-id="problems">Problems:</h3>

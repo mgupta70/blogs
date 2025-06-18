@@ -396,8 +396,9 @@ window.Quarto = {
 </figure>
 </div>
 </section>
-<section id="nms" class="level4">
-<h4 class="anchored" data-anchor-id="nms">NMS</h4>
+</section>
+<section id="nms" class="level3">
+<h3 class="anchored" data-anchor-id="nms">NMS</h3>
 <ol type="1">
 <li>Find all the boxes with a high objectness score. This is the level of confidence of the model that there is an object in the grid cell. We typically have a confidence threshold, so any box with a lower score is not considered.</li>
 </ol>
@@ -410,7 +411,7 @@ window.Quarto = {
 <p>Suppose we have B: bboxes preds, C_thresh: confidence thresh (objectness score) for each bbox<br>
 iou_thresh: iou overlap threshold</p>
 <ol type="1">
-<li><p>Filter bboxes with confidence &gt; C_thresh. Suppose now B -&gt; B_new</p></li>
+<li><p>Filter bboxes with confidence &gt; C_thresh. Suppose now B -&gt; updated <em>B</em></p></li>
 <li><p>Sort bboxes in B_new by confidence scores in descending order</p></li>
 <li><p>Initialize a new variable F_bboxes to store final bboxes</p></li>
 <li><p>while B_new is not empty:</p>
@@ -433,8 +434,7 @@ iou_thresh: iou overlap threshold</p>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> b2 <span class="kw">in</span> B:</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> iou(b1, b2) <span class="op">&lt;</span> iou_thresh:</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>            remaining_bboxes.append(b2)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    B <span class="op">=</span> b2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    B <span class="op">=</span> remaining_bboxes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="problems" class="level3">
 <h3 class="anchored" data-anchor-id="problems">Problems:</h3>

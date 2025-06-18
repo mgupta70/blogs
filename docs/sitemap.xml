@@ -1,39 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://mgupta70.github.io/posts/2025-06-09-GradCAM/gradcam_project.html</loc>
-    <lastmod>2025-06-10T05:29:50.076Z</lastmod>
+    <loc>https://mgupta70.github.io/posts/2025-06-18-PyLosses/pytorch_losses.html</loc>
+    <lastmod>2025-06-18T18:53:53.540Z</lastmod>
   </url>
   <url>
-    <loc>https://mgupta70.github.io/posts/2025-05-21-stack/stack.html</loc>
-    <lastmod>2025-05-21T22:41:25.740Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mgupta70.github.io/posts/2025-05-19-linked-list/Linked_List.html</loc>
-    <lastmod>2025-05-24T17:32:06.935Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mgupta70.github.io/posts/2025-05-04-decision-trees-basics/1_basic_decision_tree_for_classification.html</loc>
-    <lastmod>2025-05-19T06:45:12.918Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mgupta70.github.io/about.html</loc>
-    <lastmod>2025-05-05T05:57:32.039Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mgupta70.github.io/index.html</loc>
-    <lastmod>2025-05-05T05:27:23.772Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mgupta70.github.io/posts/2025-05-18-linear-regression-basics/2_linear_regression.html</loc>
-    <lastmod>2025-05-19T06:55:06.862Z</lastmod>
+    <loc>https://mgupta70.github.io/posts/2025-06-04-yolo/yolo.html</loc>
+    <lastmod>2025-06-10T18:16:28.626Z</lastmod>
   </url>
   <url>
     <loc>https://mgupta70.github.io/posts/2025-05-20-hash-map/Hash Table.html</loc>
     <lastmod>2025-05-21T20:29:39.761Z</lastmod>
   </url>
   <url>
-    <loc>https://mgupta70.github.io/posts/2025-06-04-yolo/yolo.html</loc>
-    <lastmod>2025-06-06T01:23:02.497Z</lastmod>
+    <loc>https://mgupta70.github.io/posts/2025-05-18-linear-regression-basics/2_linear_regression.html</loc>
+    <lastmod>2025-05-19T06:55:06.862Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mgupta70.github.io/index.html</loc>
+    <lastmod>2025-05-05T05:27:23.772Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mgupta70.github.io/about.html</loc>
+    <lastmod>2025-05-05T05:57:32.039Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mgupta70.github.io/posts/2025-05-04-decision-trees-basics/1_basic_decision_tree_for_classification.html</loc>
+    <lastmod>2025-05-19T06:45:12.918Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mgupta70.github.io/posts/2025-05-19-linked-list/Linked_List.html</loc>
+    <lastmod>2025-05-24T17:32:06.935Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mgupta70.github.io/posts/2025-05-21-stack/stack.html</loc>
+    <lastmod>2025-05-21T22:41:25.740Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mgupta70.github.io/posts/2025-06-09-GradCAM/gradcam_project.html</loc>
+    <lastmod>2025-06-18T18:50:37.284Z</lastmod>
   </url>
 </urlset>
