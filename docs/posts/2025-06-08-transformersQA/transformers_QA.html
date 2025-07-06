@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.1">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Mohit Gupta">
+<meta name="dcterms.date" content="2025-06-08">
+<meta name="description" content="A deep dive into ‘Transformers’">
+
+<title>Transformers Made Easy (Draft) – AI Blogs</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-443ac161e34e8c1eedb78f958e3d9213.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-5b8a677417396a6e7de0ff5891f330dc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-YQ6KB81L7R"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-YQ6KB81L7R', { 'anonymize_ip': true});
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">AI Blogs</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About Me</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://mgupta70.github.io"> <i class="bi bi-person-circle" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/mgupta70"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Transformers Made Easy (Draft)</h1>
+                  <div>
+        <div class="description">
+          A deep dive into ‘Transformers’
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">Transformers</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Mohit Gupta </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">June 8, 2025</p>
+      </div>
+    </div>
+    
+      <div>
+      <div class="quarto-title-meta-heading">Modified</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date-modified">June 26, 2025</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="explain-attention-in-transformers-as-laid-out-in-attention-is-all-you-need-paper" class="level4">
+<h4 class="anchored" data-anchor-id="explain-attention-in-transformers-as-laid-out-in-attention-is-all-you-need-paper"><span style="color:green"><strong>Explain <u>Attention</u> in Transformers as laid out in “<u>Attention</u> is all you need” paper?</strong></span></h4>
+<p>Attention = Scaled Dot-Product Attention</p>
+<p><img src="nlp_aatn_media/scaled_dp_attention.png" width="250"></p>
+<p>Attention = <img src="nlp_aatn_media/attention_step2_1_4.png" width="150"></p>
+<p>In this, weights of each value = <img src="nlp_aatn_media/attention_step2_1_3.png" width="100"></p>
+<p>Attention is dot-product b/w <span class="math inline">\(Q\)</span> and <span class="math inline">\(K\)</span> normalized with <span class="math inline">\(\sqrt{d_k}\)</span> and then applying a <code>Softmax</code> function to get weights on each value. Weighted sum of values completes the attention calculation.</p>
+</section>
+<section id="explain-difference-bw-self-attention-vs-cross-attention" class="level4">
+<h4 class="anchored" data-anchor-id="explain-difference-bw-self-attention-vs-cross-attention"><span style="color:green"><strong>Explain difference b/w Self-Attention vs Cross-Attention</strong></span></h4>
+<p>Attention mechanism is central to the success of Transformer models. Broadly speaking, attention enable the model to selectively focus on different parts of the input sequence.</p>
+<p>In context of Transformer model proposed in “Attention is all you need”</p>
+<p><strong>Self-Attention</strong> - present in both Encoder and Decoder - allows the model to weigh the importance of each element in the <strong>single</strong> sequence to <strong>compute its own representation</strong>. - capture long-range dependencies and contextual information within the <em>same</em> sequence</p>
+<p>—– Self-Attention in “Attention is all you need” ——</p>
+<p>For Encoder: In a self-attention layer all of the keys, values and queries come from the same place, in this case, the output of the previous layer in the encoder. Each position in the encoder can attend to all positions in the previous layer of the encoder.</p>
+<p>For Decoder: Self-attention layers in the decoder allow each position in the decoder to attend to all positions in the decoder up to and including that position. We need to prevent leftward information flow in the decoder to preserve the auto-regressive property. We implement this inside of scaled dot-product attention by masking out (setting to −∞) all values in the input of the softmax which correspond to illegal connections.</p>
+<p><strong>Cross-Attention</strong> - present only in Decoder - enables the model to <strong>attend to different parts of the input</strong> sequence while <strong>generating the output</strong> - enables interaction b/w input and output sequences. - In other words, allows the model to consider the relevant context from the encoder’s output during the generation of each element in the output sequence.</p>
+<p>—– Cross-Attention in “Attention is all you need” ——</p>
+<p>Queries come from the previous decoder layer, and the memory keys and values come from the output of the encoder. This allows every position in the decoder to attend over all positions in the input sequence.</p>
+</section>
+<section id="why-is-cross-attention-important" class="level4">
+<h4 class="anchored" data-anchor-id="why-is-cross-attention-important"><span style="color:green"><strong>Why is Cross-Attention important?</strong></span></h4>
+<ul>
+<li>Helpful in scenarios where information required to generate an element in output sequence is spread across the input sequence</li>
+<li>For example, in language translation, understanding the meaning of a word in the target language may require considering the multiple words in the input language sentence.</li>
+<li>Cross-attention allows the model to selectively attend to relevant parts of the source sequence during the generation process, generating meaningful translations.</li>
+</ul>
+</section>
+<section id="how-does-transformer-parallelize-computation" class="level4">
+<h4 class="anchored" data-anchor-id="how-does-transformer-parallelize-computation"><span style="color:green"><strong>How does Transformer parallelize computation?</strong></span></h4>
+<p><span style="color:green">OR</span></p>
+</section>
+<section id="how-does-transformer-avoid-recurrence-and-convolutions" class="level4">
+<h4 class="anchored" data-anchor-id="how-does-transformer-avoid-recurrence-and-convolutions"><span style="color:green"><strong>How does Transformer avoid recurrence and convolutions?</strong></span></h4>
+<p>It processes entire word sequence (or image patches) parallely. Transformers use the concept of <strong>Attention</strong> to consider all elements in the input sequence simultaneously, avoiding recurrence.</p>
+</section>
+<section id="why-rnns-are-slow-or-sequential" class="level4">
+<h4 class="anchored" data-anchor-id="why-rnns-are-slow-or-sequential"><span style="color:green"><strong>Why RNNs are slow or sequential?</strong></span></h4>
+<p>In RNN or LSTMs, hidden stare <span class="math inline">\(h_t\)</span> is a function of <span class="math inline">\(h_{t-1}\)</span> and input at <span class="math inline">\(t\)</span>. This sequential nature precludes parallelization.</p>
+</section>
+<section id="why-rnns-fails-to-capture-long-term-dependencies-how-transformers-solved-this" class="level4">
+<h4 class="anchored" data-anchor-id="why-rnns-fails-to-capture-long-term-dependencies-how-transformers-solved-this"><span style="color:green"><strong>Why RNNs fails to capture long-term dependencies? How Transformers solved this?</strong></span></h4>
+<ul>
+<li>One key factor affecting the ability to learn such dependencies is the length of the paths forward and backward signals have to traverse in the network. The shorter these paths between any combination of positions in the input and output sequences, the easier it is to learn long-range dependencies</li>
+<li>As mentioned above, <span class="math inline">\(h_t\)</span> = func( <span class="math inline">\(h_{t-1}\)</span> and <span class="math inline">\(x_t\)</span>) in RNNs.</li>
+<li>This means in a sequential network impact of <span class="math inline">\(h_{10}\)</span> on <span class="math inline">\(h_{11}\)</span> will definitely be more than <span class="math inline">\(h_{2}\)</span>. Due to this nature where <strong>dependency of two elements is dependent upon the distance between them</strong> + vanishing gradient problem, RNNs fail for long-contexts.</li>
+<li>Transformers solve this by processing the entire sequence simultaneously, <strong>disregarding</strong> the distance between two elements (by using <strong>attention</strong> mechanism to <em>draw global dependencies</em>).</li>
+<li>a self-attention layer connects all positions with a constant number of sequentially executed operations, whereas a recurrent layer requires O(n) sequential operations.</li>
+</ul>
+</section>
+<section id="how-does-transformer-enable-capturing-long-term-dependencies" class="level4">
+<h4 class="anchored" data-anchor-id="how-does-transformer-enable-capturing-long-term-dependencies"><span style="color:green"><strong>How does Transformer enable capturing long-term dependencies?</strong></span></h4>
+<p><span style="color:red">Using Residual connections, Layer Norm - mitigating vanishing gradient problem. Procesing the entire sequence in parallel and using concept of self-attention to capture interaction of all elements of input sequence with one another. Reduces the path b/w first and last element of a sequence to O(1)</span></p>
+</section>
+<section id="what-is-the-problem-with-convolution-that-transformer-solved" class="level4">
+<h4 class="anchored" data-anchor-id="what-is-the-problem-with-convolution-that-transformer-solved"><span style="color:green"><strong>What is the problem with convolution that Transformer solved?</strong></span></h4>
+<p><span style="color:green">OR</span></p>
+</section>
+<section id="why-transformers-is-better-than-cnns" class="level4">
+<h4 class="anchored" data-anchor-id="why-transformers-is-better-than-cnns"><span style="color:green"><strong>Why Transformers is better than CNNs?</strong></span></h4>
+<p>The problem with <em>convolution</em> is similar to that of <em>recurrence</em> or sequential nature of RNNs. Think from the perspective of convolutions in CNN. 2 things:</p>
+<ol type="1">
+<li>COnvolutional layers in start of the CNN capture very basic details like edges, etc. from a very small local portion of the image but conv layers towards the end of a CNN captures information regarding complex shapes (features) spread over a large portion of image area.</li>
+<li>If we want to increase the receptive field, we need to add more layers and with more layers, the receptive field increases as we add more layers.</li>
+</ol>
+<p>Both of these implies that in <em>convolutional neural networks</em>, the number of operations required to relate signals from two arbitrary input or output positions increase as distance between them increases. (This is similar to RNN where impact of <span class="math inline">\(h_{10}\)</span> on <span class="math inline">\(h_{11}\)</span> will definitely be more than <span class="math inline">\(h_{2}\)</span>). This makes <u>convolution</u> and <u>recurrence</u> both <em>unable to learn long-term dependency</em> aka <em>global context</em>.</p>
+<p>Basically, in convolutional or recurrent models relation between two tokens depends on their distance (linearly/logarithmically). <strong>Transformers use self-attention, which lets every token directly attend to every other token — no matter how far apart</strong>. This means relating any two positions takes O(1) operations in terms of sequence distance — it’s <u>distance-independent</u>.</p>
+</section>
+<section id="benefit-of-transformer-over-previous-sequence-based-methods" class="level4">
+<h4 class="anchored" data-anchor-id="benefit-of-transformer-over-previous-sequence-based-methods"><span style="color:green"><strong>Benefit of Transformer over previous sequence based methods</strong></span></h4>
+<ul>
+<li><span style="color:red">Can handle variable-length sequences</span></li>
+<li>Parallelizability, meaning more computationally efficient</li>
+<li>Shorter training times</li>
+<li>Capability to capture long-term context</li>
+</ul>
+</section>
+<section id="explain-encoder-decoder-structure-in-transformers" class="level4">
+<h4 class="anchored" data-anchor-id="explain-encoder-decoder-structure-in-transformers"><span style="color:green"><strong>Explain Encoder-Decoder Structure in Transformers</strong></span></h4>
+<p><strong>Encoder</strong> - responsible for <em>processing</em> input sequence - stack of six identical layers where each layer had 2 sublayers - Multi-Head Self-Attention - FFN - LayerNorm + Residual connection around each sublayer - Encoder creates context-rich representation of input sequence</p>
+<p><strong>Decoder</strong> - responsible for <em>generating</em> output sequence <em>based on encoded information</em> - stack of six identical layers where each layer had 2 sublayers - Masked Multi-Head Self-Attention - Cross-Attention (aka Multi-Head Attention on output of encoder stack) - FFN - LayerNorm + Residual connection around each sublayer - Decoder processes the output sequence step by step, attending to different parts of the input sequence as needed.</p>
+<p>Note: Though individual layers (either in Encoder or Decoder) were identical in terms of architecture but the weights were not shared across those layers.</p>
+</section>
+<section id="role-of-ffn-in-decoder-or-encoder" class="level4">
+<h4 class="anchored" data-anchor-id="role-of-ffn-in-decoder-or-encoder"><span style="color:red"><strong>Role of FFN in Decoder or Encoder</strong></span></h4>
+</section>
+<section id="layernorm-vs-batchnorm-in-transformers" class="level4">
+<h4 class="anchored" data-anchor-id="layernorm-vs-batchnorm-in-transformers"><span style="color:red"><strong>LayerNorm vs BatchNorm in Transformers?</strong></span></h4>
+<p>In NLP tasks, the sentence length often varies – thus, if using batchnorm, it would be uncertain what would be the appropriate normalization constant (the total number of elements to divide by during normalization) to use. Different batches would have different normalization constants which leads to instability during the course of training.</p>
+<p>In LayerNorm, for a (B, T, C) tensor, the mean and variance is computed across the channel/embedding (C) dimension for each position (T) and for each sample in batch (B). This results in (B * T) different means and variances. The normalization is applied independently to each sample across all the channels/embeddings (C). RMSNorm operates similarly to LayerNorm but only computes the root mean square (RMS) across the channel/embedding (C) dimension for each position (T) and for each sample in batch (B). This results in (B * T) different RMS values. The normalization is applied by dividing each sample’s activations by its RMS value, without subtracting the mean, making it computationally more efficient than LayerNorm.</p>
+<p>Since BatchNorm computes the mean and variance across the batch dimension and depends on batch size, it is not used in transformers due to variable sequence lengths in NLP. It requires storing the running mean and variance for each feature, which is memory-intensive for large models. Also, during distributed training, batch statistics need to be synced across multiple GPUs. LayerNorm is preferred not just in NLP but even in vision based transformers because it normalizes each sample independently, making it invariant to sequence length and batch size. RMSNorm operates in a very similar manner to LayerNorm but is more computationally efficient (since, unlike LayerNorm, mean subtraction is not performed and only RMS values are calculated) and can potentially lead to quicker convergence during training.</p>
+</section>
+<section id="why-multiple-layers-were-stacked-why-not-use-single-large-layer" class="level4">
+<h4 class="anchored" data-anchor-id="why-multiple-layers-were-stacked-why-not-use-single-large-layer"><span style="color:green"><strong>Why multiple layers were stacked? Why not use single large layer?</strong></span></h4>
+<p>Stacking allows model to learn heirarchical features. Lower layers capturing local information and higher layers capturing more abstract and global information.</p>
+</section>
+<section id="q-what-is-dot-product-attention-vs-scaled-dot-product-attention" class="level4">
+<h4 class="anchored" data-anchor-id="q-what-is-dot-product-attention-vs-scaled-dot-product-attention"><span style="color:green"><strong>Q: What is Dot-Product Attention vs Scaled Dot-Product Attention?</strong></span></h4>
+<p>Dot-Product Attention is commonly called <em>multiplicative</em> attention. It is identical to Scaled Dot-product attention explained above except that it does not peform scaling with <span class="math inline">\(\sqrt{d_k}\)</span>. In such cases, what happens is that for large dimension <span class="math inline">\(d_k\)</span> values, the dot products grow large in magnitude, pushing the softmax function into regions where it has extremely small gradients. To counteract this effect, they scaled the dot products by <span class="math inline">\(1/\sqrt{d_k}\)</span></p>
+</section>
+<section id="q-what-is-additive-attention-prior-research-suggests-it-works-better-than-multiplicative-attention.-the-why-authors-did-not-use-it" class="level4">
+<h4 class="anchored" data-anchor-id="q-what-is-additive-attention-prior-research-suggests-it-works-better-than-multiplicative-attention.-the-why-authors-did-not-use-it"><span style="color:green"><strong>Q: What is additive attention? Prior research suggests it works better than multiplicative attention. The why authors did not use it?</strong></span></h4>
+<p>Additive attention computes the compatibility function using a feed-forward network witha single hidden layer. While the Additive and Multiplicative are similar in theoretical complexity, dot-product attention is much faster and more space-efficient in practice, since it can be implemented using highly optimized matrix multiplication code.</p>
+<p>FYI, compatibility function in scaled dot-product attention = <img src="nlp_aatn_media/attention_step2_1_3.png" width="100"></p>
+<p>Also, note that additive works better than multiplicative attention (vanilla w/o scaling) for large dimension <span class="math inline">\(d_k\)</span> values only because of the probable small gradients in vanilla multiplicative attention (as explained in para above). Whereas for small <span class="math inline">\(d_k\)</span> values, both additive and dot-product are equally well.</p>
+<p>Now, having said that researchers found that using scaling, the multiplicative attention could be significantly improved for large <span class="math inline">\(d_k\)</span> and they called it <u>scaled</u> dot-product attention.</p>
+</section>
+<section id="explain-what-is-multi-head-self-attention" class="level4">
+<h4 class="anchored" data-anchor-id="explain-what-is-multi-head-self-attention"><span style="color:green"><strong>Explain what is Multi-Head Self-Attention?</strong></span></h4>
+<p><span style="color:green"> OR </span></p>
+</section>
+<section id="why-multi-head-and-why-not-single-head-attention-wasis-used" class="level4">
+<h4 class="anchored" data-anchor-id="why-multi-head-and-why-not-single-head-attention-wasis-used"><span style="color:green"><strong>Why multi-head and why not single-head Attention was/is used?</strong></span></h4>
+<ul>
+<li>In Attention mechanism, each token’s new representation is a <strong>weighted average</strong> of all other tokens’ representations.</li>
+<li>This <strong>averaging blurs the fine-grained differences</strong> between individual token positions — i.e., “resolution” is reduced. (Think of it like blurring a high-res image by averaging pixel values — you get a smoother result, but lose detail.)</li>
+<li>To address this <strong>blurring/reduced resolution</strong>, the Transformer uses Multi-Head Attention.</li>
+<li>Instead of computing a single attention, it computes multiple attention mechanisms in parallel, each with different parameter sets. This allows the model to capture diverse types of dependencies (e.g., short-range, long-range, syntactic, semantic), and combine them — restoring fine-grained details.</li>
+<li>In other words, “Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions. With a single attention head, averaging inhibits this”</li>
+<li>Moreover, due to the reduced dimension of each head, the total computational cost is similar to that of single-head attention with full dimensionality. In other words, total computational cost with single head is same as multi-head (because we reduce the dimension of each head) and end up learning more and better features for the input.</li>
+</ul>
+</section>
+<section id="why-positional-encoding" class="level4">
+<h4 class="anchored" data-anchor-id="why-positional-encoding"><span style="color:green"><strong>Why Positional Encoding?</strong></span></h4>
+<p>Since the Transformer model when processing a sequence contains no recurrence and no convolution, in order for the model to make use of the order of the sequence, we must inject some information about the relative or absolute position of the tokens in the sequence. - To this end, authors added “positional encodings” to the input embeddings at the bottoms of the encoder and decoder stacks.</p>
+</section>
+<section id="why-sine-cosine-positional-encoding" class="level4">
+<h4 class="anchored" data-anchor-id="why-sine-cosine-positional-encoding"><span style="color:green"><strong>Why Sine/ Cosine Positional Encoding?</strong></span></h4>
+<ul>
+<li>Because for any fixed offset <em>k</em>, <span class="math inline">\(PE_{pos+k}\)</span> can be represented as a linear function of <span class="math inline">\(PE_{pos}\)</span> .</li>
+<li>sin/cos functions are shift-invariant — you can express sin(pos + k) as a linear combination of sin(pos) and cos(pos). That’s why it’s easier for the model to learn relative positions even though it’s only given absolute positions.
+<ul>
+<li>sin(pos+k)=sin(pos)cos(k)+cos(pos)sin(k)</li>
+</ul></li>
+<li>These frequencies form a geometric progression — i.e., they change exponentially.
+<ul>
+<li>Small i = long wavelength (slow variation → global info)</li>
+<li>Large i = short wavelength (fast variation → local info)</li>
+</ul></li>
+</ul>
+</section>
+<section id="why-fixed-i.e.-sinecosine-and-not-a-learned-positional-encoding" class="level4">
+<h4 class="anchored" data-anchor-id="why-fixed-i.e.-sinecosine-and-not-a-learned-positional-encoding"><span style="color:green"><strong>Why <em>fixed</em> (i.e.&nbsp;sine/cosine) and not a <em>learned</em> positional Encoding?</strong></span></h4>
+<ul>
+<li>sinusodial positional encoding may allow for extrapolation when we encounter sequence of lengths greater than those encountered during training</li>
+</ul>
+</section>
+<section id="do-we-use-masking-only-for-decoder" class="level4">
+<h4 class="anchored" data-anchor-id="do-we-use-masking-only-for-decoder"><span style="color:green"><strong>Do we use masking only for Decoder?</strong></span></h4>
+<ul>
+<li>No.&nbsp;Masking can also be used for encoder.</li>
+<li>For example: when processing multiple sentences of unequal length in batches then, it is common to use a <code>[PAD]</code> token. Here, to avoid attention to unnecessary padding tokens, we can use masking.</li>
+<li><code>'i hate this so much! [PAD] [PAD] [PAD] [PAD] [PAD] [PAD] [PAD] [PAD]'</code> is different from <code>'i hate this so much!'</code>. In order to force NN to treat both as same, we provide masking to pad tokens.</li>
+<li>(Reference: HF NLP course Ch-2, Handling multiple sequences)</li>
+</ul>
+</section>
+<section id="what-is-the-role-of-cls-token" class="level4">
+<h4 class="anchored" data-anchor-id="what-is-the-role-of-cls-token"><span style="color:green"><strong>What is the role of CLS token?</strong></span></h4>
+<ul>
+<li>A special token that marks the beginning of the sentence.</li>
+<li>It can be used for encoders</li>
+<li>It can be used in decoders where we can make CLS token the default token during the start of generation process.</li>
+</ul>
+</section>
+<section id="loss-for-training-transformers" class="level4">
+<h4 class="anchored" data-anchor-id="loss-for-training-transformers"><span style="color:green"><strong>Loss for training Transformers?</strong></span></h4>
+</section>
+<section id="loss-for-training-a-multi-modal-model-like-sam" class="level4">
+<h4 class="anchored" data-anchor-id="loss-for-training-a-multi-modal-model-like-sam"><span style="color:green"><strong>Loss for training a multi-modal model like SAM?</strong></span></h4>
+</section>
+<section id="sam" class="level4">
+<h4 class="anchored" data-anchor-id="sam"><span style="color:green"><strong>SAM</strong></span></h4>
+</section>
+<section id="usually-input-to-model-is-a-batch-but-how-transformers-handle-variable-input-sequence-size" class="level4">
+<h4 class="anchored" data-anchor-id="usually-input-to-model-is-a-batch-but-how-transformers-handle-variable-input-sequence-size"><span style="color:green"><strong>Usually input to model is a batch but how Transformers handle variable input sequence size?</strong></span></h4>
+</section>
+<section id="strategiesmethods-to-both-pretrain-and-finetune-llms-vlmsimage-models" class="level4">
+<h4 class="anchored" data-anchor-id="strategiesmethods-to-both-pretrain-and-finetune-llms-vlmsimage-models"><span style="color:green"><strong>Strategies/Methods to both pretrain and finetune LLMs/ VLMs/Image Models</strong></span></h4>
+</section>
+<section id="multi-task-learnig-why-we-do-that" class="level4">
+<h4 class="anchored" data-anchor-id="multi-task-learnig-why-we-do-that"><span style="color:green"><strong>Multi-task learnig? Why we do that?</strong></span></h4>
+</section>
+<section id="why-multiple-losses" class="level4">
+<h4 class="anchored" data-anchor-id="why-multiple-losses"><span style="color:green"><strong>Why multiple losses?</strong></span></h4>
+</section>
+<section id="practices-for-xai-in-multi-modal-model" class="level4">
+<h4 class="anchored" data-anchor-id="practices-for-xai-in-multi-modal-model"><span style="color:green"><strong>Practices for xAI in multi-modal model?</strong></span></h4>
+</section>
+<section id="how-to-tackle-memory-constraints-in-transformers-amii" class="level4">
+<h4 class="anchored" data-anchor-id="how-to-tackle-memory-constraints-in-transformers-amii"><span style="color:green"><strong>How to tackle memory constraints in Transformers? (Amii)</strong></span></h4>
+</section>
+<section id="difference-between-transduction-and-induction-problems" class="level4">
+<h4 class="anchored" data-anchor-id="difference-between-transduction-and-induction-problems"><span style="color:red"><strong>Difference between transduction and induction problems</strong></span></h4>
+<p>Examples of:</p>
+<p>Transduction problems - language modeling and machine translation</p>
+<p>Induction problems -</p>
+<p><span style="color:red"> GPT vs BERT vs BART </span></p>
+</section>
+<section id="resources" class="level4">
+<h4 class="anchored" data-anchor-id="resources">Resources</h4>
+<ol type="1">
+<li>https://medium.com/<span class="citation" data-cites="abhinavbhartigoml/unraveling-transformers-a-deep-dive-into-self-attention-and-3e37dc875bea">@abhinavbhartigoml/unraveling-transformers-a-deep-dive-into-self-attention-and-3e37dc875bea</span></li>
+</ol>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/mgupta70\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

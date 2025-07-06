@@ -7,10 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Mohit Gupta">
-<meta name="dcterms.date" content="2025-06-09">
-<meta name="description" content="A basic overview on the working principle of GradCAM">
+<meta name="dcterms.date" content="2025-06-06">
+<meta name="description" content="A deep dive into ‘Attention is all you need’">
 
-<title>GradCAM Review – AI Blogs</title>
+<title>Attention is all you need (Draft) – AI Blogs</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,41 +22,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -190,14 +155,14 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">GradCAM Review</h1>
+      <h1 class="title">Attention is all you need (Draft)</h1>
                   <div>
         <div class="description">
-          A basic overview on the working principle of GradCAM
+          A deep dive into ‘Attention is all you need’
         </div>
       </div>
                           <div class="quarto-categories">
-                <div class="quarto-category">Vision</div>
+                <div class="quarto-category">Transformers</div>
               </div>
                   </div>
   </div>
@@ -215,14 +180,14 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">June 9, 2025</p>
+        <p class="date">June 6, 2025</p>
       </div>
     </div>
     
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">June 25, 2025</p>
+        <p class="date-modified">June 27, 2025</p>
       </div>
     </div>
       
@@ -240,156 +205,85 @@ window.Quarto = {
 
 
 
-<section id="full-form-of-gradcam" class="level4">
-<h4 class="anchored" data-anchor-id="full-form-of-gradcam">Full-form of GradCAM</h4>
-<p>Gradient-Weighted Class Activation Mapping</p>
-</section>
-<section id="working-principle-of-gradcam" class="level4">
-<h4 class="anchored" data-anchor-id="working-principle-of-gradcam">Working principle of GradCAM?</h4>
-<p><img src="media/grad_cam_workflow.webp" width="750"></p>
-<p>5 step process:</p>
-<p>Step 1: Forward Pass - Pass the input (image/signal) through the CNN to get the feature maps from the last convolutional layer: <span class="math inline">\(A^k\)</span> - Get raw outputs (logits) before softmax</p>
-<p>Step 2: Select the Target Class - Choose the class <em>c</em> we want to explain (usually the predicted class with highest score) and calculate its score (logit i.e.&nbsp;output before softmax): <span class="math inline">\(y^c\)</span></p>
-<p>Step 3: Compute the Gradients - Compute the gradient of the target class score <span class="math inline">\(y^c\)</span> with respect to the feature maps <span class="math inline">\(A^k\)</span> of the selected convolutional layer, i.e., <span class="math inline">\(\frac{\partial y^c}{\partial A^k}\)</span></p>
+<p>Transformers are based <strong>solely &amp; completely on attention</strong> mechanism.</p>
+<p>Transformers <strong>completely removed recurrence and convolutions</strong> to make computation <strong>parallelizable</strong> i.e.&nbsp;faster training times but more importantly, capturing <strong>long-range dependencies</strong>.</p>
+<p><strong>Mathematical Proof:</strong></p>
+<p><img src="nlp_aatn_media/attn_rec_cnv.png" width="500"></p>
+<p><strong>Q. Follow-up: How Transformer solves this?</strong></p>
+<p>Ans: One key factor affecting the ability to learn long-term dependencies is the length of the paths forward and backward signals have to traverse in the network. The shorter these paths between any combination of positions in the input and output sequences, the easier it is to learn long-range dependencies.</p>
+<p>A self-attention layer connects all positions with <strong>a constant number of sequentially executed operations</strong>, whereas</p>
+<p>a <strong>recurrent layer requires O(n) sequential operations</strong>, and</p>
+<p>a single convolutional layer with kernel width k &lt; n does not connect all pairs of input and output positions. Doing so <strong>requires a stack of O(n/k) convolutional layers</strong> in the case of contiguous kernels.</p>
+<p><strong>Q. Follow-up: Why Recurrent Models are slow?</strong></p>
+<p>Ans: Recurrent Models generate a sequence of hidden states <span class="math inline">\(h_t\)</span>, as a function of the previous hidden state <span class="math inline">\(h_{t−1}\)</span> and the input for position <code>t</code>. This inherently sequential nature (1) precludes parallelization within training examples, and (2) for longer sequence lengths you start to encounter memory constraints. So, in such cases you need to truncate the size of the sequences.</p>
+<p><strong>Q. Follow-up: Why convolution is slow?</strong></p>
+<p>Ans: In Convolution number of operations required to relate signals from two arbitrary input or output positions grows with distance between the position- this makes it more difficult to learn dependencies between distant positions. (Hint: O(n/k)). Transformers reduce this to a constant number of oprations.</p>
+<section id="transformer-architecture" class="level1">
+<h1>Transformer Architecture</h1>
+<p>Encoder Decoder Architecture - where architecture uses <em>stacked self-attention</em> and <em>point-wise, fully connected layers</em> for both the encoder and decoder</p>
+<section id="encoder-stack" class="level2">
+<h2 class="anchored" data-anchor-id="encoder-stack">Encoder Stack</h2>
 <ul>
-<li>These gradients show how important each feature map is for the target class.</li>
+<li>Stack of 6 identical layers</li>
+<li>Each layer has 2 sub-layers</li>
+<li>First sub-layer: MSA (Multi-headed self-attention)</li>
+<li>Second sub-layer: Point-wise Fully-Connected Feed Forward Network</li>
+<li>Also, there is a Residual connection and LayerNorm across each sublayer (i.e.&nbsp;output of each sub-layer is <code>LayerNorm(x + Sublayer(x))</code>)</li>
 </ul>
-<p>Step 4: Compute the Grad-CAM - For each filter <em>k</em>, global average pool the gradients spatially (over width <em>i</em> and height <em>j</em>) to get a single scalar weight <span class="math inline">\({a_k}^c\)</span>:</p>
-<p><span class="math inline">\(\alpha_k^c = \frac{1}{Z} \sum_{i} \sum_{j} \frac{\partial y^c}{\partial A_{ij}^k}\)</span></p>
+</section>
+<section id="decoder-stack" class="level2">
+<h2 class="anchored" data-anchor-id="decoder-stack">Decoder Stack</h2>
 <ul>
-<li><span class="math inline">\(\alpha_k^c\)</span> is the importance weight for kth feature map in <span class="math inline">\(A^k\)</span></li>
-<li>Finally, to calculate the final Grad-CAM, multiply each feature map <span class="math inline">\(A^k\)</span> by its corresponding importance weight <span class="math inline">\(\alpha_k^c\)</span> and then sum.</li>
-<li>Apply a ReLU activation to keep only the parts that positively influence the target class. This makes the Grad-CAM map focus only on features that support the class, not those that suppress it.</li>
+<li>Stack of 6 identical layers</li>
+<li>Each layer has 3 sub-layers</li>
+<li>First sub-layer: MSA (<em>Masked</em> Multi-headed self-attention)</li>
+<li>Second sub-layer: MA (Multi-headed attention over the output of the encoder stack) : CROSS-ATTENTION</li>
+<li>Third sub-layer: Point-wise Fully-Connected Feed Forward Network</li>
+<li>Also, there is a Residual connection and LayerNorm across each sublayer (i.e.&nbsp;output of each sub-layer is <code>LayerNorm(x + Sublayer(x))</code>)</li>
 </ul>
-<p><span class="math inline">\(L^c_{Grad-CAM} = ReLU (\sum_{k} \alpha_k^c A^k)\)</span></p>
-<p>Step 5: Post-processing - Resize the Grad-CAM map to the same spatial size as the input</p>
+<p><img src="nlp_aatn_media/transformer_Arch.png" width="500"></p>
 </section>
-<section id="why-we-used-feature-maps-ak-from-last-convolutional-layer" class="level4">
-<h4 class="anchored" data-anchor-id="why-we-used-feature-maps-ak-from-last-convolutional-layer">Why we used feature maps <span class="math inline">\(A^k\)</span> from last convolutional layer?</h4>
-<p>Grad-CAM uses the feature maps from the last conv layer because it typically has the most high-level, semantically rich features but still retains some spatial information. Using earlier layers would provide too much low-level information (edges, textures) and not enough conceptual understanding.</p>
+<section id="attention" class="level2">
+<h2 class="anchored" data-anchor-id="attention">Attention</h2>
+<p>“An attention function can be described as mapping a query and a set of key-value pairs to an output, where the query, keys, values, and output are all vectors. The output is computed as a weighted sum of the values, where the weight assigned to each value is computed by a compatibility function of the query with the corresponding key.”</p>
+<p>“The output is computed as a weighted sum of the values…” - means softmax(…)*V</p>
+<p>“…where the weight assigned to each value is computed by a compatibility function of the query with the corresponding key.” - means <img src="nlp_aatn_media/attention_step2_1_3.png" width="100"></p>
+<p>Q. What is Attention Mechanism?</p>
+<p>Ans: ??</p>
+<section id="scaled-dot-product-attention" class="level3">
+<h3 class="anchored" data-anchor-id="scaled-dot-product-attention">Scaled Dot-Product Attention</h3>
+<p>They called the attention “Scaled Dot-Product Attention” because it involves scaling with square root of dimension <span class="math inline">\(\sqrt{d_k}\)</span> + they scale the output with <code>Softmax</code> and the calculation involves dot product between <code>Q</code> &amp; <code>K</code>.</p>
+<p><img src="nlp_aatn_media/attention_step2_1_4.png" width="250"></p>
+<p><strong>Q: What is Dot-Product Attention vs Scaled Dot-Product Attention?</strong></p>
+<p><strong>Ans:</strong>Dot-Product Attention is commonly called <em>multiplicative</em> attention. It is identical to Scaled Dot-product attention explained above except that it does not peform scaling with <span class="math inline">\(\sqrt{d_k}\)</span>. In such cases, what happens is that for large dimension <span class="math inline">\(d_k\)</span> values, the dot products grow large in magnitude, pushing the softmax function into regions where it has extremely small gradients. To counteract this effect, they scaled the dot products by <span class="math inline">\(1/\sqrt{d_k}\)</span></p>
+<p><strong>Q: What is additive attention? Prior research suggests it works better than multiplicative attention. The why authors did not use it?</strong></p>
+<p><strong>Ans:</strong> Additive attention computes the compatibility function using a feed-forward network witha single hidden layer. While the Additive and Multiplicative are similar in theoretical complexity, dot-product attention is much faster and more space-efficient in practice, since it can be implemented using highly optimized matrix multiplication code.</p>
+<p>Also, note that it works better than multiplicative attention (vanilla w/o scaling) for large dimension <span class="math inline">\(d_k\)</span> values only because of the probable small gradients in vanilla multiplicative attention (as explained in para above). Whereas for small <span class="math inline">\(d_k\)</span> values, both additive and dot-product are equally well.</p>
+<p>Now, having said that researchers found that using scaling, the multiplicative attention could be significantly improved for large <span class="math inline">\(d_k\)</span>.</p>
 </section>
-<section id="global-average-pooling" class="level4">
-<h4 class="anchored" data-anchor-id="global-average-pooling">Global Average Pooling?</h4>
-<p>It computes the average of all pixel values within each feature map, effectively collapsing each map into a single scalar value. This process reduces the number of parameters in the model, making it less prone to overfitting and more robust to spatial translations.</p>
-<p>The global average pooling means that you have a 3D 8,8,10 tensor and compute the average over the 8,8 slices, you end up with a 3D tensor of shape 1,1,10 that you reshape into a 1D vector of shape 10. And then you add a softmax operator without any operation in between. The tensor before the average pooling is supposed to have as many channels as your model has classification categories.</p>
-<p>global average pooling as implemented in SqueezeNet:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>final_conv <span class="op">=</span> nn.Conv2d(<span class="dv">512</span>, <span class="va">self</span>.num_classes, kernel_size<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="va">self</span>.classifier <span class="op">=</span> nn.Sequential(</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    nn.Dropout(p<span class="op">=</span><span class="fl">0.5</span>),</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    final_conv,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    nn.ReLU(inplace<span class="op">=</span><span class="va">True</span>),</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    nn.AvgPool2d(<span class="dv">13</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>(512 is the number of channels in the feature maps feeding in to this layer, and 13 is the number of rows and columns in the feature maps going in to this layer. You’ll need to change these depending on your network structure.)</p>
+<section id="self-attention-intra-attention" class="level3">
+<h3 class="anchored" data-anchor-id="self-attention-intra-attention">Self-attention (intra-attention)</h3>
+<p>Self-attention is an attention mechanism relating different positions of a single sequence in order to compute a representation of the sequence.</p>
+<p><img src="nlp_aatn_media/scaled_dp_attention.png" width="250"></p>
 </section>
-<section id="what-is-adaptive-pooling" class="level4">
-<h4 class="anchored" data-anchor-id="what-is-adaptive-pooling">What is Adaptive Pooling?</h4>
-<ul>
-<li>In average-pooling or max-pooling, you essentially set the stride and kernel-size by your own, setting them as hyper-parameters. You will have to re-configure them if you happen to change your input size.</li>
-</ul>
-<p>In Adaptive Pooling on the other hand, we specify the output size instead. And the stride and kernel-size are automatically selected to adapt to the needs. The following equations are used to calculate the value in the source code.</p>
-<p>Stride = (input_size//output_size)<br>
-Kernel size = input_size - (output_size-1)*stride<br>
-Padding = 0</p>
-<p>(Not related to global average pooling as such but we can also use <code>adaptive_avg_pool2d</code> to achieve global average pooling, just set the output size to (1, 1),</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn.functional <span class="im">as</span> F</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> F.adaptive_avg_pool2d(x, (<span class="dv">1</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>)</p>
-</section>
-<section id="general-conv-formula" class="level4">
-<h4 class="anchored" data-anchor-id="general-conv-formula">General conv formula</h4>
-<p><span class="math inline">\(n_{out} = \frac{n_{in} - k + 2p}{s}\)</span></p>
-<p>(Derivation) very easy to conceptualize - step 1 (reduce feature map size by kernel size): <span class="math inline">\(n_{in} - k\)</span> - step 2 (add padding on both sides): <span class="math inline">\(n_{in} - k + 2p\)</span> - step 3 (divide by stride): <span class="math inline">\(n_{out} = \frac{n_{in} - k + 2p}{s}\)</span></p>
-</section>
-<section id="other-approaches-to-xai-in-computer-vision" class="level4">
-<h4 class="anchored" data-anchor-id="other-approaches-to-xai-in-computer-vision">Other Approaches to XAI in Computer Vision</h4>
-<ol type="1">
-<li>Visualizing features learned in different layers</li>
-<li>GradCAM</li>
-<li>Guided Backpropagation</li>
-<li>DeepDream (Need to verify)</li>
-<li>Dimensionality Reduction &amp; Feature Visualization (like PCA for last FC layers)</li>
-<li>Sensitivity Analysis: (how much each part of the input image is involved in the decision of network’s classifier. The algorithm blocks out different regions of an input image with a sliding gray square and then it runs these occluded images through the network and displays their probabilities for correct class using a heatmap)</li>
-<li>Saliency Map (General)</li>
-<li>Local Interpretable ModelAgnostic Explanations (LIME)</li>
-<li>SHapely Additive exPlanations (SHAP)</li>
-</ol>
-</section>
-<section id="list-of-xai-works-in-computer-vision" class="level4">
-<h4 class="anchored" data-anchor-id="list-of-xai-works-in-computer-vision">List of xAI works in Computer Vision</h4>
-<p>Reference: <a href="https://arxiv.org/pdf/2102.01792">Paper</a></p>
-<p><img src="media/xai_vision.png" width="750"> .. <img src="media/xai_vision_2.png" width="750"> .. <img src="media/xai_vision_3.png" width="750"></p>
-</section>
-<section id="t-sne-vs-pca" class="level4">
-<h4 class="anchored" data-anchor-id="t-sne-vs-pca">t-SNE vs PCA?</h4>
-<p>Ans: t-SNE for local structure; PCA for global. “In high-dimensional data, it is usually impossible to keep similar data-points close to each other using linear projections (like in PCA). Hence, non-linear methods (like t-SNE) are more suitable in such cases, as they can preserve the local structure of data very well.”</p>
-</section>
-<section id="why-explainability" class="level4">
-<h4 class="anchored" data-anchor-id="why-explainability">Why explainability?</h4>
-<p>Having appropriate answers to: - (i) Verification of the model; - (ii) Improving a model by understanding its failure points; - (iii) Extracting new insights and hidden laws of the model, and; - (iv) Identifying modules responsible for incorrect decisions.</p>
-</section>
-<section id="difference-bw-vgg-resnet-densenet-squeezenet-inceptionnet" class="level4">
-<h4 class="anchored" data-anchor-id="difference-bw-vgg-resnet-densenet-squeezenet-inceptionnet">Difference b/w VGG, ResNet, DenseNet, SqueezeNet, InceptionNet?</h4>
-<p><strong>🔷 1. VGG (e.g., VGG16, VGG19)</strong></p>
-<p>Uniqueness: Very simple and deep architecture using only 3x3 convolutions and stacked layers.</p>
-<p>Pros: Easy to implement and understand.</p>
-<p>Cons: Large number of parameters (≈138M), leading to slow training and high memory usage.</p>
-<p>Key Idea: Depth over architectural complexity.</p>
-<p><strong>🔷 2. ResNet (Residual Network)</strong></p>
-<p>Motivation (Optional): Intuitively, deeper networks should not perform worse than the shallower networks, but in practice, the deeper networks performed worse than the shallower networks, caused not by overfitting, but by an optimization problem (vanishing gradient problem). This is the problem Resnet tried to solve.</p>
-<p>Uniqueness: Introduces skip connections (residual connections) to allow gradient flow through very deep networks.</p>
-<p>Pros: Enables training of networks with 100+ layers without vanishing gradient issues.</p>
-<p>Cons: Slightly more complex architecture.</p>
-<p>Key Idea: Learn residuals: F(x) + x instead of just F(x).</p>
-<p><span style="color:green"> <strong>Ques: How does Resnet or residual connection prevent vanishing gradient problem?</strong> </span></p>
-<p>Ans: Suppose</p>
-<ol type="1">
-<li>Without Residual Connection:</li>
-</ol>
-<p><span class="math inline">\(y = \mathcal{F}(x) \Rightarrow \frac{\partial L}{\partial x} = \frac{\partial L}{\partial y} \cdot \frac{\partial \mathcal{F}}{\partial x}\)</span></p>
-<p>If <span class="math inline">\(\frac{\partial \mathcal{F}}{\partial x} \rightarrow 0\)</span>, then the gradient vanishes.</p>
-<ol start="2" type="1">
-<li>With Residual Connection:</li>
-</ol>
-<p><span class="math inline">\(y = \mathcal{F}(x) + x \Rightarrow \frac{\partial L}{\partial x} = \frac{\partial L}{\partial y} \cdot \left( \frac{\partial \mathcal{F}}{\partial x} + I \right)\)</span></p>
-<p>Here, the identity ensures gradient flow even if <span class="math inline">\(\frac{\partial \mathcal{F}}{\partial x} \rightarrow 0\)</span>.</p>
-<p><strong>🔷 3. DenseNet (Densely Connected Network)</strong></p>
-<p>Uniqueness: Each layer receives input from all previous layers (dense connectivity).</p>
-<p>Pros: Encourages feature reuse, fewer parameters than ResNet with similar performance.</p>
-<p>Cons: High memory usage due to many connections.</p>
-<p>Key Idea: Dense connectivity between layers: x_l = H([x_0, x_1, …, x_{l-1}]).</p>
-<p><span style="color:green"> <strong>Ques: Resnet vs DenseNet?</strong> </span></p>
-<p>Ans:</p>
-<p>Resnet - element-wise feature summation - large number of params but, - relatively less memory consumption - memory requirements grow linearly as number of layers increase - relatively faster inference (above point)</p>
-<p>DenseNet - feature concatenation - less number of params but, - more memory consumption: dense connectivity - everything is connected - memory requirements grow quadratically as number of layers increase - slower inference (above point)</p>
-<p><strong>🔷 4. SqueezeNet</strong></p>
-<p>Uniqueness: Achieves AlexNet-level accuracy with 50x fewer parameters. - used global average pooling (discussed above). This also reduced the number of parameters</p>
-<p>Pros: Very lightweight, ideal for edge devices or deployment in resource-constrained environments.</p>
-<p>Cons: Slightly lower accuracy on large datasets.</p>
-<p>Key Idea: Replace 3x3 filters with 1x1, use Fire modules (squeeze + expand).</p>
-<p><strong>🔷 5. InceptionNet (GoogLeNet and its variants)</strong></p>
-<p>Uniqueness: Uses Inception modules to capture multi-scale features (1x1, 3x3, 5x5 convolutions in parallel).</p>
-<p>Pros: Efficient and computationally optimized, better utilization of model capacity.</p>
-<p>Cons: More complex to design and tune.</p>
-<p>Key Idea: Parallel filters with different sizes + dimensionality reduction via 1x1 convolutions.</p>
-<p><span style="color:green"> <strong>Ques: When to use Resnet vs InceptionNet?</strong> </span></p>
-<p>Ans:</p>
-<p>Resnet: - learns deep feature - useful for general image classification, segmentation tasks</p>
-<p>InceptionNet: - learns multi-scale feature - useful for fine-grained image classification tasks - satellite imagery analysis - texture recognition</p>
-<p><img src="media/resnets_densenets.webp" width="600"></p>
-</section>
-<section id="resources" class="level4">
-<h4 class="anchored" data-anchor-id="resources">Resources</h4>
-<ol type="1">
-<li>https://arxiv.org/pdf/2102.01792</li>
-<li>https://research.google/blog/inceptionism-going-deeper-into-neural-networks/</li>
-<li>https://cs.stanford.edu/people/karpathy/convnetjs/demo/cifar10.html</li>
-<li>https://cs.stanford.edu/people/karpathy/cnnembed/</li>
-<li>https://github.com/jacobgil/pytorch-grad-cam</li>
-<li>https://xai-tutorials.readthedocs.io/en/latest/_model_specific_xai/Grad-CAM.html</li>
-</ol>
+<section id="multi-head-attention" class="level3">
+<h3 class="anchored" data-anchor-id="multi-head-attention">Multi-Head Attention</h3>
+<p>Instead of performing a single attention function with <span class="math inline">\(d_model\)</span> -dimensional keys, values and queries, they found it beneficial to linearly project the queries, keys and values <em>h</em> times with different, learned linear projections to <span class="math inline">\(d_k\)</span>, <span class="math inline">\(d_k\)</span> and <span class="math inline">\(d_v\)</span> dimensions, respectively. Attention from each head is computed, concatenated and once again projected, resulting in the final value as shown below:</p>
+<p><img src="nlp_aatn_media/multi-head-attention.png" width="250"></p>
+<p><strong>Q: Why multi-head why not single-head?</strong></p>
+<p><strong>Ans:</strong></p>
+<p>Computational wise it is same + you learn more</p>
+<section id="section" class="level40">
+<p class="heading"></p>
+<p><strong>Excerpts</strong></p>
+<p>“relying entirely on an attention mechanism to draw global dependencies between input and output”</p>
+<p>(Mine) - <strong>RNNs</strong>: global dependencies is constraint in RNNs + processing is sequential (not parallelizable).</p>
+<p><strong>Convolutions</strong>: Allows some parallelization. But number of operations required to capture global relations b/w 2 input positions grows exponentially - thus again difficult to capture long-term (global) dependencies</p>
 
 
+</section>
+</section>
+</section>
 </section>
 
 </main> <!-- /main -->

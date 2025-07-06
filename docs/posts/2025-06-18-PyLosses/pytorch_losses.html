@@ -413,6 +413,9 @@ NLL Loss:  tensor(1.3132, grad_fn=&lt;NllLossBackward0&gt;)</code></pre>
 <p>Why Softmax 1. <span class="math inline">\(e^x\)</span> is always positive no matter the sign of x. This is good because to read anything as probab or chances, it has to be + 2. training neural networks with <span class="math inline">\(e^x\)</span> is easy because derivative calculation is easy 3. quashes low values. For example: - softmax([1,2])<br>
 - [0.26894142, 0.73105858] # it is a cat perhaps !? - softmax([10,20])<br>
 - [0.0000453978687, 0.999954602] # it is definitely a CAT !</p>
+<ol start="4" type="1">
+<li>It applies a lower and upper bound so that they’re understandable.</li>
+</ol>
 <p>​Why not others:</p>
 <ol type="1">
 <li>Min-Max normalization OR Standard normalization</li>
