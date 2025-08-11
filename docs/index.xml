@@ -10,7 +10,2561 @@
 <atom:link href="https://mgupta70.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>AI/ML blogs from Mohit, Ph.D. Computer Vision</description>
 <generator>quarto-1.8.1</generator>
-<lastBuildDate>Wed, 18 Jun 2025 07:00:00 GMT</lastBuildDate>
+<lastBuildDate>Sun, 03 Aug 2025 07:00:00 GMT</lastBuildDate>
+<item>
+  <title>Comprehensive deep dive and implementation of Continuous Bag-of-Words</title>
+  <dc:creator>Mohit Gupta</dc:creator>
+  <link>https://mgupta70.github.io/posts/2025-08-10-CBOW/cbow.html</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<div id="656ef3ea" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># For text processing</span></span>
+<span id="cb1-2"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> re</span>
+<span id="cb1-3"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> nltk</span>
+<span id="cb1-4"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> nltk.corpus <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> stopwords</span>
+<span id="cb1-5">nltk.download(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'stopwords'</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># download stopwords</span></span>
+<span id="cb1-6"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> torchtext.data <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> get_tokenizer</span>
+<span id="cb1-7"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> collections <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> Counter</span>
+<span id="cb1-8"></span>
+<span id="cb1-9"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># For Neural Network</span></span>
+<span id="cb1-10"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> numpy <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> np</span>
+<span id="cb1-11"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> torch</span>
+<span id="cb1-12"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> torch.nn <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> nn</span>
+<span id="cb1-13"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> torch.utils.data <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> Dataset, DataLoader</span>
+<span id="cb1-14"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> torch.optim.lr_scheduler <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> StepLR, LambdaLR</span>
+<span id="cb1-15"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> datasets <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> load_dataset</span>
+<span id="cb1-16">device <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cuda"</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> torch.cuda.is_available() <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cpu"</span></span>
+<span id="cb1-17"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(device)</span>
+<span id="cb1-18"></span>
+<span id="cb1-19"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># For time measurement</span></span>
+<span id="cb1-20"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> time</span>
+<span id="cb1-21"></span>
+<span id="cb1-22"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># For visualization</span></span>
+<span id="cb1-23"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> matplotlib.pyplot <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> plt</span>
+<span id="cb1-24"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> sklearn.decomposition <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> PCA</span>
+<span id="cb1-25"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> sklearn.manifold <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> TSNE</span>
+<span id="cb1-26"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> sklearn.cluster <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> KMeans</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[nltk_data] Downloading package stopwords to
+[nltk_data]     C:\Users\mgupta70.ASURITE\AppData\Roaming\nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>cuda</code></pre>
+</div>
+</div>
+<p><strong>Paper title</strong>: Efficient Estimation of Word Representations in Vector Space</p>
+<p>This paper proposed 4 methods to learn word vectors.</p>
+<ol type="1">
+<li>NLLM</li>
+<li>RNNLM</li>
+<li>CBOW</li>
+<li>Skip-gram</li>
+</ol>
+<p>Some details about them as mentioned in the paper:</p>
+<ol type="1">
+<li>NLLM - a feedforward NN with following layers: i/p, projection, hidden and o/p</li>
+<li>RNNLM - removes the need of projection layer. Thus, i/p, hidden and o/p</li>
+<li>CBOW - predict current word from R previous and R future words (context words)</li>
+<li>Skip-gram - predict context words from given current word (i.e.&nbsp;predict 2R words) (Multi label multi-class classification)</li>
+</ol>
+<p>Before going into details of CBOW method, let’s load some data.</p>
+<div id="9f1b76dc" class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1">dataset <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> load_dataset(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"wikitext"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"wikitext-2-raw-v1"</span>)</span>
+<span id="cb4-2">train_texts <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> dataset[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'train'</span>][<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'text'</span>]</span>
+<span id="cb4-3">val_texts <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> dataset[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'validation'</span>][<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'text'</span>]</span>
+<span id="cb4-4"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Train sample: "</span>, train_texts[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>] )</span>
+<span id="cb4-5"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Val sample: "</span>, val_texts[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>])</span>
+<span id="cb4-6"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Train: Val = "</span>, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(train_texts), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">":"</span>, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(val_texts))</span></code></pre></div>
+</div>
+<p><code>train_texts</code> and <code>val_texts</code> are basically <code>list</code>s of strings. Let’s join all the strings into a single large string called <code>train_text</code> and <code>val_text</code></p>
+<div id="9171207c" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1">train_text <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">""</span></span>
+<span id="cb5-2"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> text_paragraph <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> train_texts:</span>
+<span id="cb5-3">    train_text <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> train_text <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">" "</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> text_paragraph</span>
+<span id="cb5-4"></span>
+<span id="cb5-5">val_text <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">""</span></span>
+<span id="cb5-6"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> text_paragraph <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> val_texts:</span>
+<span id="cb5-7">    val_text <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> val_text <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">" "</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> text_paragraph</span>
+<span id="cb5-8"></span>
+<span id="cb5-9"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Number of words in the corpus (in Millions):"</span>, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(train_text.split())<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>)</span>
+<span id="cb5-10"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Number of words in the validation corpus (in Millions):"</span>, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(val_text.split())<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of words in the corpus (in Millions): 2.05191
+Number of words in the validation corpus (in Millions): 0.213886</code></pre>
+</div>
+</div>
+<div id="0dcea1ea" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># preprocess the text: tokenize, lowercase, remove punctuation, etc.</span></span>
+<span id="cb7-2"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> tokenize_text(text, make_lower<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>, remove_stopwords<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">False</span>):</span>
+<span id="cb7-3">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># lowercase</span></span>
+<span id="cb7-4">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> make_lower:</span>
+<span id="cb7-5">        text <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> text.lower()</span>
+<span id="cb7-6">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># remove punctuation</span></span>
+<span id="cb7-7">    text <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> re.sub(<span class="vs" style="color: #20794D;
+background-color: null;
+font-style: inherit;">r'</span><span class="pp" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">[^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\w\s</span><span class="pp" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">]</span><span class="vs" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">''</span>, text)</span>
+<span id="cb7-8">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># tokenize: assume that words are separated by spaces</span></span>
+<span id="cb7-9">    tokenizer <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> get_tokenizer(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"basic_english"</span>)</span>
+<span id="cb7-10">    words <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> tokenizer(text)</span>
+<span id="cb7-11">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># remove stopwords</span></span>
+<span id="cb7-12">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> remove_stopwords:</span>
+<span id="cb7-13">        stop_words <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">set</span>(stopwords.words(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'english'</span>))</span>
+<span id="cb7-14">        words <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> [word <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> word <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> words <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> word <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">not</span> <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> stop_words]</span>
+<span id="cb7-15">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> words</span></code></pre></div>
+</div>
+<div id="a54c4fb6" class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># preprocess the train text</span></span>
+<span id="cb8-2">train_words <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> tokenize_text(train_text, remove_stopwords<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">False</span>)</span>
+<span id="cb8-3">vocab <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">set</span>(train_words)</span>
+<span id="cb8-4">V <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(vocab)</span>
+<span id="cb8-5"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"--------------------------------"</span>)</span>
+<span id="cb8-6"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Number of tokens in the corpus (in Millions):"</span>, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(train_words)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>)</span>
+<span id="cb8-7"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Vocabulary size, V:"</span>, V)</span>
+<span id="cb8-8"></span>
+<span id="cb8-9"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># preprocess the validation text</span></span>
+<span id="cb8-10">val_words <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> tokenize_text(val_text, remove_stopwords<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">False</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>--------------------------------
+Number of tokens in the corpus (in Millions): 1.749369
+Vocabulary size, V: 66102</code></pre>
+</div>
+</div>
+<div id="d558ee2f" class="cell" data-execution_count="52">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># let's see some of the train words by frequency in descending order</span></span>
+<span id="cb10-2">train_word_counts <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> Counter(train_words)</span>
+<span id="cb10-3">train_word_counts.most_common()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="52">
+<pre><code>[('the', 130769),
+ ('of', 57032),
+ ('and', 50735),
+ ('in', 45016),
+ ('to', 39522),
+ ('a', 36453),
+ ('was', 21008),
+ ('on', 15141),
+ ('as', 15062),
+ ('s', 14488),
+ ('that', 14351),
+ ('for', 13794),
+ ('with', 13012),
+ ('by', 12718),
+ ('is', 11692),
+ ('it', 9276),
+ ('from', 9229),
+ ('at', 9071),
+ ('his', 9020),
+ ('he', 8708),
+ ('were', 7334),
+ ('an', 6251),
+ ('had', 5707),
+ ('which', 5546),
+ ('be', 4860),
+ ('are', 4714),
+ ('this', 4560),
+ ('their', 4290),
+ ('first', 4245),
+ ('but', 4233),
+ ('not', 4006),
+ ('one', 3914),
+ ('they', 3894),
+ ('its', 3878),
+ ('also', 3842),
+ ('after', 3749),
+ ('her', 3670),
+ ('or', 3657),
+ ('two', 3565),
+ ('have', 3470),
+ ('has', 3325),
+ ('been', 3263),
+ ('who', 3029),
+ ('she', 2884),
+ ('new', 2767),
+ ('other', 2729),
+ ('during', 2690),
+ ('when', 2655),
+ ('time', 2607),
+ ('all', 2557),
+ ('into', 2443),
+ ('more', 2402),
+ ('would', 2332),
+ ('1', 2254),
+ ('i', 2179),
+ ('over', 2137),
+ ('while', 2127),
+ ('game', 2077),
+ ('only', 2061),
+ ('most', 2027),
+ ('2', 1982),
+ ('three', 1976),
+ ('later', 1928),
+ ('up', 1919),
+ ('about', 1914),
+ ('may', 1878),
+ ('between', 1871),
+ ('him', 1844),
+ ('song', 1828),
+ ('there', 1801),
+ ('some', 1771),
+ ('than', 1765),
+ ('out', 1760),
+ ('no', 1702),
+ ('season', 1692),
+ ('year', 1669),
+ ('made', 1642),
+ ('city', 1609),
+ ('3', 1601),
+ ('such', 1584),
+ ('before', 1557),
+ ('where', 1524),
+ ('used', 1508),
+ ('series', 1498),
+ ('them', 1488),
+ ('second', 1469),
+ ('world', 1462),
+ ('being', 1454),
+ ('years', 1451),
+ ('both', 1448),
+ ('many', 1447),
+ ('000', 1447),
+ ('these', 1445),
+ ('film', 1405),
+ ('however', 1397),
+ ('album', 1383),
+ ('south', 1373),
+ ('war', 1370),
+ ('through', 1364),
+ ('5', 1362),
+ ('north', 1357),
+ ('then', 1329),
+ ('part', 1320),
+ ('can', 1320),
+ ('early', 1300),
+ ('several', 1287),
+ ('4', 1279),
+ ('number', 1278),
+ ('state', 1274),
+ ('including', 1273),
+ ('against', 1272),
+ ('well', 1262),
+ ('known', 1259),
+ ('became', 1255),
+ ('four', 1238),
+ ('united', 1216),
+ ('under', 1198),
+ ('although', 1194),
+ ('m', 1180),
+ ('century', 1178),
+ ('day', 1165),
+ ('following', 1152),
+ ('music', 1134),
+ ('us', 1119),
+ ('began', 1102),
+ ('because', 1090),
+ ('so', 1085),
+ ('work', 1083),
+ ('like', 1075),
+ ('end', 1071),
+ ('called', 1065),
+ ('episode', 1064),
+ ('until', 1040),
+ ('found', 1039),
+ ('said', 1038),
+ ('area', 1034),
+ ('could', 1033),
+ ('states', 1019),
+ ('american', 1018),
+ ('people', 1015),
+ ('6', 1011),
+ ('since', 995),
+ ('british', 989),
+ ('each', 984),
+ ('released', 979),
+ ('same', 979),
+ ('team', 974),
+ ('church', 968),
+ ('around', 966),
+ ('10', 963),
+ ('long', 960),
+ ('did', 958),
+ ('along', 957),
+ ('million', 940),
+ ('life', 939),
+ ('five', 938),
+ ('national', 916),
+ ('0', 914),
+ ('john', 910),
+ ('back', 910),
+ ('high', 904),
+ ('company', 900),
+ ('t', 897),
+ ('another', 896),
+ ('best', 891),
+ ('use', 888),
+ ('you', 878),
+ ('if', 872),
+ ('final', 871),
+ ('september', 869),
+ ('august', 865),
+ ('river', 861),
+ ('large', 856),
+ ('what', 848),
+ ('west', 843),
+ ('8', 837),
+ ('km', 836),
+ ('off', 835),
+ ('down', 831),
+ ('7', 825),
+ ('due', 819),
+ ('games', 818),
+ ('june', 810),
+ ('history', 809),
+ ('line', 809),
+ ('will', 803),
+ ('name', 799),
+ ('now', 791),
+ ('any', 786),
+ ('storm', 786),
+ ('received', 785),
+ ('home', 784),
+ ('9', 777),
+ ('government', 774),
+ ('described', 774),
+ ('six', 773),
+ ('within', 770),
+ ('species', 770),
+ ('much', 769),
+ ('group', 764),
+ ('family', 758),
+ ('october', 757),
+ ('played', 755),
+ ('east', 748),
+ ('league', 747),
+ ('general', 744),
+ ('took', 744),
+ ('set', 744),
+ ('major', 737),
+ ('road', 737),
+ ('late', 735),
+ ('july', 735),
+ ('wrote', 733),
+ ('single', 731),
+ ('won', 731),
+ ('system', 729),
+ ('play', 726),
+ ('video', 725),
+ ('times', 724),
+ ('according', 723),
+ ('record', 718),
+ ('third', 716),
+ ('based', 713),
+ ('april', 711),
+ ('man', 707),
+ ('included', 702),
+ ('just', 700),
+ ('march', 699),
+ ('book', 697),
+ ('january', 695),
+ ('those', 694),
+ ('show', 693),
+ ('named', 691),
+ ('very', 690),
+ ('even', 690),
+ ('england', 689),
+ ('main', 687),
+ ('white', 687),
+ ('left', 686),
+ ('york', 685),
+ ('men', 684),
+ ('small', 681),
+ ('school', 681),
+ ('though', 678),
+ ('division', 672),
+ ('club', 671),
+ ('way', 670),
+ ('old', 670),
+ ('original', 667),
+ ('near', 666),
+ ('last', 665),
+ ('12', 663),
+ ('november', 661),
+ ('water', 657),
+ ('death', 655),
+ ('place', 654),
+ ('20', 653),
+ ('15', 651),
+ ('tropical', 650),
+ ('december', 647),
+ ('built', 646),
+ ('own', 644),
+ ('we', 642),
+ ('character', 641),
+ ('songs', 639),
+ ('top', 633),
+ ('de', 632),
+ ('form', 631),
+ ('30', 631),
+ ('player', 630),
+ ('do', 626),
+ ('black', 625),
+ ('king', 625),
+ ('public', 623),
+ ('island', 619),
+ ('german', 619),
+ ('next', 617),
+ ('2009', 616),
+ ('make', 613),
+ ('still', 612),
+ ('2008', 612),
+ ('2010', 611),
+ ('role', 598),
+ ('led', 598),
+ ('again', 595),
+ ('ii', 590),
+ ('moved', 590),
+ ('career', 589),
+ ('university', 589),
+ ('without', 587),
+ ('love', 585),
+ ('often', 584),
+ ('among', 582),
+ ('recorded', 581),
+ ('further', 578),
+ ('hurricane', 578),
+ ('military', 576),
+ ('period', 575),
+ ('star', 575),
+ ('local', 574),
+ ('considered', 573),
+ ('army', 570),
+ ('production', 570),
+ ('release', 569),
+ ('side', 568),
+ ('2007', 567),
+ ('great', 565),
+ ('house', 557),
+ ('came', 556),
+ ('published', 554),
+ ('written', 552),
+ ('100', 551),
+ ('continued', 550),
+ ('power', 549),
+ ('english', 548),
+ ('town', 547),
+ ('story', 545),
+ ('forces', 542),
+ ('days', 542),
+ ('run', 542),
+ ('route', 540),
+ ('held', 540),
+ ('french', 539),
+ ('support', 535),
+ ('14', 535),
+ ('16', 532),
+ ('11', 530),
+ ('18', 528),
+ ('force', 527),
+ ('half', 527),
+ ('take', 526),
+ ('few', 526),
+ ('international', 525),
+ ('having', 524),
+ ('25', 524),
+ ('county', 523),
+ ('land', 522),
+ ('throughout', 521),
+ ('2011', 519),
+ ('point', 518),
+ ('become', 516),
+ ('order', 515),
+ ('children', 515),
+ ('2006', 515),
+ ('light', 513),
+ ('version', 513),
+ ('title', 511),
+ ('former', 509),
+ ('lost', 507),
+ ('track', 507),
+ ('different', 506),
+ ('development', 505),
+ ('field', 504),
+ ('ship', 503),
+ ('similar', 502),
+ ('despite', 499),
+ ('live', 498),
+ ('common', 497),
+ ('members', 496),
+ ('park', 494),
+ ('february', 492),
+ ('13', 491),
+ ('gave', 488),
+ ('produced', 488),
+ ('short', 487),
+ ('southern', 487),
+ ('little', 485),
+ ('dylan', 485),
+ ('site', 482),
+ ('once', 480),
+ ('2012', 480),
+ ('television', 480),
+ ('writing', 480),
+ ('given', 479),
+ ('central', 478),
+ ('control', 476),
+ ('total', 476),
+ ('country', 475),
+ ('band', 475),
+ ('service', 472),
+ ('northern', 471),
+ ('re', 469),
+ ('include', 466),
+ ('young', 464),
+ ('position', 464),
+ ('fire', 463),
+ ('battalion', 460),
+ ('making', 457),
+ ('never', 457),
+ ('seven', 456),
+ ('away', 456),
+ ('tour', 455),
+ ('lead', 454),
+ ('air', 454),
+ ('age', 454),
+ ('2013', 452),
+ ('how', 451),
+ ('reported', 451),
+ ('open', 450),
+ ('seen', 450),
+ ('battle', 449),
+ ('highway', 449),
+ ('western', 448),
+ ('good', 448),
+ ('eastern', 448),
+ ('st', 447),
+ ('stated', 446),
+ ('attack', 445),
+ ('red', 445),
+ ('god', 445),
+ ('match', 444),
+ ('returned', 443),
+ ('across', 443),
+ ('body', 442),
+ ('instead', 442),
+ ('ships', 441),
+ ('established', 440),
+ ('using', 438),
+ ('ft', 438),
+ ('population', 435),
+ ('modern', 434),
+ ('construction', 434),
+ ('week', 434),
+ ('america', 434),
+ ('noted', 432),
+ ('my', 431),
+ ('less', 431),
+ ('royal', 431),
+ ('head', 430),
+ ('c', 430),
+ ('reached', 430),
+ ('developed', 429),
+ ('building', 429),
+ ('eight', 429),
+ ('rock', 428),
+ ('players', 427),
+ ('h', 427),
+ ('ireland', 427),
+ ('brigade', 426),
+ ('president', 424),
+ ('result', 424),
+ ('thought', 422),
+ ('right', 421),
+ ('performance', 420),
+ ('miles', 418),
+ ('london', 418),
+ ('himself', 417),
+ ('father', 416),
+ ('per', 415),
+ ('important', 415),
+ ('style', 413),
+ ('performed', 412),
+ ('felt', 411),
+ ('various', 410),
+ ('australia', 410),
+ ('full', 409),
+ ('17', 409),
+ ('feet', 408),
+ ('areas', 408),
+ ('previous', 407),
+ ('win', 407),
+ ('low', 406),
+ ('events', 406),
+ ('b', 405),
+ ('died', 401),
+ ('kingdom', 401),
+ ('guitar', 400),
+ ('football', 399),
+ ('too', 398),
+ ('art', 398),
+ ('others', 398),
+ ('went', 398),
+ ('originally', 397),
+ ('project', 397),
+ ('mm', 397),
+ ('human', 396),
+ ('upon', 395),
+ ('23', 395),
+ ('level', 395),
+ ('works', 394),
+ ('range', 394),
+ ('started', 392),
+ ('formed', 391),
+ ('characters', 390),
+ ('james', 390),
+ ('political', 390),
+ ('women', 388),
+ ('should', 387),
+ ('cup', 386),
+ ('50', 384),
+ ('port', 384),
+ ('caused', 383),
+ ('eventually', 382),
+ ('located', 382),
+ ('21', 382),
+ ('19', 380),
+ ('28', 379),
+ ('created', 378),
+ ('24', 378),
+ ('stars', 378),
+ ('critics', 377),
+ ('sent', 377),
+ ('me', 377),
+ ('ground', 377),
+ ('able', 376),
+ ('2004', 374),
+ ('class', 373),
+ ('2005', 373),
+ ('chart', 371),
+ ('night', 371),
+ ('born', 369),
+ ('region', 369),
+ ('street', 367),
+ ('together', 366),
+ ('design', 366),
+ ('center', 366),
+ ('court', 366),
+ ('director', 365),
+ ('present', 364),
+ ('popular', 364),
+ ('strong', 364),
+ ('every', 363),
+ ('award', 363),
+ ('return', 361),
+ ('son', 361),
+ ('remained', 360),
+ ('hero', 360),
+ ('see', 359),
+ ('novel', 358),
+ ('completed', 358),
+ ('guns', 358),
+ ('scored', 357),
+ ('announced', 355),
+ ('australian', 355),
+ ('grand', 354),
+ ('almost', 353),
+ ('fourth', 353),
+ ('22', 353),
+ ('behind', 351),
+ ('least', 350),
+ ('damage', 350),
+ ('26', 349),
+ ('added', 348),
+ ('brown', 348),
+ ('ten', 348),
+ ('party', 348),
+ ('heavy', 347),
+ ('killed', 345),
+ ('months', 345),
+ ('followed', 345),
+ ('wife', 344),
+ ('appeared', 344),
+ ('addition', 343),
+ ('d', 343),
+ ('playing', 342),
+ ('does', 342),
+ ('success', 342),
+ ('list', 340),
+ ('awards', 340),
+ ('features', 338),
+ ('aircraft', 335),
+ ('coast', 334),
+ ('sea', 334),
+ ('2003', 334),
+ ('taken', 333),
+ ('david', 331),
+ ('2015', 331),
+ ('leading', 330),
+ ('action', 329),
+ ('championship', 329),
+ ('europe', 328),
+ ('france', 328),
+ ('either', 327),
+ ('served', 327),
+ ('front', 327),
+ ('recording', 327),
+ ('towards', 326),
+ ('operations', 325),
+ ('campaign', 325),
+ ('gold', 324),
+ ('mother', 323),
+ ('put', 323),
+ ('elements', 322),
+ ('decided', 322),
+ ('records', 320),
+ ('close', 320),
+ ('generally', 319),
+ ('magazine', 319),
+ ('believed', 319),
+ ('fleet', 319),
+ ('move', 316),
+ ('female', 316),
+ ('post', 316),
+ ('ever', 316),
+ ('carey', 316),
+ ('sold', 315),
+ ('soon', 315),
+ ('example', 315),
+ ('poem', 315),
+ ('goal', 314),
+ ('points', 313),
+ ('infantry', 313),
+ ('significant', 313),
+ ('fort', 312),
+ ('weeks', 312),
+ ('rather', 311),
+ ('study', 311),
+ ('european', 310),
+ ('outside', 309),
+ ('federer', 309),
+ ('robert', 308),
+ ('opened', 308),
+ ('help', 307),
+ ('finished', 307),
+ ('directed', 307),
+ ('brought', 307),
+ ('case', 307),
+ ('non', 306),
+ ('william', 306),
+ ('law', 306),
+ ('go', 305),
+ ('wales', 305),
+ ('27', 304),
+ ('earlier', 304),
+ ('o', 304),
+ ('featured', 303),
+ ('victory', 302),
+ ('get', 302),
+ ('act', 300),
+ ('successful', 300),
+ ('manager', 300),
+ ('gun', 299),
+ ('start', 298),
+ ('mid', 298),
+ ('stage', 298),
+ ('member', 297),
+ ('provided', 297),
+ ('association', 297),
+ ('opening', 296),
+ ('working', 296),
+ ('appearance', 296),
+ ('village', 296),
+ ('mi', 296),
+ ('wanted', 295),
+ ('council', 295),
+ ('particularly', 293),
+ ('roman', 293),
+ ('jordan', 293),
+ ('troops', 292),
+ ('2014', 291),
+ ('initially', 291),
+ ('depression', 291),
+ ('atlantic', 291),
+ ('40', 291),
+ ('tech', 291),
+ ('evidence', 290),
+ ('29', 290),
+ ('yard', 290),
+ ('far', 290),
+ ('office', 289),
+ ('largest', 289),
+ ('find', 289),
+ ('dam', 289),
+ ('review', 288),
+ ('blue', 288),
+ ('george', 288),
+ ('attempt', 288),
+ ('saw', 288),
+ ('possible', 287),
+ ('19th', 287),
+ ('special', 286),
+ ('type', 286),
+ ('summer', 285),
+ ('month', 285),
+ ('above', 284),
+ ('union', 284),
+ ('yards', 284),
+ ('rest', 283),
+ ('florida', 283),
+ ('allowed', 282),
+ ('saying', 282),
+ ('event', 281),
+ ('winds', 281),
+ ('race', 281),
+ ('hours', 280),
+ ('critical', 280),
+ ('creek', 279),
+ ('cross', 279),
+ ('whom', 278),
+ ('nine', 277),
+ ('worked', 276),
+ ('2001', 276),
+ ('police', 276),
+ ('society', 276),
+ ('plan', 276),
+ ('missouri', 276),
+ ('designed', 275),
+ ('reception', 275),
+ ('500', 275),
+ ('middle', 275),
+ ('community', 275),
+ ('previously', 274),
+ ('free', 273),
+ ('process', 273),
+ ('forced', 272),
+ ('real', 271),
+ ('praised', 271),
+ ('remains', 271),
+ ('operation', 271),
+ ('era', 271),
+ ('radio', 271),
+ ('200', 270),
+ ('official', 269),
+ ('research', 269),
+ ('increased', 269),
+ ('hall', 268),
+ ('lower', 267),
+ ('station', 267),
+ ('parliament', 267),
+ ('come', 266),
+ ('michael', 266),
+ ('relationship', 266),
+ ('units', 265),
+ ('command', 265),
+ ('commander', 265),
+ ('regiment', 265),
+ ('studio', 265),
+ ('hill', 265),
+ ('taking', 264),
+ ('base', 264),
+ ('replaced', 264),
+ ('parts', 263),
+ ('writer', 263),
+ ('navy', 262),
+ ('ball', 262),
+ ('industry', 262),
+ ('social', 261),
+ ('food', 260),
+ ('highest', 259),
+ ('college', 259),
+ ('co', 259),
+ ('bay', 259),
+ ('reviews', 259),
+ ('media', 259),
+ ('beginning', 258),
+ ('claimed', 258),
+ ('estimated', 258),
+ ('don', 258),
+ ('museum', 257),
+ ('mph', 257),
+ ('canada', 257),
+ ('section', 257),
+ ('goals', 256),
+ ('stone', 256),
+ ('joined', 256),
+ ('japanese', 255),
+ ('placed', 255),
+ ('religious', 255),
+ ('commercial', 255),
+ ('average', 255),
+ ('stories', 254),
+ ('involved', 254),
+ ('signed', 254),
+ ('training', 254),
+ ('suggested', 254),
+ ('oldham', 254),
+ ('met', 253),
+ ('shot', 253),
+ ('introduced', 253),
+ ('lines', 252),
+ ('sometimes', 252),
+ ('itself', 252),
+ ('face', 251),
+ ('31', 251),
+ ('today', 251),
+ ('background', 251),
+ ('paul', 251),
+ ('business', 251),
+ ('olivier', 251),
+ ('scene', 250),
+ ('henry', 250),
+ ('going', 250),
+ ('complete', 250),
+ ('structure', 249),
+ ('mexico', 249),
+ ('additional', 248),
+ ('available', 248),
+ ('thus', 248),
+ ('give', 248),
+ ('cast', 247),
+ ('term', 247),
+ ('loss', 247),
+ ('language', 247),
+ ('date', 247),
+ ('horse', 247),
+ ('whose', 246),
+ ('nearly', 246),
+ ('sound', 246),
+ ('india', 246),
+ ('thomas', 245),
+ ('fifth', 245),
+ ('past', 245),
+ ('approximately', 244),
+ ('indian', 244),
+ ('shows', 244),
+ ('must', 244),
+ ('program', 244),
+ ('irish', 244),
+ ('told', 243),
+ ('entire', 243),
+ ('capital', 243),
+ ('damaged', 243),
+ ('already', 243),
+ ('friends', 243),
+ ('appointed', 243),
+ ('native', 242),
+ ('prior', 242),
+ ('sun', 242),
+ ('britain', 242),
+ ('names', 241),
+ ('issue', 241),
+ ('probably', 241),
+ ('turned', 241),
+ ('mark', 241),
+ ('forest', 241),
+ ('male', 240),
+ ('r', 240),
+ ('winning', 239),
+ ('passed', 239),
+ ('change', 238),
+ ('students', 238),
+ ('our', 238),
+ ('length', 237),
+ ('size', 237),
+ ('earth', 237),
+ ('civil', 236),
+ ('child', 236),
+ ('especially', 236),
+ ('woman', 235),
+ ('christian', 235),
+ ('enough', 235),
+ ('notes', 235),
+ ('overall', 234),
+ ('chinese', 234),
+ ('forward', 234),
+ ('failed', 234),
+ ('better', 234),
+ ('running', 234),
+ ('mixed', 234),
+ ('captain', 233),
+ ('ny', 233),
+ ('limited', 232),
+ ('2002', 232),
+ ('iii', 231),
+ ('minor', 231),
+ ('ordered', 231),
+ ('network', 231),
+ ('l', 231),
+ ('future', 231),
+ ('wheeler', 231),
+ ('regular', 230),
+ ('remaining', 230),
+ ('pacific', 230),
+ ('spent', 230),
+ ('changes', 230),
+ ('moving', 230),
+ ('might', 230),
+ ('arrived', 230),
+ ('includes', 230),
+ ('larger', 229),
+ ('education', 229),
+ ('usually', 229),
+ ('san', 229),
+ ('canadian', 229),
+ ('cathedral', 229),
+ ('hand', 228),
+ ('department', 228),
+ ('hit', 228),
+ ('birds', 228),
+ ('required', 227),
+ ('uk', 227),
+ ('latter', 227),
+ ('lake', 227),
+ ('decision', 226),
+ ('plot', 225),
+ ('response', 225),
+ ('africa', 225),
+ ('wide', 225),
+ ('debut', 225),
+ ('space', 224),
+ ('musical', 224),
+ ('round', 224),
+ ('voice', 224),
+ ('2000', 224),
+ ('crew', 223),
+ ('appear', 223),
+ ('related', 222),
+ ('mounted', 222),
+ ('groups', 222),
+ ('territory', 221),
+ ('view', 221),
+ ('centre', 221),
+ ('films', 221),
+ ('supported', 221),
+ ('saint', 221),
+ ('rachel', 221),
+ ('jin', 221),
+ ('positive', 220),
+ ('feature', 220),
+ ('science', 220),
+ ('nature', 220),
+ ('billboard', 220),
+ ('pressure', 220),
+ ('ended', 220),
+ ('00', 220),
+ ('finally', 219),
+ ('score', 219),
+ ('squadron', 219),
+ ('flight', 219),
+ ('culture', 219),
+ ('money', 218),
+ ('becoming', 218),
+ ('always', 217),
+ ('particular', 217),
+ ('smaller', 217),
+ ('books', 217),
+ ('provide', 217),
+ ('shown', 217),
+ ('charles', 217),
+ ('private', 216),
+ ('1995', 216),
+ ('anti', 216),
+ ('discovered', 216),
+ ('shortly', 215),
+ ('board', 215),
+ ('minutes', 215),
+ ('difficult', 215),
+ ('person', 214),
+ ('experience', 214),
+ ('nations', 214),
+ ('peter', 214),
+ ('trade', 214),
+ ('defeated', 214),
+ ('mass', 214),
+ ('temple', 214),
+ ('staff', 213),
+ ('big', 213),
+ ('surface', 213),
+ ('subsequently', 213),
+ ('lack', 213),
+ ('japan', 212),
+ ('upper', 212),
+ ('press', 212),
+ ('living', 212),
+ ('effects', 212),
+ ('zealand', 212),
+ ('fact', 211),
+ ('word', 211),
+ ('professional', 211),
+ ('material', 210),
+ ('greater', 210),
+ ('mostly', 209),
+ ('idea', 209),
+ ('problems', 209),
+ ('self', 209),
+ ('intended', 209),
+ ('room', 209),
+ ('teams', 209),
+ ('bridge', 209),
+ ('numbers', 208),
+ ('collection', 208),
+ ('captured', 208),
+ ('largely', 208),
+ ('cut', 208),
+ ('interest', 208),
+ ('key', 208),
+ ('gods', 208),
+ ('referred', 207),
+ ('themselves', 207),
+ ('cover', 207),
+ ('cm', 207),
+ ('likely', 207),
+ ('metres', 207),
+ ('primary', 207),
+ ('tv', 207),
+ ('haifa', 207),
+ ('mountain', 206),
+ ('got', 206),
+ ('2016', 206),
+ ('60', 206),
+ ('machine', 206),
+ ('scientology', 206),
+ ('news', 205),
+ ('yet', 205),
+ ('traffic', 205),
+ ('xenon', 205),
+ ('location', 204),
+ ('tower', 204),
+ ('entered', 204),
+ ('contract', 204),
+ ...]</code></pre>
+</div>
+</div>
+<p>The above approach for making vocabulary has following limitations: 1. size of vocabulary is very large. This means we need output layer with more number of neurons -&gt; more computation 2. Some words are less frequent occuring maybe only once or twice in the entire dataset. I found that in model training, when our dataset is small and we have large vocab and many words appear less frequently, it does not result in good model training. 3. Current vocabulary cannot handle out-of-vocabulary words that could appear in validation/ test settings. 4. Many stopwords like <code>the</code>, <code>a</code> are overrepresented in the dataset.</p>
+<p>In order to solve 1 and 2, we filter out low frequency words by defining a hyperparameter <code>MIN_FREQ</code></p>
+<p>(For 1 and 2, we can also use Heirarchical Softmax instead of just Softmax classifier.)</p>
+<p>For 3, we assign token <code>"&lt;unk&gt;"</code> to new tokens (or words) and to less frequent ones which we filtered out using <code>MIN_FREQ</code></p>
+<p>For 4, we can use <code>remove_stopwords = False</code> while tokenizing the text. But when I removed stopwords, I witnessed decline in performance. Perhaps because stopwords are high in frequency and are essential to understand context in order to learn the current word emebeddings. Hence, I am keeping the stopwords.</p>
+<div id="bbe30c50" class="cell" data-execution_count="53">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># filter low frequency words to create vocabulary (from train text)</span></span>
+<span id="cb12-2">MIN_FREQ <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span></span>
+<span id="cb12-3">train_word_counts <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> Counter(train_words)</span>
+<span id="cb12-4">high_freq_words <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> [word <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> word <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> train_words <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> train_word_counts[word] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> MIN_FREQ]</span>
+<span id="cb12-5"></span>
+<span id="cb12-6"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># create a vocabulary</span></span>
+<span id="cb12-7">vocab <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">list</span>(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">set</span>(high_freq_words))</span>
+<span id="cb12-8">vocab.append(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"&lt;unk&gt;"</span>)</span>
+<span id="cb12-9">V <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(vocab)</span>
+<span id="cb12-10"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Vocabulary size, V:"</span>, V)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Vocabulary size, V: 4089</code></pre>
+</div>
+</div>
+<p>This has brought down vocab from over 66k to just about 4k.</p>
+<section id="cbow" class="level3">
+<h3 class="anchored" data-anchor-id="cbow">CBOW</h3>
+<p>Model architecture as proposed</p>
+<p><img src="https://mgupta70.github.io/posts/2025-08-10-CBOW/media/word2vec/cbow_skip_gram.png" width="650"></p>
+<p><strong>CBOW:</strong> Predict the middle word based on R previous words and R future words</p>
+<p><strong>Skip-gram:</strong> Predict context words based on middle word</p>
+<p><img src="https://mgupta70.github.io/posts/2025-08-10-CBOW/media/word2vec/cbow1.png" width="650"></p>
+<p>CBOW architecture has no hidden layer.</p>
+<p>It is a feedforward NN with following layers: Input → Embedding → Output</p>
+<ul>
+<li>Input layer: one-hot encoded context words</li>
+<li>Embedding layer: V x D matrix</li>
+<li>Output layer: V x 1 vector</li>
+</ul>
+<p>“…where the non-linear hidden layer is removed…” -&gt; no hidden layer</p>
+<p>“…and the projection layer is shared for all words (not just the projection matrix); thus, all words get projected into the same position (their vectors are averaged)” -&gt; <code>self.embeddings(context_indices).mean(dim=1)</code></p>
+</section>
+<section id="why-was-the-non-linear-hidden-layer-removed" class="level3">
+<h3 class="anchored" data-anchor-id="why-was-the-non-linear-hidden-layer-removed">Why was the non-linear hidden layer removed?</h3>
+<p>Ans: To make training faster. In other words, make model simpler. This was the main argument in the paper.</p>
+<div id="a68d3499" class="cell" data-execution_count="54">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">class</span> CBOWModel(nn.Module):</span>
+<span id="cb14-2">    <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">__init__</span>(<span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>, V, D):</span>
+<span id="cb14-3">        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">"""</span></span>
+<span id="cb14-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">        V: vocabulary size</span></span>
+<span id="cb14-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">        D: embedding size</span></span>
+<span id="cb14-6"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">        """</span></span>
+<span id="cb14-7">        <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">super</span>(CBOWModel, <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>).<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">__init__</span>()</span>
+<span id="cb14-8">        <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>.projection <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> nn.Embedding(V, D)</span>
+<span id="cb14-9">        <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>.output <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> nn.Linear(D, V)</span>
+<span id="cb14-10">        <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>.init_weights()</span>
+<span id="cb14-11"></span>
+<span id="cb14-12">    <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> forward(<span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>, inputs):</span>
+<span id="cb14-13">        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">"""</span></span>
+<span id="cb14-14"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">        inputs: context indices of shape [batch_size, 2R]</span></span>
+<span id="cb14-15"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">        """</span></span>
+<span id="cb14-16">        embeddings <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>.projection(inputs).mean(dim<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Average across context words shape: [batch_size, D]</span></span>
+<span id="cb14-17">        logits <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>.output(embeddings)</span>
+<span id="cb14-18">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> logits</span>
+<span id="cb14-19">    </span>
+<span id="cb14-20">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># optional: weights initialization</span></span>
+<span id="cb14-21">    <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> init_weights(<span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>):</span>
+<span id="cb14-22">        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># xavier uniform initialization for embeddings and linear weights</span></span>
+<span id="cb14-23">        nn.init.xavier_uniform_(<span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>.projection.weight)</span>
+<span id="cb14-24">        nn.init.xavier_uniform_(<span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>.output.weight)</span>
+<span id="cb14-25">        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># zero bias initialization (optional but recommended)- valid for linear layer not for embedding layer</span></span>
+<span id="cb14-26">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>.output.bias <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">is</span> <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">not</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">None</span>:</span>
+<span id="cb14-27">            nn.init.zeros_(<span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>.output.bias)</span></code></pre></div>
+</div>
+<p>As per original paper (refer above image), authors: - used 4 history and 4 future word to predict current word. (R=4)</p>
+<div id="68e3eea1" class="cell" data-execution_count="55">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1">R <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span> <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># context window size</span></span>
+<span id="cb15-2"></span>
+<span id="cb15-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># create word to index and index to word mappings</span></span>
+<span id="cb15-4">word_to_idx <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> {word: idx <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> idx, word <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">enumerate</span>(vocab)}</span>
+<span id="cb15-5">idx_to_word <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> {idx: word <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> word, idx <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> word_to_idx.items()}</span>
+<span id="cb15-6"></span>
+<span id="cb15-7"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> get_context_target(words, R, word_to_idx):</span>
+<span id="cb15-8">    contexts <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> []</span>
+<span id="cb15-9">    targets <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> []</span>
+<span id="cb15-10">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(R, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(words) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> R):</span>
+<span id="cb15-11">        context_words <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> words[i<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>R:i] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> words[i<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>:i<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span>R<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]</span>
+<span id="cb15-12">        context_words <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> torch.tensor([word_to_idx[w] <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> w <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> word_to_idx <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span> word_to_idx[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"&lt;unk&gt;"</span>] <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> w <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> context_words], dtype<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>torch.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">long</span>)</span>
+<span id="cb15-13"></span>
+<span id="cb15-14">        target_word <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> words[i]</span>
+<span id="cb15-15">        target_word <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> torch.tensor(word_to_idx[target_word] <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> target_word <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> word_to_idx <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span> word_to_idx[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"&lt;unk&gt;"</span>], dtype<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>torch.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">long</span>)</span>
+<span id="cb15-16"></span>
+<span id="cb15-17">        contexts.append(context_words)</span>
+<span id="cb15-18">        targets.append(target_word)</span>
+<span id="cb15-19"></span>
+<span id="cb15-20">    X <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> torch.stack(contexts)</span>
+<span id="cb15-21">    y <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> torch.stack(targets)</span>
+<span id="cb15-22">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> X, y</span>
+<span id="cb15-23"></span>
+<span id="cb15-24">X_train, y_train <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> get_context_target(train_words, R, word_to_idx)</span>
+<span id="cb15-25">X_val, y_val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> get_context_target(val_words, R, word_to_idx)</span>
+<span id="cb15-26"></span>
+<span id="cb15-27"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Train data:"</span>)</span>
+<span id="cb15-28"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(X_train.shape, y_train.shape)</span>
+<span id="cb15-29"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Validation data:"</span>)</span>
+<span id="cb15-30"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(X_val.shape, y_val.shape)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Train data:
+torch.Size([1749361, 8]) torch.Size([1749361])
+Validation data:
+torch.Size([183475, 8]) torch.Size([183475])</code></pre>
+</div>
+</div>
+<div id="9fffefe7" class="cell" data-execution_count="56">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"X_train sample:"</span>)</span>
+<span id="cb17-2"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(X_train[:<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>,:])</span>
+<span id="cb17-3"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"y_train sample:"</span>)</span>
+<span id="cb17-4"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(y_train[:<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>])</span>
+<span id="cb17-5"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"--------------------------------"</span>)</span>
+<span id="cb17-6"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"X_val sample:"</span>)</span>
+<span id="cb17-7"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(X_val[:<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>,:])</span>
+<span id="cb17-8"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"y_val sample:"</span>)</span>
+<span id="cb17-9"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(y_val[:<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>])</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>X_train sample:
+tensor([[ 581, 3372, 3297, 4088,  581,  274, 4088, 3372],
+        [3372, 3297, 4088, 1405,  274, 4088, 3372, 1964]])
+y_train sample:
+tensor([1405,  581])
+--------------------------------
+X_val sample:
+tensor([[4088, 4088, 4088, 4088,  240, 2041, 3147, 4088],
+        [4088, 4088, 4088, 3169, 2041, 3147, 4088, 2358]])
+y_val sample:
+tensor([3169,  240])</code></pre>
+</div>
+</div>
+</section>
+<section id="how-cbow-is-different-from-stansard-bag-of-words-or-what-does-as-unlike-standard-bag-of-words-model-it-uses-continuous-distributed-representation-of-the-context-means" class="level3">
+<h3 class="anchored" data-anchor-id="how-cbow-is-different-from-stansard-bag-of-words-or-what-does-as-unlike-standard-bag-of-words-model-it-uses-continuous-distributed-representation-of-the-context-means">How CBOW is different from stansard Bag-of-Words? (Or, What does “as unlike standard bag-of-words model, it uses continuous distributed representation of the context” means?)</h3>
+<p>Ans:</p>
+<p><strong>Standard Bag-of-Words:</strong> - Each word is represented as sparse vector containing 1’s at index corresponding to the context words and 0’s elsewhere. - Here, size of each word embedding vector = [1, V] where <code>V</code> is vocab size</p>
+<p><strong>Continuous Bag-of-Words</strong> - Each word is represented via a projection matrix in which values are continuos and hence the vector does not necessarily consist of just 1’s and 0’s - Here, size of each word embedding vector = [1, D] where <code>D</code> is <code>embedding_dimension</code> a user chooses</p>
+<div id="9b31a836" class="cell" data-execution_count="67">
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1">D <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">300</span> <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># embedding size</span></span>
+<span id="cb19-2"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Context window size, 2R:'</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>R)</span>
+<span id="cb19-3"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Embedding size, D:'</span>, D)</span>
+<span id="cb19-4"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Vocabulary size, V:'</span>, V)</span>
+<span id="cb19-5"></span>
+<span id="cb19-6"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># create the model</span></span>
+<span id="cb19-7">model <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> CBOWModel(V, D).to(device)</span>
+<span id="cb19-8"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># count the number of parameters</span></span>
+<span id="cb19-9">trainable_params <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">sum</span>(p.numel() <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> p <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> model.parameters() <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> p.requires_grad)</span>
+<span id="cb19-10"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Number of trainable parameters (Millions):'</span>, trainable_params<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1e6</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Context window size, 2R: 8
+Embedding size, D: 300
+Vocabulary size, V: 4089
+Number of trainable parameters (Millions): 2.457489</code></pre>
+</div>
+</div>
+<div id="6596d285" class="cell" data-execution_count="68">
+<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">class</span> CBOWDataset(Dataset):</span>
+<span id="cb21-2">    <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">__init__</span>(<span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>, contexts, targets):</span>
+<span id="cb21-3">        <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>.contexts <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> contexts.to(device)</span>
+<span id="cb21-4">        <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>.targets <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> targets.to(device)</span>
+<span id="cb21-5"></span>
+<span id="cb21-6">    <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">__len__</span>(<span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>):</span>
+<span id="cb21-7">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(<span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>.contexts)</span>
+<span id="cb21-8">    </span>
+<span id="cb21-9">    <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">__getitem__</span>(<span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>, idx):</span>
+<span id="cb21-10">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>.contexts[idx], <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">self</span>.targets[idx]</span></code></pre></div>
+</div>
+<div id="bded79e9" class="cell" data-execution_count="69">
+<div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># create the dataset</span></span>
+<span id="cb22-2">train_ds <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> CBOWDataset(X_train, y_train)</span>
+<span id="cb22-3">val_ds <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> CBOWDataset(X_val, y_val)</span>
+<span id="cb22-4"></span>
+<span id="cb22-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># create the dataloader</span></span>
+<span id="cb22-6">batch_size <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">128</span></span>
+<span id="cb22-7">train_dl <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> DataLoader(train_ds, batch_size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>batch_size, shuffle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>)</span>
+<span id="cb22-8">val_dl <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> DataLoader(val_ds, batch_size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>batch_size, shuffle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>)</span>
+<span id="cb22-9"></span>
+<span id="cb22-10"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Model training settings</span></span>
+<span id="cb22-11">criterion <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> nn.CrossEntropyLoss()</span>
+<span id="cb22-12">epochs <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">20</span></span>
+<span id="cb22-13"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># LambdaLR scheduler (start with lr=0.025 and linearly decay to 0.00005 (nearly 0) over user-defined epochs)</span></span>
+<span id="cb22-14">initial_lr <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.025</span></span>
+<span id="cb22-15">lr_lambda <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">lambda</span> epoch: <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> epoch <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> epochs</span>
+<span id="cb22-16">optimizer <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> torch.optim.Adam(model.parameters(), lr<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>initial_lr)</span>
+<span id="cb22-17">scheduler <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> LambdaLR(optimizer, lr_lambda<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>lr_lambda)</span>
+<span id="cb22-18"></span>
+<span id="cb22-19"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> epoch <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(epochs):</span>
+<span id="cb22-20">    total_loss <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span></span>
+<span id="cb22-21">    model.train()</span>
+<span id="cb22-22">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> batch_idx, (context_idx, target_idx) <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">enumerate</span>(train_dl):</span>
+<span id="cb22-23">        context_idx <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> context_idx.to(device)</span>
+<span id="cb22-24">        target_idx <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> target_idx.to(device)</span>
+<span id="cb22-25"></span>
+<span id="cb22-26">        optimizer.zero_grad()</span>
+<span id="cb22-27">        logits <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> model(context_idx)</span>
+<span id="cb22-28">        loss <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> criterion(logits, target_idx)</span>
+<span id="cb22-29">        loss.backward()</span>
+<span id="cb22-30">        optimizer.step()</span>
+<span id="cb22-31">        total_loss <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+=</span> loss.item()</span>
+<span id="cb22-32">        </span>
+<span id="cb22-33">    current_lr <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> optimizer.param_groups[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>][<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'lr'</span>]</span>
+<span id="cb22-34">    <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">f"Epoch </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>epoch<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">, Loss: </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>total_loss<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(train_dl)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:.4f}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">, LR: </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>current_lr<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:.4f}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span>
+<span id="cb22-35">    scheduler.step()</span>
+<span id="cb22-36"></span>
+<span id="cb22-37">    model.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">eval</span>()</span>
+<span id="cb22-38">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">with</span> torch.no_grad():</span>
+<span id="cb22-39">        total_loss <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span></span>
+<span id="cb22-40">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> batch_idx, (context_idx, target_idx) <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">enumerate</span>(val_dl):</span>
+<span id="cb22-41">            context_idx <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> context_idx.to(device)</span>
+<span id="cb22-42">            target_idx <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> target_idx.to(device)</span>
+<span id="cb22-43"></span>
+<span id="cb22-44">            logits <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> model(context_idx)</span>
+<span id="cb22-45">            loss <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> criterion(logits, target_idx)</span>
+<span id="cb22-46">            total_loss <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+=</span> loss.item()</span>
+<span id="cb22-47"></span>
+<span id="cb22-48">        <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">f"Validation Loss: </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>total_loss<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(val_dl)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:.4f}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Epoch 1, Loss: 6.0743, LR: 0.0250
+Validation Loss: 6.0751
+Epoch 2, Loss: 5.9600, LR: 0.0238
+Validation Loss: 5.9654
+Epoch 3, Loss: 5.8597, LR: 0.0225
+Validation Loss: 5.9073
+Epoch 4, Loss: 5.7652, LR: 0.0213
+Validation Loss: 5.8122
+Epoch 5, Loss: 5.6731, LR: 0.0200
+Validation Loss: 5.7198
+Epoch 6, Loss: 5.5820, LR: 0.0188
+Validation Loss: 5.6467
+Epoch 7, Loss: 5.4927, LR: 0.0175
+Validation Loss: 5.5951
+Epoch 8, Loss: 5.4013, LR: 0.0163
+Validation Loss: 5.5274
+Epoch 9, Loss: 5.3099, LR: 0.0150
+Validation Loss: 5.4637
+Epoch 10, Loss: 5.2136, LR: 0.0138
+Validation Loss: 5.4086
+Epoch 11, Loss: 5.1117, LR: 0.0125
+Validation Loss: 5.3469
+Epoch 12, Loss: 5.0028, LR: 0.0112
+Validation Loss: 5.3002
+Epoch 13, Loss: 4.8867, LR: 0.0100
+Validation Loss: 5.2706
+Epoch 14, Loss: 4.7610, LR: 0.0087
+Validation Loss: 5.2455
+Epoch 15, Loss: 4.6259, LR: 0.0075
+Validation Loss: 5.2198
+Epoch 16, Loss: 4.4806, LR: 0.0063
+Validation Loss: 5.2170
+Epoch 17, Loss: 4.3247, LR: 0.0050
+Validation Loss: 5.2252
+Epoch 18, Loss: 4.1590, LR: 0.0038
+Validation Loss: 5.2454
+Epoch 19, Loss: 3.9821, LR: 0.0025
+Validation Loss: 5.2643
+Epoch 20, Loss: 3.7955, LR: 0.0013
+Validation Loss: 5.2792</code></pre>
+</div>
+</div>
+<p>Above, we used dynamic learning rate by using <code>lr_scheduler</code> from Pytorch. We reduced learning rate linearly because because original paper did this.</p>
+<p><img src="https://mgupta70.github.io/posts/2025-08-10-CBOW/media/word2vec/cbow_training2.png" width="650"></p>
+<div id="17bd2224" class="cell" data-execution_count="70">
+<div class="sourceCode cell-code" id="cb24" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># embedding from first model layer</span></span>
+<span id="cb24-2">embeddings <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">list</span>(model.parameters())[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>]</span>
+<span id="cb24-3">embeddings <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> embeddings.cpu().detach().numpy()</span>
+<span id="cb24-4"></span>
+<span id="cb24-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># normalization</span></span>
+<span id="cb24-6">norms <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> (embeddings <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">**</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>).<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">sum</span>(axis<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">**</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb24-7">norms <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.reshape(norms, (<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(norms), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>))</span>
+<span id="cb24-8">embeddings_norm <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> embeddings <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> norms</span>
+<span id="cb24-9">embeddings_norm.shape</span>
+<span id="cb24-10"></span>
+<span id="cb24-11"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> get_top_similar(word: <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">str</span>, topN: <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">int</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>):</span>
+<span id="cb24-12">    word_id <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> word_to_idx[word]</span>
+<span id="cb24-13">    word_vec <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> embeddings_norm[word_id]</span>
+<span id="cb24-14">    word_vec <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.reshape(word_vec, (<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(word_vec), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>))</span>
+<span id="cb24-15">    dists <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.matmul(embeddings_norm, word_vec).flatten()</span>
+<span id="cb24-16">    topN_ids <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.argsort(<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>dists)[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> : topN <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]</span>
+<span id="cb24-17"></span>
+<span id="cb24-18">    topN_dict <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> {}</span>
+<span id="cb24-19">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> sim_word_id <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> topN_ids:</span>
+<span id="cb24-20">        sim_word <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> idx_to_word[sim_word_id]</span>
+<span id="cb24-21">        topN_dict[sim_word] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> dists[sim_word_id]</span>
+<span id="cb24-22">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> topN_dict</span></code></pre></div>
+</div>
+<section id="lets-see-some-semantic-capabilities-which-our-model-has-learned" class="level4">
+<h4 class="anchored" data-anchor-id="lets-see-some-semantic-capabilities-which-our-model-has-learned">Let’s see some <strong>Semantic</strong> capabilities which our model has learned…</h4>
+<div id="6f9a4eac" class="cell" data-execution_count="71">
+<div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Top 5 similar words to 'man':"</span>)</span>
+<span id="cb25-2"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> word, sim <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> get_top_similar(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"man"</span>, topN<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>).items():</span>
+<span id="cb25-3">    <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{}</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">: </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{:.3f}</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">format</span>(word, sim))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Top 5 similar words to 'man':
+person: 0.287
+woman: 0.272
+cougar: 0.270
+girl: 0.246
+pitcher: 0.224</code></pre>
+</div>
+</div>
+</section>
+<section id="lets-see-with-syntactic-capabilities-which-our-model-has-learned" class="level4">
+<h4 class="anchored" data-anchor-id="lets-see-with-syntactic-capabilities-which-our-model-has-learned">Let’s see with <strong>Syntactic</strong> capabilities which our model has learned</h4>
+<p><img src="https://mgupta70.github.io/posts/2025-08-10-CBOW/media/word2vec/cbow_syntactic.png" width="650"></p>
+<div id="43534493" class="cell" data-execution_count="76">
+<div class="sourceCode cell-code" id="cb27" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1">emb1 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> embeddings[word_to_idx[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"king"</span>]]</span>
+<span id="cb27-2">emb2 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> embeddings[word_to_idx[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"man"</span>]]</span>
+<span id="cb27-3">emb3 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> embeddings[word_to_idx[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"woman"</span>]]</span>
+<span id="cb27-4"></span>
+<span id="cb27-5">emb4 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> emb1 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> emb2 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> emb3</span>
+<span id="cb27-6">emb4_norm <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> (emb4 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">**</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>).<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">sum</span>() <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">**</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb27-7">emb4 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> emb4 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> emb4_norm</span>
+<span id="cb27-8"></span>
+<span id="cb27-9">emb4 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.reshape(emb4, (<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(emb4), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>))</span>
+<span id="cb27-10">dists <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.matmul(embeddings_norm, emb4).flatten()</span>
+<span id="cb27-11"></span>
+<span id="cb27-12">top5 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.argsort(<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>dists)[:<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>]</span>
+<span id="cb27-13"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">Top 15 similar words to 'king - man + woman':"</span>)</span>
+<span id="cb27-14"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> i,word_id <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">enumerate</span>(top5):</span>
+<span id="cb27-15">    <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{}</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">. </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{}</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">: </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{:.3f}</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">format</span>(i<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, idx_to_word[word_id], dists[word_id]))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Top 15 similar words to 'king - man + woman':
+1. woman: 0.669
+2. king: 0.600
+3. emperor: 0.256
+4. lord: 0.245
+5. treaty: 0.234
+6. church: 0.224
+7. archbishop: 0.224
+8. monarch: 0.215
+9. scene: 0.212
+10. royal: 0.211
+11. regime: 0.207
+12. anglo: 0.202
+13. 10th: 0.200
+14. surviving: 0.200
+15. queen: 0.198</code></pre>
+</div>
+</div>
+<p>We see <strong>queen</strong> in top 15 words. To get better results: 1. train with larger sized datasets 2. Increase <code>D</code> 3. Train longer</p>
+<p><strong>Why am I saying this?</strong></p>
+<p>As per original paper trained the CBOW model on a large dataset of <strong>6 Billion</strong> words. Even then their performance were not super-good until they started to increase the <code>D</code>.</p>
+<p><img src="https://mgupta70.github.io/posts/2025-08-10-CBOW/media/word2vec/cbow_training1.png" width="650"></p>
+<p>Their results:</p>
+<p><img src="https://mgupta70.github.io/posts/2025-08-10-CBOW/media/word2vec/cbow_result.png" width="650"></p>
+<p>Further improvements: 1. Implement Heirarchical Softmax to speed up the computation 2. Implement Negative sampling</p>
+
+
+</section>
+</section>
+
+ ]]></description>
+  <category>NLP</category>
+  <guid>https://mgupta70.github.io/posts/2025-08-10-CBOW/cbow.html</guid>
+  <pubDate>Sun, 03 Aug 2025 07:00:00 GMT</pubDate>
+  <media:content url="https://mgupta70.github.io/posts/2025-08-10-CBOW/cbow_logo.png" medium="image" type="image/png" height="53" width="144"/>
+</item>
 <item>
   <title>Pytorch Losses Review</title>
   <dc:creator>Mohit Gupta</dc:creator>
